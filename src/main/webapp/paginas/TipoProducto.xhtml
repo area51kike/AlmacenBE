@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html">
+<f:view>
+   <h:head>
+      <title>#{tipoProductoFrm.nombreBean}</title>
+   </h:head>
+   <h:body>
+      <h1>#{tipoProductoFrm.nombreBean}</h1>
+      <h:dataTable value="#{tipoProductoFrm.listaTipoProducto}" var="r">
+         <h:column>
+            #{r.id}
+            <f:facet name="header">ID</f:facet>
+         </h:column>
+         <h:column>
+            #{r.activo?'Activo':'Inactivo'}
+         </h:column>
+         <h:column>
+            #{r.observaciones.toUpperCase()}
+         </h:column>
+      </h:dataTable>
+
+      <h:form id="frmCrear">
+         <h:panelGrid columns="2">
+            <h:outputLabel for="txtId" value="ID:" />
+            <h:inputText id="txtId" value="#{tipoProductoFrm.registro.id}" readonly="true" disabled="true"/>
+
+            <h:outputLabel for="txtNombre" value="Nombre:" />
+            <h:inputText id="txtNombre" value="#{tipoProductoFrm.registro.nombre}" size="75"/>
+
+            <h:commandButton value="Crear" actionListener="#{tipoProductoFrm.btnGuardarHandler}" />
+         </h:panelGrid>
+      </h:form>
+   </h:body>
+</f:view>
+</html>
