@@ -4,8 +4,11 @@
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
              version="3.0">
     <persistence-unit name="inventarioPU" transaction-type="JTA">
+
+        <!-- Fuente de datos JTA configurada en el servidor de aplicaciones -->
         <jta-data-source>jdbc/pgdb</jta-data-source>
 
+        <!-- Entidades registradas para el contexto de persistencia -->
         <class>sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Almacen</class>
         <class>sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Caracteristica</class>
         <class>sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Cliente</class>
@@ -26,10 +29,12 @@
         <class>sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.VentaDetalle</class>
 
         <properties>
-            <!-- ✅ SOLO estas propiedades para EclipseLink -->
+            <!-- Configuración específica para EclipseLink como proveedor JPA -->
             <property name="eclipselink.target-database" value="PostgreSQL"/>
             <property name="eclipselink.logging.level" value="FINE"/>
             <property name="eclipselink.logging.parameters" value="true"/>
+
+            <!-- Desactiva la generación automática del esquema en la base de datos -->
             <property name="jakarta.persistence.schema-generation.database.action" value="none"/>
         </properties>
     </persistence-unit>

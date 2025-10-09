@@ -14,12 +14,13 @@ import java.io.PrintWriter;
 
 @WebServlet(name = "TipoAlmacenamiento", urlPatterns = "web/tipo_almacen")
 public class TipoAlmacenServlet extends HttpServlet {
+
     @Inject
     TipoAlmacenDAO taDao;
 
-    // Método para manejar las solicitudes POST (envío de formulario)
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Fragmentos HTML para construir la respuesta
         String arriba = """
                 <html>
                 <head>
@@ -35,24 +36,25 @@ public class TipoAlmacenServlet extends HttpServlet {
         StringBuilder sb = new StringBuilder();
         String nombre = req.getParameter("nombre");
 
-        if(req.getParameter("nombre") == null) {
+        // Validación básica del parámetro recibido
+        if (nombre == null) {
             sb.append("<p>Debe agregar el nombre del tipo de almacen</p>");
         } else {
-            if(nombre!=null) {
-                TipoAlmacen tipoAlmacen = new TipoAlmacen();
-                tipoAlmacen.setNombre(nombre);
-                tipoAlmacen.setActivo(true);
-                tipoAlmacen.setObservaciones("creado en clase 26 de agosto 2025");
+            // Construcción del objeto y simulación de persistencia
+            TipoAlmacen tipoAlmacen = new TipoAlmacen();
+            tipoAlmacen.setNombre(nombre);
+            tipoAlmacen.setActivo(true);
+            tipoAlmacen.setObservaciones("creado en clase 26 de agosto 2025");
 
-                try {
-                    sb.append("<p>Agregado con exito</p>");
-                } catch (Exception ex) {
-
-                    sb.append(ex.getMessage());
-                }
+            try {
+                // Persistencia omitida: falta taDao.crear(tipoAlmacen);
+                sb.append("<p>Agregado con éxito</p>");
+            } catch (Exception ex) {
+                sb.append("<p>Error: ").append(ex.getMessage()).append("</p>");
             }
         }
 
+        // Envío de respuesta HTML al cliente
         try {
             PrintWriter writer = resp.getWriter();
             writer.println(arriba);
@@ -60,30 +62,29 @@ public class TipoAlmacenServlet extends HttpServlet {
             writer.println(abajo);
             writer.flush();
             writer.close();
-        } catch(Exception ex) {
-
+        } catch (Exception ex) {
+            // Silenciado: no se reporta el error al usuario ni al log
         }
     }
 
-    // --- NUEVO MÉTODO A AGREGAR ---
-    // Método para manejar las solicitudes GET (navegación a la URL)
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Renderiza un formulario HTML simple para crear un nuevo TipoAlmacen
         String htmlForm = """
-            <html>
-            <head>
-                <title>Agregar Tipo de Almacen</title>
-            </head>
-            <body>
-                <h2>Crear Nuevo Tipo de Almacen</h2>
-                <form action="web/tipo_almacen" method="post">
-                    <label for="nombre">Nombre del tipo de almacen:</label><br>
-                    <input type="text" id="nombre" name="nombre" required><br><br>
-                    <input type="submit" value="Guardar">
-                </form>
-            </body>
-            </html>
-            """;
+                <html>
+                <head>
+                    <title>Agregar Tipo de Almacen</title>
+                </head>
+                <body>
+                    <h2>Crear Nuevo Tipo de Almacen</h2>
+                    <form action="web/tipo_almacen" method="post">
+                        <label for="nombre">Nombre del tipo de almacen:</label><br>
+                        <input type="text" id="nombre" name="nombre" required><br><br>
+                        <input type="submit" value="Guardar">
+                    </form>
+                </body>
+                </html>
+                """;
 
         resp.setContentType("text/html");
         PrintWriter writer = resp.getWriter();

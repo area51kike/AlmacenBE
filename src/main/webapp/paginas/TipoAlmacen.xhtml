@@ -1,221 +1,12 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Tipo de Almacén</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            font-weight: 600;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        /* Estilos para la tabla */
-        .data-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-bottom: 40px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .data-table thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .data-table th {
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85em;
-            letter-spacing: 0.5px;
-        }
-
-        .data-table td {
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .data-table tbody tr {
-            transition: background-color 0.3s ease;
-        }
-
-        .data-table tbody tr:hover {
-            background-color: #f5f5f5;
-        }
-
-        .data-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Estilos para el formulario */
-        .form-section {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .form-section h2 {
-            color: #667eea;
-            margin-bottom: 25px;
-            font-size: 1.8em;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
-        }
-
-        .form-grid {
-            display: grid;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 0.95em;
-        }
-
-        .form-group input {
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 1em;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-group input:disabled {
-            background-color: #f5f5f5;
-            cursor: not-allowed;
-        }
-
-        .btn-submit {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 14px 40px;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        /* Badge para estado activo/inactivo */
-        .badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .badge-activo {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .badge-inactivo {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Mensajes de error */
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border-left: 4px solid #dc3545;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .header h1 {
-                font-size: 1.8em;
-            }
-
-            .content {
-                padding: 20px;
-            }
-
-            .data-table {
-                font-size: 0.9em;
-            }
-
-            .data-table th,
-            .data-table td {
-                padding: 10px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="#{request.contextPath}/resources/estilos/disenoAlmacen.css" />
 </head>
 <body>
 <div class="container">
@@ -224,50 +15,89 @@
     </div>
 
     <div class="content">
-        <!-- Tabla de datos -->
-        <h:dataTable value="#{tipoAlmacenFrm.listaTipoAlmacen}" var="r" styleClass="data-table">
-            <h:column>
-                <f:facet name="header">ID</f:facet>
-                #{r.id}
-            </h:column>
-            <h:column>
-                <f:facet name="header">Estado</f:facet>
-                <span class="badge #{r.activo ? 'badge-activo' : 'badge-inactivo'}">
-                        #{r.activo ? 'Activo' : 'Inactivo'}
-                    </span>
-            </h:column>
-            <h:column>
-                <f:facet name="header">Observaciones</f:facet>
-                #{r.observaciones != null ? r.observaciones.toUpperCase() : ''}
-            </h:column>
-        </h:dataTable>
+        <!-- Formulario principal con AJAX para evitar recarga completa -->
+        <h:form id="frmPrincipal">
+            <h:panelGroup id="panelCompleto">
 
-        <!-- Formulario de creación -->
-        <div class="form-section">
-            <h2>Nuevo Tipo de Almacén</h2>
+                <!-- Tabla que muestra todos los registros existentes -->
+                <h:dataTable value="#{tipoAlmacenFrm.listaTipoAlmacen}" var="r" styleClass="data-table">
+                    <h:column>
+                        <f:facet name="header">ID</f:facet>
+                        #{r.id}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Nombre</f:facet>
+                        #{r.nombre}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Estado</f:facet>
+                        <span class="badge #{r.activo ? 'badge-activo' : 'badge-inactivo'}">
+                            #{r.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Observaciones</f:facet>
+                        #{r.observaciones != null ? r.observaciones.toUpperCase() : ''}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Acciones</f:facet>
+                        <!-- Botón para eliminar un registro con confirmación -->
+                        <h:commandButton value="Eliminar"
+                                         actionListener="#{tipoAlmacenFrm.btnEliminarHandler(r)}"
+                                         styleClass="btn-eliminar"
+                                         onclick="return confirm('¿Está seguro que desea eliminar este registro?');">
+                            <f:ajax execute="@this" render="panelCompleto" />
+                        </h:commandButton>
+                    </h:column>
+                </h:dataTable>
 
-            <h:messages styleClass="error-message" />
+                <!-- Botón para mostrar el formulario de creación -->
+                <h:commandButton value="Nuevo" actionListener="#{tipoAlmacenFrm.btnNuevoHandler}"
+                                 styleClass="btn-submit btn-nuevo">
+                    <f:ajax execute="@this" render="panelCompleto" />
+                </h:commandButton>
 
-            <h:form id="frmCrear">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <h:outputLabel for="txtId" value="ID:" />
-                        <h:inputText id="txtId" value="#{tipoAlmacenFrm.registro.id}"
-                                     readonly="true" disabled="true" styleClass="form-control"/>
+                <!-- Sección del formulario para crear un nuevo registro -->
+                <h:panelGroup rendered="#{tipoAlmacenFrm.mostrarFormulario}">
+                    <div class="form-section">
+                        <h2>Nuevo Tipo de Almacén</h2>
+
+                        <!-- Muestra mensajes de validación o éxito -->
+                        <h:messages styleClass="error-message" />
+
+                        <div class="form-grid">
+                            <!-- Campo informativo del próximo ID sugerido -->
+                            <div class="form-group">
+                                <h:outputLabel for="lblProximoId" value="ID (Asignado automáticamente):" />
+                                <h:outputText id="lblProximoId" value="#{tipoAlmacenFrm.proximoId}"
+                                              styleClass="form-control-readonly" />
+                            </div>
+
+                            <!-- Campo obligatorio para el nombre del tipo de almacén -->
+                            <div class="form-group">
+                                <h:outputLabel for="txtNombre" value="Nombre:" />
+                                <h:inputText id="txtNombre" value="#{tipoAlmacenFrm.registro.nombre}"
+                                             size="75" styleClass="form-control" required="true"
+                                             requiredMessage="El nombre es obligatorio"/>
+                            </div>
+
+                            <!-- Campo opcional para observaciones -->
+                            <div class="form-group">
+                                <h:outputLabel for="txtObservaciones" value="Observaciones:" />
+                                <h:inputText id="txtObservaciones" value="#{tipoAlmacenFrm.registro.observaciones}"
+                                             size="75" styleClass="form-control" required="false"/>
+                            </div>
+                        </div>
+
+                        <!-- Botón para guardar el nuevo registro -->
+                        <h:commandButton value="Crear" actionListener="#{tipoAlmacenFrm.btnGuardarHandler}"
+                                         styleClass="btn-submit">
+                            <f:ajax execute="@form" render="panelCompleto" />
+                        </h:commandButton>
                     </div>
-
-                    <div class="form-group">
-                        <h:outputLabel for="txtNombre" value="Nombre:" />
-                        <h:inputText id="txtNombre" value="#{tipoAlmacenFrm.registro.nombre}"
-                                     size="75" styleClass="form-control" required="true"
-                                     requiredMessage="El nombre es obligatorio"/>
-                    </div>
-                </div>
-
-                <h:commandButton value="Crear" actionListener="#{tipoAlmacenFrm.btnGuardarHandler}"
-                                 styleClass="btn-submit" />
-            </h:form>
-        </div>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
     </div>
 </div>
 </body>

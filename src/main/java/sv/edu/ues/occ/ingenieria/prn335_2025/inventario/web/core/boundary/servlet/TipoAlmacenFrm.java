@@ -24,71 +24,107 @@ public class TipoAlmacenFrm implements Serializable {
 
     private List<TipoAlmacen> listaTipoAlmacen;
     private String nombreBean = "Tipo de Almacén";
-    private TipoAlmacen registro = new TipoAlmacen(); // ✅ INICIALIZADO
+    private TipoAlmacen registro = new TipoAlmacen();
+    private boolean mostrarFormulario = false;
+    private Integer proximoId; // Calculado dinámicamente
 
     @PostConstruct
     public void inicializar() {
-        try {
+        try {// Carga inicial de registros y cálculo del próximo ID disponible
             listaTipoAlmacen = taDao.findRange(0, Integer.MAX_VALUE);
+            calcularProximoId();
         } catch (Exception e) {
             e.printStackTrace();
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Error al cargar datos", e.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al cargar datos", e.getMessage()));
+        }
+    }
+
+    private void calcularProximoId() {
+        try {
+            // Consulta el próximo ID sugerido desde la base de datos
+            Integer id = taDao.obtenerProximoId();
+            proximoId = (id != null && id > 0) ? id : 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            proximoId = 1;
         }
     }
 
     public void btnGuardarHandler(ActionEvent event) {
         try {
+            // Guarda el nuevo registro en la base de datos
             taDao.crear(registro);
-            // Limpiar formulario después de guardar
-            registro = new TipoAlmacen();
-            // Recargar lista
-            listaTipoAlmacen = taDao.findRange(0, Integer.MAX_VALUE);
 
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Éxito", "Registro guardado correctamente"));
+            // Reinicia el formulario y actualiza la lista
+            registro = new TipoAlmacen();
+            listaTipoAlmacen = taDao.findRange(0, Integer.MAX_VALUE);
+            calcularProximoId();
+            mostrarFormulario = false;
+
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Registro guardado correctamente"));
         } catch (Exception e) {
             e.printStackTrace();
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Error al guardar", e.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al guardar", e.getMessage()));
         }
     }
 
     public void btnModificarHandler(ActionEvent event) {
         if (this.registro == null || this.registro.getId() == null) {
-            // Usar FacesMessage en lugar de ValidatorException
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay registro seleccionado para modificar"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay registro seleccionado para modificar"));
             return;
         }
         try {
-            taDao.modificar(registro); // Cambiado a modificar
+            // Actualiza el registro existente
+            taDao.modificar(registro);
+
+            // Limpieza y actualización de estado
             registro = new TipoAlmacen();
             listaTipoAlmacen = taDao.findRange(0, Integer.MAX_VALUE);
+            calcularProximoId();
+            mostrarFormulario = false;
 
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Éxito", "Registro modificado correctamente"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Registro modificado correctamente"));
         } catch (Exception e) {
             e.printStackTrace();
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Error al modificar", e.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al modificar", e.getMessage()));
+        }
+    }
+
+    public void btnNuevoHandler(ActionEvent event) {
+        // Prepara el formulario para crear un nuevo registro
+        this.registro = new TipoAlmacen();
+        this.mostrarFormulario = true;
+    }
+
+    public void btnEliminarHandler(TipoAlmacen registro) {
+        try {
+            if (registro != null) {
+                // Elimina el registro seleccionado
+                taDao.eliminar(registro);
+
+                // Refresca la lista y el ID sugerido
+                this.listaTipoAlmacen = taDao.findRange(0, Integer.MAX_VALUE);
+                calcularProximoId();
+
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Registro eliminado correctamente"));
+            }
+        } catch (IllegalArgumentException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se pudo eliminar el registro: " + e.getMessage()));
+        } catch (IllegalAccessException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error de acceso", "No tiene permisos para eliminar: " + e.getMessage()));
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error inesperado", "Error al eliminar: " + e.getMessage()));
         }
     }
 
     public void validarNombre(FacesContext facesContext, UIComponent uiComponent, Object nombre) {
+        // Validación de longitud y contenido del campo nombre
         if (nombre == null || nombre.toString().isEmpty()) {
-            throw new ValidatorException(
-                    new FacesMessage("El nombre no puede estar vacío"));
+            throw new ValidatorException(new FacesMessage("El nombre no puede estar vacío"));
         }
         String nom = nombre.toString().trim();
         if (nom.length() < 1 || nom.length() > 155) {
-            throw new ValidatorException(
-                    new FacesMessage("El nombre debe tener entre 1 y 155 caracteres"));
+            throw new ValidatorException(new FacesMessage("El nombre debe tener entre 1 y 155 caracteres"));
         }
     }
 
@@ -116,4 +152,17 @@ public class TipoAlmacenFrm implements Serializable {
     public void setRegistro(TipoAlmacen registro) {
         this.registro = registro;
     }
+
+    public boolean isMostrarFormulario() {
+        return mostrarFormulario;
+    }
+
+    public void setMostrarFormulario(boolean mostrarFormulario) {
+        this.mostrarFormulario = mostrarFormulario;
+    }
+
+    public Integer getProximoId() {
+        return proximoId;
+    }
+
 }
