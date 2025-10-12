@@ -2,14 +2,12 @@ package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import java.io.Serializable;
 
 @Entity
 @Table(name = "tipo_almacen", schema = "public")
-public class TipoAlmacen implements Serializable {
-
+public class TipoAlmacen {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // ✅ AGREGADO
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_tipo_almacen", nullable = false)
     private Integer id;
 
@@ -21,12 +19,9 @@ public class TipoAlmacen implements Serializable {
     private Boolean activo;
 
     @Lob
-    @Column(name = "obsevaciones")  // ✅ CORREGIDO el nombre
-    private String observaciones;
-    public TipoAlmacen() {
-        this.activo = true; // o false, según lo necesites
-    }
-    // Getters y Setters
+    @Column(name = "obsevaciones")
+    private String obsevaciones;
+
     public Integer getId() {
         return id;
     }
@@ -51,11 +46,12 @@ public class TipoAlmacen implements Serializable {
         this.activo = activo;
     }
 
-    public String getObservaciones() {  // ✅ CORREGIDO
-        return observaciones;
+    public String getObservaciones() {
+        return obsevaciones;
     }
 
-    public void setObservaciones(String observaciones) {  // ✅ CORREGIDO
-        this.observaciones = observaciones;
+    public void setObservaciones(String obsevaciones) {
+        this.obsevaciones = obsevaciones;
     }
+
 }

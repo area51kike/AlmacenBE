@@ -17,7 +17,7 @@ public class ProductoTipoProductoCaracteristica {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_producto_caracteristica")
-    private sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProductoCaracteristica idTipoProductoCaracteristica;
+    private TipoProductoCaracteristica idTipoProductoCaracteristica;
 
     @Lob
     @Column(name = "valor")
@@ -43,11 +43,11 @@ public class ProductoTipoProductoCaracteristica {
         this.idProductoTipoProducto = idProductoTipoProducto;
     }
 
-    public sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProductoCaracteristica getIdTipoProductoCaracteristica() {
+    public TipoProductoCaracteristica getIdTipoProductoCaracteristica() {
         return idTipoProductoCaracteristica;
     }
 
-    public void setIdTipoProductoCaracteristica(sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProductoCaracteristica idTipoProductoCaracteristica) {
+    public void setIdTipoProductoCaracteristica(TipoProductoCaracteristica idTipoProductoCaracteristica) {
         this.idTipoProductoCaracteristica = idTipoProductoCaracteristica;
     }
 

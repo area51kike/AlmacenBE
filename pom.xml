@@ -78,7 +78,6 @@
             <artifactId>primefaces</artifactId>
             <version>15.0.8</version>
             <classifier>jakarta</classifier>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

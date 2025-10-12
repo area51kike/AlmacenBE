@@ -15,7 +15,7 @@ public class Compra {
     @MapsId
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_compra", nullable = false)
-    private sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Proveedor proveedor;
+    private Proveedor proveedor;
 
     @Column(name = "fecha")
     private OffsetDateTime fecha;
@@ -39,11 +39,11 @@ public class Compra {
         this.id = id;
     }
 
-    public sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Proveedor getProveedor() {
+    public Proveedor getProveedor() {
         return proveedor;
     }
 
-    public void setProveedor(sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Proveedor proveedor) {
+    public void setProveedor(Proveedor proveedor) {
         this.proveedor = proveedor;
     }
 

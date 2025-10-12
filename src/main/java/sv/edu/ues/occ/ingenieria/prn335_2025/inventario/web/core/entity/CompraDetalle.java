@@ -6,6 +6,10 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+
+
+
+
 @Entity
 @Table(name = "compra_detalle", schema = "public")
 public class CompraDetalle {
@@ -19,7 +23,7 @@ public class CompraDetalle {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_producto")
-    private sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto idProducto;
+    private Producto idProducto;
 
     @Column(name = "cantidad", precision = 8, scale = 2)
     private BigDecimal cantidad;
@@ -51,11 +55,11 @@ public class CompraDetalle {
         this.idCompra = idCompra;
     }
 
-    public sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto getIdProducto() {
+    public Producto getIdProducto() {
         return idProducto;
     }
 
-    public void setIdProducto(sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto idProducto) {
+    public void setIdProducto(Producto idProducto) {
         this.idProducto = idProducto;
     }
 

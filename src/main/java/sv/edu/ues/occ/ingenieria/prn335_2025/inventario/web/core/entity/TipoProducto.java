@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 @Table(name = "tipo_producto", schema = "public")
 public class TipoProducto {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_tipo_producto", nullable = false)
     private Long id;
 

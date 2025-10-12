@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "kardex", schema = "public")
 public class Kardex {
@@ -16,7 +17,7 @@ public class Kardex {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_producto")
-    private sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto idProducto;
+    private Producto idProducto;
 
     @Column(name = "fecha")
     private OffsetDateTime fecha;
@@ -43,7 +44,7 @@ public class Kardex {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_venta_detalle")
-    private sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.VentaDetalle idVentaDetalle;
+    private VentaDetalle idVentaDetalle;
 
     @Lob
     @Column(name = "referencia_externa")
@@ -65,11 +66,11 @@ public class Kardex {
         this.id = id;
     }
 
-    public sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto getIdProducto() {
+    public Producto getIdProducto() {
         return idProducto;
     }
 
-    public void setIdProducto(sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto idProducto) {
+    public void setIdProducto(Producto idProducto) {
         this.idProducto = idProducto;
     }
 
@@ -129,11 +130,11 @@ public class Kardex {
         this.idCompraDetalle = idCompraDetalle;
     }
 
-    public sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.VentaDetalle getIdVentaDetalle() {
+    public VentaDetalle getIdVentaDetalle() {
         return idVentaDetalle;
     }
 
-    public void setIdVentaDetalle(sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.VentaDetalle idVentaDetalle) {
+    public void setIdVentaDetalle(VentaDetalle idVentaDetalle) {
         this.idVentaDetalle = idVentaDetalle;
     }
 

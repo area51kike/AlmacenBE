@@ -18,7 +18,7 @@ public class ProductoTipoProducto {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_producto")
-    private sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto idTipoProducto;
+    private TipoProducto idTipoProducto;
 
     @Column(name = "fecha_creacion")
     private OffsetDateTime fechaCreacion;
@@ -46,11 +46,11 @@ public class ProductoTipoProducto {
         this.idProducto = idProducto;
     }
 
-    public sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto getIdTipoProducto() {
+    public TipoProducto getIdTipoProducto() {
         return idTipoProducto;
     }
 
-    public void setIdTipoProducto(sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto idTipoProducto) {
+    public void setIdTipoProducto(TipoProducto idTipoProducto) {
         this.idTipoProducto = idTipoProducto;
     }
 

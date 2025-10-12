@@ -15,7 +15,7 @@ public class Caracteristica {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_unidad_medida")
-    private sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoUnidadMedida idTipoUnidadMedida;
+    private TipoUnidadMedida idTipoUnidadMedida;
 
     @Column(name = "activo")
     private Boolean activo;
@@ -40,11 +40,11 @@ public class Caracteristica {
         this.nombre = nombre;
     }
 
-    public sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoUnidadMedida getIdTipoUnidadMedida() {
+    public TipoUnidadMedida getIdTipoUnidadMedida() {
         return idTipoUnidadMedida;
     }
 
-    public void setIdTipoUnidadMedida(sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoUnidadMedida idTipoUnidadMedida) {
+    public void setIdTipoUnidadMedida(TipoUnidadMedida idTipoUnidadMedida) {
         this.idTipoUnidadMedida = idTipoUnidadMedida;
     }
 

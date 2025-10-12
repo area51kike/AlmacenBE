@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 
 import java.util.List;
+
 public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInterface<T> {
     final Class<T> entityClass;
 
@@ -15,6 +16,24 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
     }
 
     public abstract EntityManager getEntityManager();
+
+    public List<T> findAll() throws IllegalArgumentException {
+        try {
+            EntityManager em = getEntityManager();
+            if (em == null) {
+                throw new IllegalStateException("EntityManager no disponible");
+            }
+
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<T> cq = cb.createQuery(entityClass);
+            Root<T> root = cq.from(entityClass);
+            cq.select(root);
+            TypedQuery<T> query = em.createQuery(cq);
+            return query.getResultList();
+        } catch (Exception ex) {
+            throw new IllegalStateException("Error al acceder a todos los registros", ex);
+        }
+    }
 
     public List<T> findRange(int first, int max) throws IllegalArgumentException {
         if (first < 0 || max < 1) {
@@ -57,10 +76,6 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
             throw new IllegalStateException("Error al contar registros", ex);
         }
     }
-    public String imprimirCarnet(){
-        String carnet = "JR24001";
-        return carnet;
-    }
 
     public void crear(T registro) throws IllegalArgumentException {
         if (registro == null) {
@@ -94,4 +109,46 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
         }
     }
 
+    // ✅ CAMBIADO: Ahora acepta la entidad (T) en lugar de solo el ID
+    public void eliminar(T entity) throws IllegalArgumentException {
+        if (entity == null) {
+            throw new IllegalArgumentException("La entidad no puede ser nula");
+        }
+
+        try {
+            EntityManager em = getEntityManager();
+            if (em == null) {
+                throw new IllegalStateException("EntityManager no disponible");
+            }
+            if (!em.contains(entity)) {
+                entity = em.merge(entity);
+            }
+            em.remove(entity);
+        } catch (Exception ex) {
+            System.err.println("Error en DAO.eliminar: " + ex.getMessage());
+            ex.printStackTrace();
+            throw new IllegalStateException("Error al eliminar el registro", ex);
+        }
+    }
+
+    public void eliminarPorId(Object id) throws IllegalArgumentException {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID no puede ser nulo");
+        }
+
+        try {
+            EntityManager em = getEntityManager();
+            if (em == null) {
+                throw new IllegalStateException("EntityManager no disponible");
+            }
+            T registro = em.find(entityClass, id);
+            if (registro != null) {
+                em.remove(registro);
+            } else {
+                throw new IllegalArgumentException("Registro con ID " + id + " no encontrado");
+            }
+        } catch (Exception ex) {
+            throw new IllegalStateException("Error al eliminar el registro por ID", ex);
+        }
+    }
 }

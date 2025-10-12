@@ -11,7 +11,7 @@ public class Almacen {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_almacen")
-    private sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoAlmacen idTipoAlmacen;
+    private TipoAlmacen idTipoAlmacen;
 
     @Column(name = "activo")
     private Boolean activo;
@@ -28,11 +28,11 @@ public class Almacen {
         this.id = id;
     }
 
-    public sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoAlmacen getIdTipoAlmacen() {
+    public TipoAlmacen getIdTipoAlmacen() {
         return idTipoAlmacen;
     }
 
-    public void setIdTipoAlmacen(sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoAlmacen idTipoAlmacen) {
+    public void setIdTipoAlmacen(TipoAlmacen idTipoAlmacen) {
         this.idTipoAlmacen = idTipoAlmacen;
     }
 
