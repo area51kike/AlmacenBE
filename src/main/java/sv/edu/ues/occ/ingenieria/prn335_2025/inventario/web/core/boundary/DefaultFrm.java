@@ -172,7 +172,7 @@ public abstract class DefaultFrm<T> implements Serializable {
         }
     }
 
-    private boolean esNombreVacio(T registro) {
+    protected boolean esNombreVacio(T registro) {
         try {
             // Usar reflexión para obtener el nombre
             java.lang.reflect.Method metodoGetNombre = registro.getClass().getMethod("getNombre");

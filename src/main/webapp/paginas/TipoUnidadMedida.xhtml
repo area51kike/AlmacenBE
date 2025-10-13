@@ -7,11 +7,11 @@
       xmlns:p="http://primefaces.org/ui">
 <h:head>
     <meta charset="UTF-8"/>
-    <title>#{productoFrm.nombreBean}</title>
+    <title>#{tipoUnidadMedidaFrm.nombreBean}</title>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
 </h:head>
 <h:body>
-    <h1>#{productoFrm.nombreBean}</h1>
+    <h1>#{tipoUnidadMedidaFrm.nombreBean}</h1>
 
     <div>
         <a href="ManejarTodo.jsf">
@@ -26,29 +26,29 @@
             <h:form id="frmTop">
                 <p:dataTable id="tablaRegistros"
                              lazy="true"
-                             rendered="#{productoFrm.estado.name() == 'NADA'}"
-                             rows="#{productoFrm.pageSize}"
+                             rendered="#{tipoUnidadMedidaFrm.estado.name() == 'NADA'}"
+                             rows="#{tipoUnidadMedidaFrm.pageSize}"
                              paginator="true"
                              paginatorPosition="bottom"
-                             value="#{productoFrm.modelo}"
+                             value="#{tipoUnidadMedidaFrm.modelo}"
                              var="reg"
                              selectionMode="single"
-                             selection="#{productoFrm.registro}"
+                             selection="#{tipoUnidadMedidaFrm.registro}"
                              rowKey="#{reg.id}">
                     <p:ajax event="rowSelect"
-                            listener="#{productoFrm.selectionHandler}"
+                            listener="#{tipoUnidadMedidaFrm.selectionHandler}"
                             update=":pnlTabla :pnlDetalle"/>
 
                     <p:column headerText="ID">
                         <h:outputText value="#{reg.id}"/>
                     </p:column>
 
-                    <p:column headerText="Nombre Producto">
-                        <h:outputText value="#{reg.nombreProducto}"/>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{reg.nombre}"/>
                     </p:column>
 
-                    <p:column headerText="Referencia Externa">
-                        <h:outputText value="#{reg.referenciaExterna}"/>
+                    <p:column headerText="Unidad Base">
+                        <h:outputText value="#{reg.unidadBase}"/>
                     </p:column>
 
                     <p:column headerText="Estado">
@@ -62,14 +62,14 @@
 
                 <p:commandButton id="btnNuevo"
                                  value="Nuevo"
-                                 rendered="#{productoFrm.estado.name() == 'NADA'}"
-                                 actionListener="#{productoFrm.btnNuevoHandler}"
+                                 rendered="#{tipoUnidadMedidaFrm.estado.name() == 'NADA'}"
+                                 actionListener="#{tipoUnidadMedidaFrm.btnNuevoHandler}"
                                  update=":pnlDetalle :pnlTabla"/>
 
                 <p:commandButton id="btnCancelar"
                                  value="Cancelar"
-                                 rendered="#{productoFrm.estado.name() != 'NADA'}"
-                                 actionListener="#{productoFrm.btnCancelarHandler}"
+                                 rendered="#{tipoUnidadMedidaFrm.estado.name() != 'NADA'}"
+                                 actionListener="#{tipoUnidadMedidaFrm.btnCancelarHandler}"
                                  update=":pnlDetalle :pnlTabla"/>
             </h:form>
 
@@ -78,56 +78,58 @@
     </h:panelGroup>
 
     <h:panelGroup id="pnlDetalle">
-        <h:form id="frmCrear" rendered="#{productoFrm.estado.name() != 'NADA'}">
+        <h:form id="frmCrear" rendered="#{tipoUnidadMedidaFrm.estado.name() != 'NADA'}">
             <h:panelGrid columns="2" cellpadding="5">
 
                 <h:outputLabel for="txtIdPanel" value="ID:"/>
                 <h:panelGroup id="txtIdPanel">
-                    <h:outputText rendered="#{empty productoFrm.registro.id}"
+                    <h:outputText rendered="#{empty tipoUnidadMedidaFrm.registro.id}"
                                   value="(Se asignará automáticamente al guardar)"/>
                     <h:inputText id="txtId"
-                                 value="#{productoFrm.registro.id}"
-                                 rendered="#{not empty productoFrm.registro.id}"
+                                 value="#{tipoUnidadMedidaFrm.registro.id}"
+                                 rendered="#{not empty tipoUnidadMedidaFrm.registro.id}"
                                  disabled="true"/>
                 </h:panelGroup>
 
-                <h:outputLabel for="txtNombreProducto" value="Nombre Producto:"/>
-                <h:inputText id="txtNombreProducto"
-                             value="#{productoFrm.registro.nombreProducto}"
+                <h:outputLabel for="txtNombre" value="Nombre:"/>
+                <h:inputText id="txtNombre"
+                             value="#{tipoUnidadMedidaFrm.registro.nombre}"
                              required="true"
-                             requiredMessage="El nombre del producto es requerido"/>
+                             requiredMessage="El nombre es requerido"/>
 
-                <h:outputLabel for="txtReferenciaExterna" value="Referencia Externa:"/>
-                <h:inputText id="txtReferenciaExterna"
-                             value="#{productoFrm.registro.referenciaExterna}"/>
+                <h:outputLabel for="txtUnidadBase" value="Unidad Base:"/>
+                <h:inputText id="txtUnidadBase"
+                             value="#{tipoUnidadMedidaFrm.registro.unidadBase}"
+                             required="true"
+                             requiredMessage="La unidad base es requerida"/>
 
                 <h:outputLabel for="chkActivo" value="Activo:"/>
                 <h:selectBooleanCheckbox id="chkActivo"
-                                         value="#{productoFrm.registro.activo}"/>
+                                         value="#{tipoUnidadMedidaFrm.registro.activo}"/>
 
                 <h:outputLabel for="txtComentarios" value="Comentarios:"/>
                 <h:inputTextarea id="txtComentarios"
-                                 value="#{productoFrm.registro.comentarios}"
+                                 value="#{tipoUnidadMedidaFrm.registro.comentarios}"
                                  rows="4"
                                  cols="50"/>
             </h:panelGrid>
 
             <h:panelGroup>
                 <p:commandButton value="Guardar"
-                                 actionListener="#{productoFrm.btnGuardarHandler}"
-                                 rendered="#{productoFrm.estado.name() == 'CREAR'}"
+                                 actionListener="#{tipoUnidadMedidaFrm.btnGuardarHandler}"
+                                 rendered="#{tipoUnidadMedidaFrm.estado.name() == 'CREAR'}"
                                  update="messages :pnlDetalle :pnlTabla"
                                  process="@form"/>
 
                 <p:commandButton value="Modificar"
-                                 actionListener="#{productoFrm.btnModificarHandler}"
-                                 rendered="#{productoFrm.estado.name() == 'MODIFICAR'}"
+                                 actionListener="#{tipoUnidadMedidaFrm.btnModificarHandler}"
+                                 rendered="#{tipoUnidadMedidaFrm.estado.name() == 'MODIFICAR'}"
                                  update="messages :pnlDetalle :pnlTabla"
                                  process="@form"/>
 
                 <p:commandButton value="Eliminar"
-                                 actionListener="#{productoFrm.btnEliminarHandler}"
-                                 rendered="#{productoFrm.estado.name() == 'MODIFICAR'}"
+                                 actionListener="#{tipoUnidadMedidaFrm.btnEliminarHandler}"
+                                 rendered="#{tipoUnidadMedidaFrm.estado.name() == 'MODIFICAR'}"
                                  update="messages :pnlDetalle :pnlTabla"/>
             </h:panelGroup>
         </h:form>

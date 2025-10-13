@@ -1,35 +1,28 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.faces.application.FacesMessage;
-import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.event.ActionEvent;
-import jakarta.faces.validator.ValidatorException;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoAlmacenDAO;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoAlmacen;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoUnidadMedidaDAO;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoUnidadMedida;
+
 import java.io.Serializable;
-import java.util.List;
 
 @Named
 @ViewScoped
-public class TipoAlmacenFrm extends DefaultFrm<TipoAlmacen> implements Serializable {
+public class TipoUnidadMedidaFrm extends DefaultFrm<TipoUnidadMedida> implements Serializable {
 
     @Inject
     FacesContext facesContext;
 
     @Inject
-    TipoAlmacenDAO tipoAlmacenDAO;
+    TipoUnidadMedidaDAO tipoUnidadMedidaDAO;
 
-
-    public TipoAlmacenFrm() {
-        this.nombreBean = " Tipo Almacen";
+    public TipoUnidadMedidaFrm() {
+        this.nombreBean = "Tipo Unidad de Medida";
     }
-
 
     @Override
     protected FacesContext getFacesContext() {
@@ -37,22 +30,22 @@ public class TipoAlmacenFrm extends DefaultFrm<TipoAlmacen> implements Serializa
     }
 
     @Override
-    protected InventarioDefaultDataAccess<TipoAlmacen> getDao() {
-        return tipoAlmacenDAO;
+    protected InventarioDefaultDataAccess<TipoUnidadMedida> getDao() {
+        return tipoUnidadMedidaDAO;
     }
 
     @Override
-    protected TipoAlmacen nuevoRegistro() {
-        TipoAlmacen tipoAlmacen = new TipoAlmacen();
-        return tipoAlmacen;
+    protected TipoUnidadMedida nuevoRegistro() {
+        TipoUnidadMedida tipoUnidadMedida = new TipoUnidadMedida();
+        return tipoUnidadMedida;
     }
 
     @Override
-    protected TipoAlmacen buscarRegistroPorId(Object id) {
+    protected TipoUnidadMedida buscarRegistroPorId(Object id) {
         if (id != null && id instanceof Integer buscado && this.modelo.getWrappedData().isEmpty()) {
-            for (TipoAlmacen ta : (Iterable<TipoAlmacen>) tipoAlmacenDAO.findAll()) {
-                if (ta.getId().equals(buscado)) {
-                    return ta;
+            for (TipoUnidadMedida tum : (Iterable<TipoUnidadMedida>) tipoUnidadMedidaDAO.findAll()) {
+                if (tum.getId().equals(buscado)) {
+                    return tum;
                 }
             }
         }
@@ -60,7 +53,7 @@ public class TipoAlmacenFrm extends DefaultFrm<TipoAlmacen> implements Serializa
     }
 
     @Override
-    protected String getIdAsText(TipoAlmacen r) {
+    protected String getIdAsText(TipoUnidadMedida r) {
         if (r != null && r.getId() != null) {
             return r.getId().toString();
         }
@@ -68,7 +61,7 @@ public class TipoAlmacenFrm extends DefaultFrm<TipoAlmacen> implements Serializa
     }
 
     @Override
-    protected TipoAlmacen getIdByText(String id) {
+    protected TipoUnidadMedida getIdByText(String id) {
         if (id != null && this.modelo != null && !this.modelo.getWrappedData().isEmpty()) {
             try {
                 Integer buscado = Integer.parseInt(id);
@@ -83,7 +76,4 @@ public class TipoAlmacenFrm extends DefaultFrm<TipoAlmacen> implements Serializa
         }
         return null;
     }
-
-
-
 }

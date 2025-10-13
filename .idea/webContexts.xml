@@ -3,8 +3,11 @@
   <component name="WebContextManager">
     <option name="state">
       <map>
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/ManejarTodo.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/TipoAlmacen.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/TipoProducto.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/TipoUnidadMedida.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/manejartodo.xhtml.jsp" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
       </map>
     </option>
   </component>
