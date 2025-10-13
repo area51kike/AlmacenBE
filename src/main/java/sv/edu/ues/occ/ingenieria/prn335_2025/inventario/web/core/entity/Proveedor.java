@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 @Table(name = "proveedor", schema = "public")
 public class Proveedor {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_proveedor", nullable = false)
     private Integer id;
 

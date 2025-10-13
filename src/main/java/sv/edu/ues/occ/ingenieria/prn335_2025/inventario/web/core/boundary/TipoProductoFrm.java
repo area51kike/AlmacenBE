@@ -29,7 +29,7 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> implements Seriali
     private Long tipoProductoPadreSeleccionado;
 
     public TipoProductoFrm() {
-        this.nombreBean = "Formulario Tipo de Producto";
+        this.nombreBean = "Tipo de Producto";
     }
 
     @Override

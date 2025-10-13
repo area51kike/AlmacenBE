@@ -21,7 +21,7 @@ public class TipoUnidadMedidaFrm extends DefaultFrm<TipoUnidadMedida> implements
     TipoUnidadMedidaDAO tipoUnidadMedidaDAO;
 
     public TipoUnidadMedidaFrm() {
-        this.nombreBean = "Tipo Unidad de Medida";
+        this.nombreBean = "Unidad de Medida";
     }
 
     @Override

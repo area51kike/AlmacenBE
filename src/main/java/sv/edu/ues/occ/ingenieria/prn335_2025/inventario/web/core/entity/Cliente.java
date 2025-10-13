@@ -1,9 +1,6 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
@@ -12,6 +9,7 @@ import java.util.UUID;
 @Table(name = "cliente", schema = "public")
 public class Cliente {
     @Id
+    @GeneratedValue(generator = "UUID")
     @Column(name = "id_cliente", nullable = false)
     private UUID id;
 

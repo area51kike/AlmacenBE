@@ -27,7 +27,7 @@ public class TipoAlmacenFrm extends DefaultFrm<TipoAlmacen> implements Serializa
 
 
     public TipoAlmacenFrm() {
-        this.nombreBean = " Tipo Almacen";
+        this.nombreBean = " Tipo de Almacen";
     }
 
 

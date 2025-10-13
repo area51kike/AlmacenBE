@@ -41,7 +41,7 @@ public class TipoAlmacenDAOTest {
         TipoAlmacenDAO spyCut = Mockito.spy(cut);
         Mockito.doReturn(mockEm).when(spyCut).getEntityManager();
 
-        // Ejecutar el método modificar a través del spy
+
         spyCut.modificar(existente);
 
         // Verificar que se llamó a merge con el objeto correcto
@@ -79,7 +79,7 @@ public class TipoAlmacenDAOTest {
         TipoAlmacenDAO spyCut = Mockito.spy(cut);
         Mockito.doReturn(mockEm).when(spyCut).getEntityManager();
 
-        // Ejecutar el método count
+
         int resultado = spyCut.count();
 
         // Verificar el resultado y las interacciones
@@ -116,7 +116,7 @@ public class TipoAlmacenDAOTest {
         TipoAlmacenDAO spyCut = Mockito.spy(cut);
         Mockito.doReturn(mockEm).when(spyCut).getEntityManager();
 
-        // Ejecutar el método findRange
+
         List<TipoAlmacen> resultado = spyCut.findRange(0, 2);
 
         // Verificar el resultado y las interacciones
@@ -338,7 +338,7 @@ public class TipoAlmacenDAOTest {
         // Verifica que el constructor se inicialice correctamente
         TipoAlmacenDAO cut = new TipoAlmacenDAO();
         assertNotNull(cut);
-        // Si necesitas acceder a la entityClass, podrías requerir reflección o un método getter
+
     }
     @Test
     void getEntityManagerExitoso() {

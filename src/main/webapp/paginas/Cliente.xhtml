@@ -1,18 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html lang="es"
       xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
       xmlns:p="http://primefaces.org/ui">
 <h:head>
     <meta charset="UTF-8"/>
-    <title>#{tipoProductoFrm.nombreBean}</title>
+    <title>#{clienteFrm.nombreBean}</title>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
 </h:head>
 <h:body>
-    <h1>#{tipoProductoFrm.nombreBean}</h1>
-
+    <h1>#{clienteFrm.nombreBean}</h1>
     <div style="margin-bottom: 20px;">
         <a href="ManejarTodo.jsf" style="text-decoration: none;">
             <button style="padding: 10px 15px; font-size: 17px; background: #229954; color: white; border: none; border-radius: 5px; cursor: pointer;">
@@ -20,26 +18,25 @@
             </button>
         </a>
     </div>
-
     <h:panelGroup id="pnlTabla">
         <h:panelGrid>
             <h:form id="frmTop">
                 <p:dataTable id="tablaRegistros"
                              lazy="true"
-                             rendered="#{tipoProductoFrm.estado.name() == 'NADA'}"
-                             rows="#{tipoProductoFrm.pageSize}"
+                             rendered="#{clienteFrm.estado.name() == 'NADA'}"
+                             rows="#{clienteFrm.pageSize}"
                              paginator="true"
                              paginatorPosition="bottom"
-                             value="#{tipoProductoFrm.modelo}"
+                             value="#{clienteFrm.modelo}"
                              var="reg"
                              selectionMode="single"
-                             selection="#{tipoProductoFrm.registro}"
+                             selection="#{clienteFrm.registro}"
                              rowKey="#{reg.id}">
                     <p:ajax event="rowSelect"
-                            listener="#{tipoProductoFrm.selectionHandler}"
+                            listener="#{clienteFrm.selectionHandler}"
                             update=":pnlTabla :pnlDetalle"/>
 
-                    <p:column headerText="ID">
+                    <p:column headerText="UIID">
                         <h:outputText value="#{reg.id}"/>
                     </p:column>
 
@@ -47,29 +44,30 @@
                         <h:outputText value="#{reg.nombre}"/>
                     </p:column>
 
-                    <p:column headerText="Tipo Padre">
-                        <h:outputText value="#{reg.idTipoProductoPadre != null ? reg.idTipoProductoPadre.nombre : 'Ninguno'}"/>
+                    <p:column headerText="DUI">
+                        <h:outputText value="#{reg.dui}"/>
+                    </p:column>
+
+                    <p:column headerText="NIT">
+                        <h:outputText value="#{reg.nit}"/>
                     </p:column>
 
                     <p:column headerText="Estado">
-                        <h:outputText value="#{reg.activo ? 'Activo' : 'Inactivo'}"/>
+                        <h:outputText value="#{reg.activo?'Activo':'Inactivo'}"/>
                     </p:column>
 
-                    <p:column headerText="Comentarios">
-                        <h:outputText value="#{reg.comentarios}"/>
-                    </p:column>
                 </p:dataTable>
 
                 <p:commandButton id="btnNuevo"
                                  value="Nuevo"
-                                 rendered="#{tipoProductoFrm.estado.name() == 'NADA'}"
-                                 actionListener="#{tipoProductoFrm.btnNuevoHandler}"
+                                 rendered="#{clienteFrm.estado.name() == 'NADA'}"
+                                 actionListener="#{clienteFrm.btnNuevoHandler}"
                                  update=":pnlDetalle :pnlTabla"/>
 
                 <p:commandButton id="btnCancelar"
                                  value="Cancelar"
-                                 rendered="#{tipoProductoFrm.estado.name() != 'NADA'}"
-                                 actionListener="#{tipoProductoFrm.btnCancelarHandler}"
+                                 rendered="#{clienteFrm.estado.name() != 'NADA'}"
+                                 actionListener="#{clienteFrm.btnCancelarHandler}"
                                  update=":pnlDetalle :pnlTabla"/>
             </h:form>
 
@@ -78,61 +76,63 @@
     </h:panelGroup>
 
     <h:panelGroup id="pnlDetalle">
-        <h:form id="frmCrear" rendered="#{tipoProductoFrm.estado.name() != 'NADA'}">
+        <h:form id="frmCrear" rendered="#{clienteFrm.estado.name() != 'NADA'}">
             <h:panelGrid columns="2" cellpadding="5">
 
                 <h:outputLabel for="txtIdPanel" value="ID:"/>
                 <h:panelGroup id="txtIdPanel">
-                    <h:outputText rendered="#{empty tipoProductoFrm.registro.id}"
+                    <h:outputText rendered="#{empty clienteFrm.registro.id}"
                                   value="(Se asignará automáticamente al guardar)"/>
                     <h:inputText id="txtId"
-                                 value="#{tipoProductoFrm.registro.id}"
-                                 rendered="#{not empty tipoProductoFrm.registro.id}"
+                                 value="#{clienteFrm.registro.id}"
+                                 rendered="#{not empty clienteFrm.registro.id}"
                                  disabled="true"/>
                 </h:panelGroup>
 
                 <h:outputLabel for="txtNombre" value="Nombre:"/>
                 <h:inputText id="txtNombre"
-                             value="#{tipoProductoFrm.registro.nombre}"
+                             value="#{clienteFrm.registro.nombre}"
                              required="true"
-                             requiredMessage="El nombre es requerido"
-                             maxlength="155"/>
+                             requiredMessage="Su nombre es requerido"/>
 
-                <h:outputLabel for="cmbTipoPadre" value="Tipo Padre:"/>
-                <p:selectOneMenu id="cmbTipoPadre"
-                                 value="#{tipoProductoFrm.tipoProductoPadreSeleccionado}"
-                                 showEmptyOption="true"
-                                 emptyOptionLabel="-- Sin tipo padre (Raíz) --">
-                    <f:selectItems value="#{tipoProductoFrm.tiposProductoHierarchy}"/>
-                </p:selectOneMenu>
+                <h:outputLabel for="txtDui" value="DUI:"/>
+                <h:inputText id="txtDui"
+                             value="#{clienteFrm.registro.dui}"
+                             required="true" requiredMessage="Su D.U.I es requerido">
+                    <f:validateLength minimum="9" maximum="9"
+                                      message="El DUI debe tener 9 caracteres"/>
+                </h:inputText>
+
+
+                <h:outputLabel for="txtNIT" value="NIT:"/>
+                <h:inputText id="txtNIT"
+                             value="#{clienteFrm.registro.nit}"
+                             required="true" requiredMessage="Su NIT es requerido">
+                    <f:validateLength minimum="14" maximum="14"
+                                      message="El NIT debe tener 14 caracteres"/>
+                </h:inputText>
+
 
                 <h:outputLabel for="chkActivo" value="Activo:"/>
                 <h:selectBooleanCheckbox id="chkActivo"
-                                         value="#{tipoProductoFrm.registro.activo}"/>
-
-                <h:outputLabel for="txtComentarios" value="Comentarios:"/>
-                <h:inputTextarea id="txtComentarios"
-                                 value="#{tipoProductoFrm.registro.comentarios}"
-                                 rows="4"
-                                 cols="50"/>
+                                         value="#{clienteFrm.registro.activo}"/>
             </h:panelGrid>
-
             <h:panelGroup>
                 <p:commandButton value="Guardar"
-                                 actionListener="#{tipoProductoFrm.btnGuardarHandler}"
-                                 rendered="#{tipoProductoFrm.estado.name() == 'CREAR'}"
+                                 actionListener="#{clienteFrm.btnGuardarHandler}"
+                                 rendered="#{clienteFrm.estado.name() == 'CREAR'}"
                                  update="messages :pnlDetalle :pnlTabla"
                                  process="@form"/>
 
                 <p:commandButton value="Modificar"
-                                 actionListener="#{tipoProductoFrm.btnModificarHandler}"
-                                 rendered="#{tipoProductoFrm.estado.name() == 'MODIFICAR'}"
+                                 actionListener="#{clienteFrm.btnModificarHandler}"
+                                 rendered="#{clienteFrm.estado.name() == 'MODIFICAR'}"
                                  update="messages :pnlDetalle :pnlTabla"
                                  process="@form"/>
 
                 <p:commandButton value="Eliminar"
-                                 actionListener="#{tipoProductoFrm.btnEliminarHandler}"
-                                 rendered="#{tipoProductoFrm.estado.name() == 'MODIFICAR'}"
+                                 actionListener="#{clienteFrm.btnEliminarHandler}"
+                                 rendered="#{clienteFrm.estado.name() == 'MODIFICAR'}"
                                  update="messages :pnlDetalle :pnlTabla"/>
             </h:panelGroup>
         </h:form>
