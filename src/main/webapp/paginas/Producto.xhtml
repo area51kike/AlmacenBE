@@ -1,138 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
-<html lang="es"
-      xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:f="jakarta.faces.core"
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
 <h:head>
     <meta charset="UTF-8"/>
-    <title>#{productoFrm.nombreBean}</title>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['producto.titulo']}</title>
 </h:head>
 <h:body>
-    <h1>#{productoFrm.nombreBean}</h1>
+    <div class="page-container">
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['producto.titulo']}</h1>
+            </div>
+            <div class="content">
+                <!-- PANEL TABLA -->
+                <h:panelGroup id="pnlTabla" layout="block"
+                              style="display:#{productoFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTop">
+                            <p:dataTable id="tabla-top"
+                                         lazy="true"
+                                         rendered="#{productoFrm.estado == 'NADA'}"
+                                         rows="5"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{productoFrm.modelo}"
+                                         var="reg"
+                                         selectionMode="single"
+                                         selection="#{productoFrm.registro}" rowKey="#{reg.id}">
+                                <p:ajax event="rowSelect" listener="#{productoFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle"/>
+                                <p:column headerText="#{msg['producto.tabla.id']}"><h:outputText value="#{reg.id}"/></p:column>
+                                <p:column headerText="#{msg['producto.tabla.nombreProducto']}"><h:outputText value="#{reg.nombreProducto}"/></p:column>
+                                <p:column headerText="#{msg['producto.tabla.referenciaExterna']}"><h:outputText value="#{reg.referenciaExterna}"/></p:column>
+                                <p:column headerText="#{msg['producto.tabla.comentarios']}"><h:outputText value="#{reg.comentarios}"/></p:column>
+                                <p:column headerText="#{msg['producto.tabla.estado']}"><h:outputText value="#{reg.activo ? msg['producto.estado.activo'] : msg['producto.estado.inactivo']}" styleClass="#{reg.activo?'estado-activo':'estado-inactivo'}"/></p:column>
+                            </p:dataTable>
 
-    <div style="margin-bottom: 20px;">
-        <a href="ManejarTodo.jsf" style="text-decoration: none;">
-            <button style="padding: 10px 15px; font-size: 17px; background: #229954; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                ← Volver al Inicio
-            </button>
-        </a>
-    </div>
+                            <!-- Botón Nuevo (incluimos BotonesTop pasando el bean correcto) -->
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="nuevo"/>
+                                <ui:param name="bean" value="#{productoFrm}"/>
+                            </ui:include>
+                        </h:form>
 
-    <h:panelGroup id="pnlTabla">
-        <h:panelGrid>
-            <h:form id="frmTop">
-                <p:dataTable id="tablaRegistros"
-                             lazy="true"
-                             rendered="#{productoFrm.estado.name() == 'NADA'}"
-                             rows="#{productoFrm.pageSize}"
-                             paginator="true"
-                             paginatorPosition="bottom"
-                             value="#{productoFrm.modelo}"
-                             var="reg"
-                             selectionMode="single"
-                             selection="#{productoFrm.registro}"
-                             rowKey="#{reg.id}">
-                    <p:ajax event="rowSelect"
-                            listener="#{productoFrm.selectionHandler}"
-                            update=":pnlTabla :pnlDetalle"/>
-
-                    <p:column headerText="ID">
-                        <h:outputText value="#{reg.id}"/>
-                    </p:column>
-
-                    <p:column headerText="Nombre Producto">
-                        <h:outputText value="#{reg.nombreProducto}"/>
-                    </p:column>
-
-                    <p:column headerText="Referencia Externa">
-                        <h:outputText value="#{reg.referenciaExterna}"/>
-                    </p:column>
-
-                    <p:column headerText="Estado">
-                        <h:outputText value="#{reg.activo?'Activo':'Inactivo'}"/>
-                    </p:column>
-
-                    <p:column headerText="Comentarios">
-                        <h:outputText value="#{reg.comentarios}"/>
-                    </p:column>
-                </p:dataTable>
-
-                <p:commandButton id="btnNuevo"
-                                 value="Nuevo"
-                                 icon="pi pi-plus-circle"
-                                 rendered="#{productoFrm.estado.name() == 'NADA'}"
-                                 actionListener="#{productoFrm.btnNuevoHandler}"
-                                 update=":pnlDetalle :pnlTabla"/>
-
-                <p:commandButton id="btnCancelar"
-                                 value="Cancelar"
-                                 rendered="#{productoFrm.estado.name() != 'NADA'}"
-                                 actionListener="#{productoFrm.btnCancelarHandler}"
-                                 update=":pnlDetalle :pnlTabla"/>
-            </h:form>
-
-            <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
-        </h:panelGrid>
-    </h:panelGroup>
-
-    <h:panelGroup id="pnlDetalle">
-        <h:form id="frmCrear" rendered="#{productoFrm.estado.name() != 'NADA'}">
-            <h:panelGrid columns="2" cellpadding="5">
-
-                <h:outputLabel for="txtIdPanel" value="ID:"/>
-                <h:panelGroup id="txtIdPanel">
-                    <h:outputText rendered="#{empty productoFrm.registro.id}"
-                                  value="(Se asignará automáticamente al guardar)"/>
-                    <h:inputText id="txtId"
-                                 value="#{productoFrm.registro.id}"
-                                 rendered="#{not empty productoFrm.registro.id}"
-                                 disabled="true"/>
+                        <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
+                    </div>
                 </h:panelGroup>
 
-                <h:outputLabel for="txtNombreProducto" value="Nombre Producto:"/>
-                <h:inputText id="txtNombreProducto"
-                             value="#{productoFrm.registro.nombreProducto}"
-                             required="true"
-                             requiredMessage="El nombre del producto es requerido"/>
+                <!-- PANEL DETALLE -->
+                <h:panelGroup id="pnlDetalle">
+                    <h:form id="frmCrear" rendered="#{productoFrm.estado != 'NADA'}">
+                        <h:panelGrid columns="2" cellpadding="5">
 
-                <h:outputLabel for="txtReferenciaExterna" value="Referencia Externa:"/>
-                <h:inputText id="txtReferenciaExterna"
-                             value="#{productoFrm.registro.referenciaExterna}"/>
+                            <h:outputLabel for="txtIdPanel" value="#{msg['producto.tabla.id']}:"/>
+                            <h:panelGroup id="txtIdPanel">
+                                <h:outputText rendered="#{empty productoFrm.registro.id}"
+                                              value="(#{msg['producto.id.autogenerado']})"/>
+                                <h:inputText id="txtId"
+                                             value="#{productoFrm.registro.id}"
+                                             rendered="#{not empty productoFrm.registro.id}"
+                                             disabled="true"/>
+                            </h:panelGroup>
 
-                <h:outputLabel for="chkActivo" value="Activo:"/>
-                <h:selectBooleanCheckbox id="chkActivo"
-                                         value="#{productoFrm.registro.activo}"/>
+                            <h:outputLabel for="txtNombreProducto" value="#{msg['producto.form.nombreProducto']}"/>
+                            <h:inputText id="txtNombreProducto"
+                                         value="#{productoFrm.registro.nombreProducto}"
+                                         required="true"
+                                         requiredMessage="#{msg['producto.nombreProducto.requerido']}"/>
 
-                <h:outputLabel for="txtComentarios" value="Comentarios:"/>
-                <h:inputTextarea id="txtComentarios"
-                                 value="#{productoFrm.registro.comentarios}"
-                                 rows="4"
-                                 cols="50"/>
-            </h:panelGrid>
+                            <h:outputLabel for="txtReferenciaExterna" value="#{msg['producto.form.referenciaExterna']}"/>
+                            <h:inputText id="txtReferenciaExterna"
+                                         value="#{productoFrm.registro.referenciaExterna}"/>
 
-            <h:panelGroup>
-                <p:commandButton value="Guardar"
-                                 actionListener="#{productoFrm.btnGuardarHandler}"
-                                 rendered="#{productoFrm.estado.name() == 'CREAR'}"
-                                 update="messages :pnlDetalle :pnlTabla"
-                                 process="@form"/>
+                            <h:outputLabel for="txtComentarios" value="#{msg['producto.form.comentarios']}"/>
+                            <h:inputTextarea id="txtComentarios"
+                                             value="#{productoFrm.registro.comentarios}"
+                                             rows="4"
+                                             cols="50"/>
 
-                <p:commandButton value="Modificar"
-                                 actionListener="#{productoFrm.btnModificarHandler}"
-                                 rendered="#{productoFrm.estado.name() == 'MODIFICAR'}"
-                                 update="messages :pnlDetalle :pnlTabla"
-                                 process="@form"/>
+                            <h:outputLabel for="chkActivo" value="#{msg['producto.form.activo']}"/>
+                            <h:selectBooleanCheckbox id="chkActivo"
+                                                     value="#{productoFrm.registro.activo}"/>
+                        </h:panelGrid>
 
-                <p:commandButton value="Eliminar"
-                                 actionListener="#{productoFrm.btnEliminarHandler}"
-                                 rendered="#{productoFrm.estado.name() == 'MODIFICAR'}"
-                                 update="messages :pnlDetalle :pnlTabla"/>
-            </h:panelGroup>
-        </h:form>
-    </h:panelGroup>
+                        <!-- Botones Crear / Modificar / Eliminar -->
+                        <h:panelGrid columns="3">
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="crud"/>
+                                <ui:param name="bean" value="#{productoFrm}"/>
+                            </ui:include>
+                        </h:panelGrid>
+                    </h:form>
 
+                    <!-- Botón Cancelar: su propio form  -->
+                    <h:form id="frmCancelar">
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="cancelar"/>
+                            <ui:param name="bean" value="#{productoFrm}"/>
+                        </ui:include>
+                    </h:form>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
 </h:body>
 </html>
