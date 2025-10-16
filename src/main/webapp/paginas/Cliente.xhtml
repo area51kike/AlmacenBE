@@ -1,142 +1,120 @@
-<!DOCTYPE html>
-<html lang="es"
-      xmlns="http://www.w3.org/1999/xhtml"
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
 <h:head>
     <meta charset="UTF-8"/>
-    <title>#{clienteFrm.nombreBean}</title>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['cliente.titulo']}</title>
 </h:head>
 <h:body>
-    <h1>#{clienteFrm.nombreBean}</h1>
-    <div style="margin-bottom: 20px;">
-        <a href="ManejarTodo.jsf" style="text-decoration: none;">
-            <button style="padding: 10px 15px; font-size: 17px; background: #229954; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                ← Volver al Inicio
-            </button>
-        </a>
-    </div>
-    <h:panelGroup id="pnlTabla">
-        <h:panelGrid>
-            <h:form id="frmTop">
-                <p:dataTable id="tablaRegistros"
-                             lazy="true"
-                             rendered="#{clienteFrm.estado.name() == 'NADA'}"
-                             rows="#{clienteFrm.pageSize}"
-                             paginator="true"
-                             paginatorPosition="bottom"
-                             value="#{clienteFrm.modelo}"
-                             var="reg"
-                             selectionMode="single"
-                             selection="#{clienteFrm.registro}"
-                             rowKey="#{reg.id}">
-                    <p:ajax event="rowSelect"
-                            listener="#{clienteFrm.selectionHandler}"
-                            update=":pnlTabla :pnlDetalle"/>
+    <div class="page-container">
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['cliente.titulo']}</h1>
+            </div>
+            <div class="content">
+                <!-- PANEL TABLA -->
+                <h:panelGroup id="pnlTabla" layout="block"
+                              style="display:#{clienteFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTop">
+                            <p:dataTable id="tabla-top"
+                                         lazy="true"
+                                         rendered="#{clienteFrm.estado == 'NADA'}"
+                                         rows="5"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{clienteFrm.modelo}"
+                                         var="reg"
+                                         selectionMode="single"
+                                         selection="#{clienteFrm.registro}" rowKey="#{reg.id}">
+                                <p:ajax event="rowSelect" listener="#{clienteFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle"/>
+                                <p:column headerText="#{msg['cliente.tabla.id']}"><h:outputText value="#{reg.id}"/></p:column>
+                                <p:column headerText="#{msg['cliente.tabla.nombre']}"><h:outputText value="#{reg.nombre}"/></p:column>
+                                <p:column headerText="#{msg['cliente.tabla.dui']}"><h:outputText value="#{reg.dui}"/></p:column>
+                                <p:column headerText="#{msg['cliente.tabla.nit']}"><h:outputText value="#{reg.nit}"/></p:column>
+                                <p:column headerText="#{msg['cliente.tabla.estado']}"><h:outputText value="#{reg.activo ? msg['cliente.estado.activo'] : msg['cliente.estado.inactivo']}" styleClass="#{reg.activo?'estado-activo':'estado-inactivo'}"/></p:column>
+                            </p:dataTable>
 
-                    <p:column headerText="UIID">
-                        <h:outputText value="#{reg.id}"/>
-                    </p:column>
+                            <!-- Botón Nuevo (incluimos BotonesTop pasando el bean correcto) -->
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="nuevo"/>
+                                <ui:param name="bean" value="#{clienteFrm}"/>
+                            </ui:include>
+                        </h:form>
 
-                    <p:column headerText="Nombre">
-                        <h:outputText value="#{reg.nombre}"/>
-                    </p:column>
-
-                    <p:column headerText="DUI">
-                        <h:outputText value="#{reg.dui}"/>
-                    </p:column>
-
-                    <p:column headerText="NIT">
-                        <h:outputText value="#{reg.nit}"/>
-                    </p:column>
-
-                    <p:column headerText="Estado">
-                        <h:outputText value="#{reg.activo?'Activo':'Inactivo'}"/>
-                    </p:column>
-
-                </p:dataTable>
-
-                <p:commandButton id="btnNuevo"
-                                 value="Nuevo"
-                                 rendered="#{clienteFrm.estado.name() == 'NADA'}"
-                                 actionListener="#{clienteFrm.btnNuevoHandler}"
-                                 update=":pnlDetalle :pnlTabla"/>
-
-                <p:commandButton id="btnCancelar"
-                                 value="Cancelar"
-                                 rendered="#{clienteFrm.estado.name() != 'NADA'}"
-                                 actionListener="#{clienteFrm.btnCancelarHandler}"
-                                 update=":pnlDetalle :pnlTabla"/>
-            </h:form>
-
-            <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
-        </h:panelGrid>
-    </h:panelGroup>
-
-    <h:panelGroup id="pnlDetalle">
-        <h:form id="frmCrear" rendered="#{clienteFrm.estado.name() != 'NADA'}">
-            <h:panelGrid columns="2" cellpadding="5">
-
-                <h:outputLabel for="txtIdPanel" value="ID:"/>
-                <h:panelGroup id="txtIdPanel">
-                    <h:outputText rendered="#{empty clienteFrm.registro.id}"
-                                  value="(Se asignará automáticamente al guardar)"/>
-                    <h:inputText id="txtId"
-                                 value="#{clienteFrm.registro.id}"
-                                 rendered="#{not empty clienteFrm.registro.id}"
-                                 disabled="true"/>
+                        <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
+                    </div>
                 </h:panelGroup>
 
-                <h:outputLabel for="txtNombre" value="Nombre:"/>
-                <h:inputText id="txtNombre"
-                             value="#{clienteFrm.registro.nombre}"
-                             required="true"
-                             requiredMessage="Su nombre es requerido"/>
+                <!-- PANEL DETALLE -->
+                <h:panelGroup id="pnlDetalle">
+                    <h:form id="frmCrear" rendered="#{clienteFrm.estado != 'NADA'}">
+                        <h:panelGrid columns="2" cellpadding="5">
 
-                <h:outputLabel for="txtDui" value="DUI:"/>
-                <h:inputText id="txtDui"
-                             value="#{clienteFrm.registro.dui}"
-                             required="true" requiredMessage="Su D.U.I es requerido">
-                    <f:validateLength minimum="9" maximum="9"
-                                      message="El DUI debe tener 9 caracteres"/>
-                </h:inputText>
+                            <h:outputLabel for="txtIdPanel" value="#{msg['cliente.tabla.id']}:"/>
+                            <h:panelGroup id="txtIdPanel">
+                                <h:outputText rendered="#{empty clienteFrm.registro.id}"
+                                              value="(#{msg['cliente.id.autogenerado']})"/>
+                                <h:inputText id="txtId"
+                                             value="#{clienteFrm.registro.id}"
+                                             rendered="#{not empty clienteFrm.registro.id}"
+                                             disabled="true"/>
+                            </h:panelGroup>
 
+                            <h:outputLabel for="txtNombre" value="#{msg['cliente.form.nombre']}"/>
+                            <h:inputText id="txtNombre"
+                                         value="#{clienteFrm.registro.nombre}"
+                                         required="true"
+                                         requiredMessage="#{msg['cliente.nombre.requerido']}"/>
 
-                <h:outputLabel for="txtNIT" value="NIT:"/>
-                <h:inputText id="txtNIT"
-                             value="#{clienteFrm.registro.nit}"
-                             required="true" requiredMessage="Su NIT es requerido">
-                    <f:validateLength minimum="14" maximum="14"
-                                      message="El NIT debe tener 14 caracteres"/>
-                </h:inputText>
+                            <h:outputLabel for="txtDui" value="#{msg['cliente.form.dui']}"/>
+                            <h:inputText id="txtDui"
+                                         value="#{clienteFrm.registro.dui}"
+                                         required="true"
+                                         requiredMessage="#{msg['cliente.dui.requerido']}">
+                                <f:validateLength minimum="9" maximum="9"
+                                                  message="#{msg['cliente.dui.longitud']}"/>
+                            </h:inputText>
 
+                            <h:outputLabel for="txtNIT" value="#{msg['cliente.form.nit']}"/>
+                            <h:inputText id="txtNIT"
+                                         value="#{clienteFrm.registro.nit}"
+                                         required="true"
+                                         requiredMessage="#{msg['cliente.nit.requerido']}">
+                                <f:validateLength minimum="14" maximum="14"
+                                                  message="#{msg['cliente.nit.longitud']}"/>
+                            </h:inputText>
 
-                <h:outputLabel for="chkActivo" value="Activo:"/>
-                <h:selectBooleanCheckbox id="chkActivo"
-                                         value="#{clienteFrm.registro.activo}"/>
-            </h:panelGrid>
-            <h:panelGroup>
-                <p:commandButton value="Guardar"
-                                 actionListener="#{clienteFrm.btnGuardarHandler}"
-                                 rendered="#{clienteFrm.estado.name() == 'CREAR'}"
-                                 update="messages :pnlDetalle :pnlTabla"
-                                 process="@form"/>
+                            <h:outputLabel for="chkActivo" value="#{msg['cliente.form.activo']}"/>
+                            <h:selectBooleanCheckbox id="chkActivo"
+                                                     value="#{clienteFrm.registro.activo}"/>
+                        </h:panelGrid>
 
-                <p:commandButton value="Modificar"
-                                 actionListener="#{clienteFrm.btnModificarHandler}"
-                                 rendered="#{clienteFrm.estado.name() == 'MODIFICAR'}"
-                                 update="messages :pnlDetalle :pnlTabla"
-                                 process="@form"/>
+                        <!-- Botones Crear / Modificar / Eliminar -->
+                        <h:panelGrid columns="3">
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="crud"/>
+                                <ui:param name="bean" value="#{clienteFrm}"/>
+                            </ui:include>
+                        </h:panelGrid>
+                    </h:form>
 
-                <p:commandButton value="Eliminar"
-                                 actionListener="#{clienteFrm.btnEliminarHandler}"
-                                 rendered="#{clienteFrm.estado.name() == 'MODIFICAR'}"
-                                 update="messages :pnlDetalle :pnlTabla"/>
-            </h:panelGroup>
-        </h:form>
-    </h:panelGroup>
-
+                    <!-- Botón Cancelar: su propio form  -->
+                    <h:form id="frmCancelar">
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="cancelar"/>
+                            <ui:param name="bean" value="#{clienteFrm}"/>
+                        </ui:include>
+                    </h:form>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
 </h:body>
 </html>

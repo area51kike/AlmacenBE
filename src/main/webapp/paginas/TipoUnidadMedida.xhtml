@@ -1,138 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
-<html lang="es"
-      xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:f="jakarta.faces.core"
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
 <h:head>
     <meta charset="UTF-8"/>
-    <title>#{tipoUnidadMedidaFrm.nombreBean}</title>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['tum.titulo']}</title>
 </h:head>
 <h:body>
-    <h1>#{tipoUnidadMedidaFrm.nombreBean}</h1>
+    <div class="page-container">
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['tipoUnidadMedida.titulo']}</h1>
+            </div>
+            <div class="content">
+                <!-- PANEL TABLA -->
+                <h:panelGroup id="pnlTabla" layout="block"
+                              style="display:#{tipoUnidadMedidaFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTop">
+                            <p:dataTable id="tabla-top"
+                                         lazy="true"
+                                         rendered="#{tipoUnidadMedidaFrm.estado == 'NADA'}"
+                                         rows="5"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{tipoUnidadMedidaFrm.modelo}"
+                                         var="reg"
+                                         selectionMode="single"
+                                         selection="#{tipoUnidadMedidaFrm.registro}" rowKey="#{reg.id}">
+                                <p:ajax event="rowSelect" listener="#{tipoUnidadMedidaFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle"/>
+                                <p:column headerText="#{msg['tum.tabla.id']}"><h:outputText value="#{reg.id}"/></p:column>
+                                <p:column headerText="#{msg['tum.tabla.nombre']}"><h:outputText value="#{reg.nombre}"/></p:column>
+                                <p:column headerText="#{msg['tum.tabla.unidadBase']}"><h:outputText value="#{reg.unidadBase}"/></p:column>
+                                <p:column headerText="#{msg['tum.tabla.comentarios']}"><h:outputText value="#{reg.comentarios}"/></p:column>
+                                <p:column headerText="#{msg['tum.tabla.estado']}"><h:outputText value="#{reg.activo ? msg['tum.estado.activo'] : msg['tum.estado.inactivo']}" styleClass="#{reg.activo?'estado-activo':'estado-inactivo'}"/></p:column>
+                            </p:dataTable>
 
-    <div style="margin-bottom: 20px;">
-        <a href="ManejarTodo.jsf" style="text-decoration: none;">
-            <button style="padding: 10px 15px; font-size: 17px; background: #229954; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                ← Volver al Inicio
-            </button>
-        </a>
-    </div>
-    <h:panelGroup id="pnlTabla">
-        <h:panelGrid>
-            <h:form id="frmTop">
-                <p:dataTable id="tablaRegistros"
-                             lazy="true"
-                             rendered="#{tipoUnidadMedidaFrm.estado.name() == 'NADA'}"
-                             rows="#{tipoUnidadMedidaFrm.pageSize}"
-                             paginator="true"
-                             paginatorPosition="bottom"
-                             value="#{tipoUnidadMedidaFrm.modelo}"
-                             var="reg"
-                             selectionMode="single"
-                             selection="#{tipoUnidadMedidaFrm.registro}"
-                             rowKey="#{reg.id}">
-                    <p:ajax event="rowSelect"
-                            listener="#{tipoUnidadMedidaFrm.selectionHandler}"
-                            update=":pnlTabla :pnlDetalle"/>
+                            <!-- Botón Nuevo (incluimos BotonesTop pasando el bean correcto) -->
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="nuevo"/>
+                                <ui:param name="bean" value="#{tipoUnidadMedidaFrm}"/>
+                            </ui:include>
+                        </h:form>
 
-                    <p:column headerText="ID">
-                        <h:outputText value="#{reg.id}"/>
-                    </p:column>
-
-                    <p:column headerText="Nombre">
-                        <h:outputText value="#{reg.nombre}"/>
-                    </p:column>
-
-                    <p:column headerText="Unidad Base">
-                        <h:outputText value="#{reg.unidadBase}"/>
-                    </p:column>
-
-                    <p:column headerText="Estado">
-                        <h:outputText value="#{reg.activo?'Activo':'Inactivo'}"/>
-                    </p:column>
-
-                    <p:column headerText="Comentarios">
-                        <h:outputText value="#{reg.comentarios}"/>
-                    </p:column>
-                </p:dataTable>
-
-                <p:commandButton id="btnNuevo"
-                                 value="Nuevo"
-                                 rendered="#{tipoUnidadMedidaFrm.estado.name() == 'NADA'}"
-                                 actionListener="#{tipoUnidadMedidaFrm.btnNuevoHandler}"
-                                 update=":pnlDetalle :pnlTabla"/>
-
-                <p:commandButton id="btnCancelar"
-                                 value="Cancelar"
-                                 rendered="#{tipoUnidadMedidaFrm.estado.name() != 'NADA'}"
-                                 actionListener="#{tipoUnidadMedidaFrm.btnCancelarHandler}"
-                                 update=":pnlDetalle :pnlTabla"/>
-            </h:form>
-
-            <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
-        </h:panelGrid>
-    </h:panelGroup>
-
-    <h:panelGroup id="pnlDetalle">
-        <h:form id="frmCrear" rendered="#{tipoUnidadMedidaFrm.estado.name() != 'NADA'}">
-            <h:panelGrid columns="2" cellpadding="5">
-
-                <h:outputLabel for="txtIdPanel" value="ID:"/>
-                <h:panelGroup id="txtIdPanel">
-                    <h:outputText rendered="#{empty tipoUnidadMedidaFrm.registro.id}"
-                                  value="(Se asignará automáticamente al guardar)"/>
-                    <h:inputText id="txtId"
-                                 value="#{tipoUnidadMedidaFrm.registro.id}"
-                                 rendered="#{not empty tipoUnidadMedidaFrm.registro.id}"
-                                 disabled="true"/>
+                        <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
+                    </div>
                 </h:panelGroup>
 
-                <h:outputLabel for="txtNombre" value="Nombre:"/>
-                <h:inputText id="txtNombre"
-                             value="#{tipoUnidadMedidaFrm.registro.nombre}"
-                             required="true"
-                             requiredMessage="El nombre es requerido"/>
+                <!-- PANEL DETALLE -->
+                <h:panelGroup id="pnlDetalle">
+                    <h:form id="frmCrear" rendered="#{tipoUnidadMedidaFrm.estado != 'NADA'}">
+                        <h:panelGrid columns="2" cellpadding="5">
 
-                <h:outputLabel for="txtUnidadBase" value="Unidad Base:"/>
-                <h:inputText id="txtUnidadBase"
-                             value="#{tipoUnidadMedidaFrm.registro.unidadBase}"
-                             required="true"
-                             requiredMessage="La unidad base es requerida"/>
+                            <h:outputLabel for="txtIdPanel" value="#{msg['tum.tabla.id']}:"/>
+                            <h:panelGroup id="txtIdPanel">
+                                <h:outputText rendered="#{empty tipoUnidadMedidaFrm.registro.id}"
+                                              value="(#{msg['tum.id.autogenerado']})"/>
+                                <h:inputText id="txtId"
+                                             value="#{tipoUnidadMedidaFrm.registro.id}"
+                                             rendered="#{not empty tipoUnidadMedidaFrm.registro.id}"
+                                             disabled="true"/>
+                            </h:panelGroup>
 
-                <h:outputLabel for="chkActivo" value="Activo:"/>
-                <h:selectBooleanCheckbox id="chkActivo"
-                                         value="#{tipoUnidadMedidaFrm.registro.activo}"/>
+                            <h:outputLabel for="txtNombre" value="#{msg['tum.form.nombre']}"/>
+                            <h:inputText id="txtNombre"
+                                         value="#{tipoUnidadMedidaFrm.registro.nombre}"
+                                         required="true"
+                                         requiredMessage="#{msg['tum.nombre.requerido']}"/>
 
-                <h:outputLabel for="txtComentarios" value="Comentarios:"/>
-                <h:inputTextarea id="txtComentarios"
-                                 value="#{tipoUnidadMedidaFrm.registro.comentarios}"
-                                 rows="4"
-                                 cols="50"/>
-            </h:panelGrid>
+                            <h:outputLabel for="txtUnidadBase" value="#{msg['tum.form.unidadBase']}"/>
+                            <h:inputText id="txtUnidadBase"
+                                         value="#{tipoUnidadMedidaFrm.registro.unidadBase}"
+                                         required="true"
+                                         requiredMessage="#{msg['tum.unidadBase.requerida']}"/>
 
-            <h:panelGroup>
-                <p:commandButton value="Guardar"
-                                 actionListener="#{tipoUnidadMedidaFrm.btnGuardarHandler}"
-                                 rendered="#{tipoUnidadMedidaFrm.estado.name() == 'CREAR'}"
-                                 update="messages :pnlDetalle :pnlTabla"
-                                 process="@form"/>
+                            <h:outputLabel for="txtComentarios" value="#{msg['tum.form.comentarios']}"/>
+                            <h:inputTextarea id="txtComentarios"
+                                             value="#{tipoUnidadMedidaFrm.registro.comentarios}"
+                                             rows="4"
+                                             cols="50"/>
 
-                <p:commandButton value="Modificar"
-                                 actionListener="#{tipoUnidadMedidaFrm.btnModificarHandler}"
-                                 rendered="#{tipoUnidadMedidaFrm.estado.name() == 'MODIFICAR'}"
-                                 update="messages :pnlDetalle :pnlTabla"
-                                 process="@form"/>
+                            <h:outputLabel for="chkActivo" value="#{msg['tum.form.activo']}"/>
+                            <h:selectBooleanCheckbox id="chkActivo"
+                                                     value="#{tipoUnidadMedidaFrm.registro.activo}"/>
+                        </h:panelGrid>
 
-                <p:commandButton value="Eliminar"
-                                 actionListener="#{tipoUnidadMedidaFrm.btnEliminarHandler}"
-                                 rendered="#{tipoUnidadMedidaFrm.estado.name() == 'MODIFICAR'}"
-                                 update="messages :pnlDetalle :pnlTabla"/>
-            </h:panelGroup>
-        </h:form>
-    </h:panelGroup>
+                        <!-- Botones Crear / Modificar / Eliminar -->
+                        <h:panelGrid columns="3">
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="crud"/>
+                                <ui:param name="bean" value="#{tipoUnidadMedidaFrm}"/>
+                            </ui:include>
+                        </h:panelGrid>
+                    </h:form>
 
+                    <!-- Botón Cancelar: su propio form  -->
+                    <h:form id="frmCancelar">
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="cancelar"/>
+                            <ui:param name="bean" value="#{tipoUnidadMedidaFrm}"/>
+                        </ui:include>
+                    </h:form>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
 </h:body>
 </html>

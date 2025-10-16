@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <f:view locale="#{idiomaBean.locale}">
+        <div class="sidebar">
+            <!-- Selector de idioma con dropdown -->
+            <h:form class="language-selector">
+                <p:selectOneMenu value="#{idiomaBean.idioma}"
+                                 styleClass="idioma-dropdown">
+                    <f:selectItem itemLabel= "#{msg['idioma.espanol']}" itemValue="es" />
+                    <f:selectItem itemLabel="#{msg['idioma.ingles']}" itemValue="en" />
+                    <f:selectItem itemLabel="#{msg['idioma.frances']}" itemValue="fr" />
+                    <p:ajax
+                            event="change" listener="#{idiomaBean.cambiarIdioma(idiomaBean.idioma)}"
+                            update="@all" />
+                </p:selectOneMenu>
+            </h:form>
+
+            <h2>#{msg['sidebar.titulo']}</h2>
+            <ul>
+                <li><h:link value="#{msg['sidebar.inicio']}" outcome="/paginas/Inicio.jsf"/></li>
+                <li><h:link value="#{msg['sidebar.clientes']}" outcome="/paginas/Cliente.jsf"/></li>
+                <li><h:link value="#{msg['sidebar.productos']}" outcome="/paginas/Producto.jsf"/></li>
+                <li><h:link value="#{msg['sidebar.proveedores']}" outcome="/paginas/Proveedor.jsf"/></li>
+                <li><h:link value="#{msg['sidebar.tipoAlmacen']}" outcome="/paginas/TipoAlmacen.jsf"/></li>
+                <li><h:link value="#{msg['sidebar.tipoProducto']}" outcome="/paginas/TipoProducto.jsf"/></li>
+                <li><h:link value="#{msg['sidebar.tipoUnidadMedida']}" outcome="/paginas/TipoUnidadMedida.jsf"/></li>
+            </ul>
+        </div>
+    </f:view>
+
+</ui:composition>
