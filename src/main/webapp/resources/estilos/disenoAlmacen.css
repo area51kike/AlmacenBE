@@ -5,40 +5,115 @@
     box-sizing: border-box;
 }
 
-/* Fondo general */
+/* Fondo general con gradiente y tipografía moderna */
 body {
-
-    background-size: cover;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(150deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    padding: 20px;
-    /* Reemplaza background-color por el degradado */
-    background: linear-gradient(to right, #666768, #262929, #515151);
+    padding: 0;
+    margin: 0;
 }
 
+/* Layout principal con sidebar */
+.page-container {
+    display: flex;
+    min-height: 100vh;
+}
 
-/* Contenedor principal centrado con estilo de tarjeta */
+/* SIDEBAR - Menú lateral */
+.sidebar {
+    width: 280px;
+    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+    overflow-y: auto;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+}
+
+/* Selector de idioma en la parte superior */
+.language-selector {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.idioma-dropdown {
+    width: 100%;
+}
+
+/* Título del sidebar */
+.sidebar h2 {
+    padding: 20px 20px 20px;
+    font-size: 1.4em;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 10px;
+}
+
+/* Lista del menú */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    margin: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Enlaces del sidebar */
+.sidebar a {
+    display: block;
+    padding: 11px 25px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 1em;
+    border-left: 4px solid transparent;
+}
+
+.sidebar a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-left-color: white;
+    padding-left: 30px;
+    transform: translateX(5px);
+}
+
+.sidebar a:active,
+.sidebar a.active {
+    background: rgba(255, 255, 255, 0.2);
+    border-left-color: white;
+    font-weight: 600;
+}
+
+/* Contenedor principal con margen para el sidebar */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
+    margin-left: 280px;
+    max-width: calc(100% - 280px);
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
+    min-height: 100vh;
 }
 
 /* Encabezado con fondo degradado y texto centrado */
 .header {
-    background: linear-gradient(135deg, #CC8E8E 0%, #B96464 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 30px;
-    text-align: center; /* ¡Añadido para asegurar la centralización! */
+    text-align: center;
 }
 
 /* Título principal con sombra sutil */
 h1 {
-    text-align: center; /* Asegura que cualquier H1 esté centrado */
-    font-size: 2.5em; /* Manteniendo el estilo */
+    text-align: center;
+    font-size: 2.5em;
     font-weight: 600;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -61,7 +136,7 @@ h1 {
 
 /* Encabezado de tabla con fondo degradado */
 .data-table thead {
-    background: linear-gradient(135deg, #CC8E8E 0%, #B96464 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
 }
 
@@ -101,8 +176,18 @@ h1 {
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    max-width: 700px;
+    margin: 0 auto;
 }
 
+/* Título del formulario con línea decorativa */
+.form-section h2 {
+    color: #667eea;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 10px;
+}
 
 /* Distribución en cuadrícula para campos del formulario */
 .form-grid {
@@ -137,7 +222,7 @@ h1 {
 /* Efecto de enfoque en campos */
 .form-group input:focus {
     outline: none;
-    border-color: #B96464;
+    border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -149,7 +234,7 @@ h1 {
 
 /* Botón principal con gradiente y animación */
 .btn-submit {
-    background: linear-gradient(135deg, #CC8E8E 0%, #B96464 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 14px 40px;
     border: none;
@@ -163,7 +248,7 @@ h1 {
 
 .btn-submit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(107, 126, 234, 0.6);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 .btn-submit:active {
@@ -193,92 +278,14 @@ h1 {
 .btn-eliminar:active {
     transform: translateY(0);
 }
-/* Botón de cancelar con estilo de alerta */
-.btn-cancelar {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.9em;
+
+/* Indicadores visuales para estado activo/inactivo */
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
     font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-}
-
-.btn-cancelar:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
-    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
-}
-
-/* Botón de modificar con estilo de alerta */
-.btn-modificar {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.9em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-}
-
-.btn-modificar:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
-    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
-}
-
-/* Botón de modificar con estilo de alerta */
-.btn-crear {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.9em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-}
-
-.btn-crear:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
-    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
-}
-
-/* Botón de modificar con estilo de alerta */
-.btn-nuevo {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.9em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-}
-
-.btn-nuevo:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
-    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
-}
-
-.btn-eliminar:active {
-    transform: translateY(0);
-}
-
-.btn-eliminar:active {
-    transform: translateY(0);
 }
 
 .badge-activo {
@@ -301,10 +308,151 @@ h1 {
     border-left: 4px solid #dc3545;
 }
 
+/* ===== ESTILO PARA EL BOTÓN NUEVO DE PRIMEFACES ===== */
+.btn-nuevo-custom.ui-button {
+    background: #ea6687 !important;
+    background-image: linear-gradient(135deg, #ea6687 0%, #764ba2 100%) !important;
+}
+
+.btn-nuevo-custom.ui-button .ui-button-text {
+    color: white !important;
+}
+
+.btn-nuevo-custom.ui-button:hover,
+.btn-nuevo-custom.ui-button.ui-state-hover {
+    background: #764ba2 !important;
+    background-image: linear-gradient(135deg, #764ba2 0%, #ea6687 100%) !important;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-editar {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-editar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
+    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+}
+
+.btn-cancelar {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+.btn-cancelar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.5);
+}
+
+.form-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-start;
+    margin-top: 20px;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-control-readonly {
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1em;
+    background-color: #f5f5f5;
+    color: #666;
+}
+
+.form-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-top: 8px;
+}
+
+.form-control-textarea {
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.global-message {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.messages {
+    margin-bottom: 20px;
+}
+
+/* Tabla con bordes negros entre filas y columnas */
+.tabla-con-bordes.ui-datatable .ui-datatable-tablewrapper table {
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+.tabla-con-bordes.ui-datatable .ui-datatable-tablewrapper table th,
+.tabla-con-bordes.ui-datatable .ui-datatable-tablewrapper table td {
+    border: 1px solid black;
+    padding: 12px 15px;
+}
+
+.tabla-con-bordes.ui-datatable .ui-datatable-tablewrapper table th {
+    background: linear-gradient(135deg, #a2299e 0%, #a2299e 100%);
+    color: #000000;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+}
+
+.tabla-con-bordes.ui-datatable .ui-datatable-tablewrapper table tbody tr:hover {
+    background-color: #9147ac;
+}
+
 /* Ajustes para pantallas pequeñas */
 @media (max-width: 768px) {
-    body {
-        padding: 10px;
+    .sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+    }
+
+    .container {
+        margin-left: 0;
+        max-width: 100%;
+    }
+
+    .main-layout {
+        flex-direction: column;
     }
 
     .header h1 {
@@ -328,234 +476,158 @@ h1 {
         font-size: 0.8em;
         padding: 6px 12px;
     }
-    /* Estilos adicionales para el CSS */
 
     .action-buttons {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .btn-editar {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 5px;
-        font-size: 0.9em;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
-    }
-
-    .btn-editar:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
-        background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
-    }
-
-    .btn-cancelar {
-        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-        color: white;
-        padding: 14px 30px;
-        border: none;
-        border-radius: 6px;
-        font-size: 1.1em;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-left: 10px;
-    }
-
-    .btn-cancelar:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.5);
+        flex-direction: column;
     }
 
     .form-buttons {
-        display: flex;
-        gap: 15px;
-        justify-content: flex-start;
-        margin-top: 20px;
+        flex-direction: column;
     }
 
-    .full-width {
-        grid-column: 1 / -1;
+    .btn-cancelar {
+        margin-left: 0;
+        margin-top: 10px;
     }
 
-    .form-control-readonly {
-        padding: 12px 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 6px;
-        font-size: 1em;
-        background-color: #f5f5f5;
-        color: #666;
-    }
-
-    .form-checkbox {
-        width: 20px;
-        height: 20px;
-        margin-top: 8px;
-    }
-
-    .form-control-textarea {
-        padding: 12px 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 6px;
-        font-size: 1em;
-        transition: all 0.3s ease;
-        font-family: inherit;
-        resize: vertical;
-        min-height: 80px;
-    }
-
-    .global-message {
-        margin-bottom: 20px;
-        padding: 15px;
-        border-radius: 6px;
-    }
-
-    .messages {
-        margin-bottom: 20px;
-    }
-
-    /* Mejoras responsive */
-    @media (max-width: 768px) {
-        .action-buttons {
-            flex-direction: column;
-        }
-
-        .form-buttons {
-            flex-direction: column;
-        }
-
-        .btn-cancelar {
-            margin-left: 0;
-            margin-top: 10px;
-        }
+    .sidebar a:hover {
+        padding-left: 25px;
+        transform: none;
     }
 }
 
-/* Layout: sidebar izquierda, container derecha */
-.page-container {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-    min-height: calc(100vh - 40px); /* opcional: compensa el padding body */
-}
-
-/* Sidebar fijo a la izquierda */
-.page-container > .sidebar {
-    width: 250px;
-    background-color: #333;
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    min-height: 95vh;
-    flex-shrink: 0;
-}
-
-.page-container > .sidebar h2 {
-    font-size: 1.8em;         /* más grande */
-    font-weight: 700;         /* un poco más grueso */
-    margin-bottom: 30px;      /* más separación con los links */
-    text-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
-}
-
-/* Contenedor principal de la página */
-.page-container {
-
-    display: flex;
-    align-items: center;   /* centra verticalmente el container */
-    justify-content: center;       /* centra horizontalmente */
-    min-height: 100vh;     /* ocupa toda la altura de la ventana */
-    padding: 20px;
-    gap: 50px;             /* espacio entre sidebar y container */
-}
-
-/* Container a la derecha, centrado verticalmente */
-.page-container > .container {
-    flex: 1 1 auto;
-    margin: 0;
-    background-color: #515151;
-    border-radius: 10px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    align-self: center;
-}
-
-/* Contenedor de la tabla con fondo blanco */
+/* Contenedor de la tabla */
 .content-tabla {
-    background-color: white;
-    border-radius: 10px;
+    background: white;
     padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-
-.page-container > .sidebar ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.page-container > .sidebar ul li {
-    padding: 4px 12px;
-    margin-bottom: 5px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-}
-
-.page-container >.sidebar ul li:hover {
-    background-color: #555;
-    background-image: url('#{resource["imagenes:bienvenida.jpeg"]}');
-}
-
-
-/* Enlaces dentro del sidebar */
-.page-container > .sidebar a,
-.page-container > .sidebar h\:link { /* PrimeFaces usa h:link, que se renderiza como <a> */
-    color: #FFD700;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease, background-color 0.2s ease;
-}
-
-/* Color al pasar el mouse */
-.page-container > .sidebar a:hover,
-.page-container > .sidebar h\:link:hover {
-    color: #FFF8DC; /* dorado claro */
-    text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
-}
-
-.language-selector {
-    padding: 10px;
-    text-align: center;
-    background-color: #555;
     border-radius: 8px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.idioma-dropdown {
+/* Estilos para los estados en la tabla */
+.estado-activo {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.estado-inactivo {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+/* Estilos para panelGrid de PrimeFaces */
+.ui-panelgrid {
     width: 100%;
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: white;
-    cursor: pointer;
-    transition: all 0.3s;
+    margin-bottom: 20px;
 }
 
-.idioma-dropdown:hover {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0,123,255,0.3);
+.ui-panelgrid td {
+    padding: 12px;
 }
 
-.idioma-dropdown:focus {
+/* Estilos para inputs de texto */
+.ui-inputfield,
+.ui-inputtext,
+.ui-inputtextarea {
+    width: 100%;
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.ui-inputfield:focus,
+.ui-inputtext:focus,
+.ui-inputtextarea:focus {
     outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 8px rgba(0,123,255,0.4);
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.ui-inputfield:disabled,
+.ui-inputtext:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+/* Estilos para checkbox */
+.ui-chkbox {
+    margin-top: 8px;
+}
+
+/* Mejoras para la tabla de PrimeFaces */
+.ui-datatable {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ui-datatable .ui-datatable-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    font-weight: 600;
+}
+
+.ui-datatable thead th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    border: none;
+}
+
+.ui-datatable tbody td {
+    padding: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.ui-datatable tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.ui-datatable tbody tr.ui-state-highlight {
+    background-color: #e3f2fd !important;
+    color: #1976d2 !important;
+}
+
+/* Paginador */
+.ui-paginator {
+    background: #f8f9fa;
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.ui-paginator .ui-paginator-page.ui-state-active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+/* Growl messages */
+.ui-growl {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+/* Panel de detalle con formulario */
+#pnlDetalle {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#pnlDetalle .ui-panelgrid {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+#pnlDetalle .ui-panelgrid-cell {
+    padding: 15px;
 }
