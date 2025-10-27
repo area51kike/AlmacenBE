@@ -52,52 +52,101 @@
                     </div>
                 </h:panelGroup>
 
-                <!-- PANEL DETALLE -->
+                <!-- PANEL DETALLE CON TABVIEW -->
                 <h:panelGroup id="pnlDetalle">
                     <h:form id="frmCrear" rendered="#{clienteFrm.estado != 'NADA'}">
-                        <h:panelGrid columns="2" cellpadding="5">
 
-                            <h:outputLabel for="txtIdPanel" value="#{msg['cliente.tabla.id']}:"/>
-                            <h:panelGroup id="txtIdPanel">
-                                <h:outputText rendered="#{empty clienteFrm.registro.id}"
-                                              value="(#{msg['cliente.id.autogenerado']})"/>
-                                <h:inputText id="txtId"
-                                             value="#{clienteFrm.registro.id}"
-                                             rendered="#{not empty clienteFrm.registro.id}"
-                                             disabled="true"/>
-                            </h:panelGroup>
+                        <!-- TabView con dos pestañas -->
+                        <p:tabView id="tabViewCliente">
 
-                            <h:outputLabel for="txtNombre" value="#{msg['cliente.form.nombre']}"/>
-                            <h:inputText id="txtNombre"
-                                         value="#{clienteFrm.registro.nombre}"
-                                         required="true"
-                                         requiredMessage="#{msg['cliente.nombre.requerido']}"/>
+                            <!-- Tab 1: Generalidades -->
+                            <p:tab title="Generalidades">
+                                <h:panelGrid columns="2" cellpadding="5" style="margin-top: 10px;">
+                                    <h:outputLabel for="txtIdPanel" value="#{msg['cliente.tabla.id']}:"/>
+                                    <h:panelGroup id="txtIdPanel">
+                                        <h:outputText rendered="#{empty clienteFrm.registro.id}"
+                                                      value="(#{msg['cliente.id.autogenerado']})"/>
+                                        <h:inputText id="txtId"
+                                                     value="#{clienteFrm.registro.id}"
+                                                     rendered="#{not empty clienteFrm.registro.id}"
+                                                     disabled="true"/>
+                                    </h:panelGroup>
 
-                            <h:outputLabel for="txtDui" value="#{msg['cliente.form.dui']}"/>
-                            <h:inputText id="txtDui"
-                                         value="#{clienteFrm.registro.dui}"
-                                         required="true"
-                                         requiredMessage="#{msg['cliente.dui.requerido']}">
-                                <f:validateLength minimum="9" maximum="9"
-                                                  message="#{msg['cliente.dui.longitud']}"/>
-                            </h:inputText>
+                                    <h:outputLabel for="txtNombre" value="#{msg['cliente.form.nombre']}"/>
+                                    <h:inputText id="txtNombre"
+                                                 value="#{clienteFrm.registro.nombre}"
+                                                 required="true"
+                                                 requiredMessage="#{msg['cliente.nombre.requerido']}"
+                                                 style="width: 300px;"/>
 
-                            <h:outputLabel for="txtNIT" value="#{msg['cliente.form.nit']}"/>
-                            <h:inputText id="txtNIT"
-                                         value="#{clienteFrm.registro.nit}"
-                                         required="true"
-                                         requiredMessage="#{msg['cliente.nit.requerido']}">
-                                <f:validateLength minimum="14" maximum="14"
-                                                  message="#{msg['cliente.nit.longitud']}"/>
-                            </h:inputText>
+                                    <h:outputLabel for="txtDui" value="#{msg['cliente.form.dui']}"/>
+                                    <h:inputText id="txtDui"
+                                                 value="#{clienteFrm.registro.dui}"
+                                                 required="true"
+                                                 requiredMessage="#{msg['cliente.dui.requerido']}"
+                                                 style="width: 150px;">
+                                        <f:validateLength minimum="9" maximum="9"
+                                                          message="#{msg['cliente.dui.longitud']}"/>
+                                    </h:inputText>
 
-                            <h:outputLabel for="chkActivo" value="#{msg['cliente.form.activo']}"/>
-                            <h:selectBooleanCheckbox id="chkActivo"
-                                                     value="#{clienteFrm.registro.activo}"/>
-                        </h:panelGrid>
+                                    <h:outputLabel for="txtNIT" value="#{msg['cliente.form.nit']}"/>
+                                    <h:inputText id="txtNIT"
+                                                 value="#{clienteFrm.registro.nit}"
+                                                 required="true"
+                                                 requiredMessage="#{msg['cliente.nit.requerido']}"
+                                                 style="width: 200px;">
+                                        <f:validateLength minimum="14" maximum="14"
+                                                          message="#{msg['cliente.nit.longitud']}"/>
+                                    </h:inputText>
+
+                                    <h:outputLabel for="chkActivo" value="#{msg['cliente.form.activo']}"/>
+                                    <h:selectBooleanCheckbox id="chkActivo"
+                                                             value="#{clienteFrm.registro.activo}"/>
+                                </h:panelGrid>
+                            </p:tab>
+
+                            <!-- Tab 2: Cliente (Resumen de datos) -->
+                            <p:tab title="Cliente">
+                                <p:panelGrid id="gridResumen"
+                                             columns="2"
+                                             layout="grid"
+                                             columnClasses="col-label col-value"
+                                             styleClass="resumen-grid"
+                                             style="margin-top:10px">
+
+                                    <h:outputText value="ID:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty clienteFrm.registro.id ? msg['cliente.id.autogenerado'] : clienteFrm.registro.id}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="#{msg['cliente.form.nombre']}:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty clienteFrm.registro.nombre ? '-' : clienteFrm.registro.nombre}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="#{msg['cliente.form.dui']}:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty clienteFrm.registro.dui ? '-' : clienteFrm.registro.dui}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="#{msg['cliente.form.nit']}:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty clienteFrm.registro.nit ? '-' : clienteFrm.registro.nit}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="#{msg['cliente.form.activo']}:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{clienteFrm.registro.activo ? msg['cliente.estado.activo'] : msg['cliente.estado.inactivo']}"
+                                                      styleClass="#{clienteFrm.registro.activo ? 'estado-activo' : 'estado-inactivo'}"/>
+                                    </p:outputPanel>
+
+                                </p:panelGrid>
+                            </p:tab>
+
+                        </p:tabView>
 
                         <!-- Botones Crear / Modificar / Eliminar -->
-                        <h:panelGrid columns="3">
+                        <h:panelGrid columns="3" style="margin-top: 15px;">
                             <ui:include src="/paginas/ues/BotonesTop.xhtml">
                                 <ui:param name="section" value="crud"/>
                                 <ui:param name="bean" value="#{clienteFrm}"/>
