@@ -7,6 +7,8 @@ import jakarta.persistence.PersistenceContext;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Stateless
 @LocalBean
@@ -22,4 +24,30 @@ public class TipoProductoDao extends InventarioDefaultDataAccess<TipoProducto> i
     }
 
     public TipoProductoDao() { super(TipoProducto.class); }
+
+
+    public List<TipoProducto> findAll() {
+        try {
+            return em.createQuery("SELECT t FROM TipoProducto t ORDER BY t.nombre", TipoProducto.class)
+                    .getResultList();
+        } catch (Exception e) {
+            System.err.println("Error al cargar TipoProducto: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+    public TipoProducto findById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID no puede ser nulo");
+        }
+
+        try {
+            EntityManager em = getEntityManager();
+            if (em == null) {
+                throw new IllegalStateException("EntityManager no disponible");
+            }
+            return em.find(TipoProducto.class, id);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Error al buscar el registro por ID", ex);
+        }
+    }
 }
