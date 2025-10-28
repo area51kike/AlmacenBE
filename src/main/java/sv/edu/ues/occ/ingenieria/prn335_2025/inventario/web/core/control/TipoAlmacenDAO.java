@@ -16,6 +16,7 @@ public class TipoAlmacenDAO extends InventarioDefaultDataAccess<TipoAlmacen> imp
     EntityManager em;
 
     @Override
+
     public EntityManager getEntityManager() {
         return em;
     }

@@ -11,12 +11,16 @@ import java.io.Serializable;
 public class ProveedorDAO extends InventarioDefaultDataAccess<Proveedor> implements Serializable {
     @PersistenceContext(unitName = "inventarioPU")
     EntityManager em;
+
     public ProveedorDAO(Class<Proveedor> entityClass) {
         super(entityClass);
     }
+
     @Override
+
     public EntityManager getEntityManager() {
         return em;
     }
+
     public ProveedorDAO() { super(Proveedor.class); }
 }

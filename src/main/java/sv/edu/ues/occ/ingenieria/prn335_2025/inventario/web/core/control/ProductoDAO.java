@@ -34,7 +34,6 @@ public class ProductoDAO extends InventarioDefaultDataAccess<Producto> {
                 throw new IllegalStateException("EntityManager no disponible");
             }
 
-            // Generar UUID si no existe
             if (registro.getId() == null) {
                 registro.setId(UUID.randomUUID());
             }

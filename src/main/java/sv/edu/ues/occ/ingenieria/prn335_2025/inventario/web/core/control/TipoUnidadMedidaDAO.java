@@ -33,7 +33,6 @@ public class TipoUnidadMedidaDAO extends InventarioDefaultDataAccess<TipoUnidadM
                 throw new IllegalStateException("EntityManager no disponible");
             }
 
-            // Obtener el siguiente valor de la secuencia
             if (registro.getId() == null || registro.getId() == 0) {
                 Query query = em.createNativeQuery("SELECT nextval('tipo_unidad_medida_id_tipo_unidad_medida_seq'::regclass)");
                 Number nextId = (Number) query.getSingleResult();

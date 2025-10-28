@@ -16,6 +16,7 @@ public class TipoProductoDao extends InventarioDefaultDataAccess<TipoProducto> i
     EntityManager em;
 
     @Override
+
     public EntityManager getEntityManager() {
         return em;
     }
