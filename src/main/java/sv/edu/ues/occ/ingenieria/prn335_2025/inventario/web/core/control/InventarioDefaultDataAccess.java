@@ -7,7 +7,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 
 import java.util.List;
-
 public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInterface<T> {
     final Class<T> entityClass;
 
@@ -109,7 +108,6 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
         }
     }
 
-    // ✅ CAMBIADO: Ahora acepta la entidad (T) en lugar de solo el ID
     public void eliminar(T entity) throws IllegalArgumentException {
         if (entity == null) {
             throw new IllegalArgumentException("La entidad no puede ser nula");
