@@ -8,14 +8,15 @@ import java.util.UUID;
 @Table(name = "producto_tipo_producto_caracteristica", schema = "public")
 public class ProductoTipoProductoCaracteristica {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_producto_tipo_producto_caracteristica", nullable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_producto_tipo_producto")
     private ProductoTipoProducto idProductoTipoProducto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_tipo_producto_caracteristica")
     private TipoProductoCaracteristica idTipoProductoCaracteristica;
 

@@ -12,11 +12,11 @@ public class TipoProductoCaracteristica implements Serializable {
     @Column(name = "id_tipo_producto_caracteristica", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_caracteristica")
     private Caracteristica caracteristica;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_tipo_producto")
     private TipoProducto tipoProducto;
 

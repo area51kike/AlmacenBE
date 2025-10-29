@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <meta charset="UTF-8"/>
+    <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['productoTipoProductoCaracteristica.titulo']}</title>
+</h:head>
+<h:body>
+    <div class="page-container">
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['productoTipoProductoCaracteristica.titulo']}</h1>
+            </div>
+            <div class="content">
+                <!-- PANEL TABLA -->
+                <h:panelGroup id="pnlTabla" layout="block"
+                              style="display:#{productoTipoProductoCaracteristicaFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTop">
+                            <p:dataTable id="tabla-top"
+                                         lazy="true"
+                                         rendered="#{productoTipoProductoCaracteristicaFrm.estado == 'NADA'}"
+                                         rows="5"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{productoTipoProductoCaracteristicaFrm.modelo}"
+                                         var="reg"
+                                         selectionMode="single"
+                                         selection="#{productoTipoProductoCaracteristicaFrm.registro}"
+                                         rowKey="#{reg.id}">
+                                <p:ajax event="rowSelect"
+                                        listener="#{productoTipoProductoCaracteristicaFrm.selectionHandler}"
+                                        update=":pnlDetalle"
+                                        process="@this"/>
+                                <p:column headerText="#{msg['productoTipoProductoCaracteristica.tabla.id']}">
+                                    <h:outputText value="#{reg.id}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['productoTipoProductoCaracteristica.tabla.productoTipoProducto']}">
+                                    <h:outputText value="#{reg.idProductoTipoProducto != null ? reg.idProductoTipoProducto.id : 'N/A'}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['productoTipoProductoCaracteristica.tabla.tipoProductoCaracteristica']}">
+                                    <h:outputText value="#{reg.idTipoProductoCaracteristica != null and reg.idTipoProductoCaracteristica.caracteristica != null ? reg.idTipoProductoCaracteristica.caracteristica.nombre : 'N/A'}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['productoTipoProductoCaracteristica.tabla.valor']}">
+                                    <h:outputText value="#{reg.valor}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                            <!-- Botón Nuevo -->
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="nuevo"/>
+                                <ui:param name="bean" value="#{productoTipoProductoCaracteristicaFrm}"/>
+                            </ui:include>
+                        </h:form>
+
+                        <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
+                    </div>
+                </h:panelGroup>
+
+                <!-- PANEL DETALLE CON TABVIEW -->
+                <h:panelGroup id="pnlDetalle">
+                    <h:form id="frmCrear" rendered="#{productoTipoProductoCaracteristicaFrm.estado != 'NADA' and productoTipoProductoCaracteristicaFrm.registro != null}">
+
+                        <!-- TabView con dos pestañas -->
+                        <p:tabView id="tabViewProductoTipoProductoCaracteristica">
+
+                            <!-- Tab 1: Generalidades -->
+                            <p:tab title="Generalidades">
+                                <h:panelGrid columns="2" cellpadding="5" style="margin-top: 10px;">
+                                    <h:outputLabel for="txtIdPanel"
+                                                   value="#{msg['productoTipoProductoCaracteristica.tabla.id']}:"/>
+                                    <h:panelGroup id="txtIdPanel">
+                                        <h:outputText rendered="#{empty productoTipoProductoCaracteristicaFrm.registro.id}"
+                                                      value="(#{msg['productoTipoProductoCaracteristica.id.autogenerado']})"/>
+                                        <h:inputText id="txtId"
+                                                     value="#{productoTipoProductoCaracteristicaFrm.registro.id}"
+                                                     rendered="#{not empty productoTipoProductoCaracteristicaFrm.registro.id}"
+                                                     disabled="true"
+                                                     style="width: 300px;"/>
+                                    </h:panelGroup>
+
+                                    <h:outputLabel for="cboProductoTipoProducto"
+                                                   value="#{msg['productoTipoProductoCaracteristica.form.productoTipoProducto']}"/>
+                                    <p:selectOneMenu id="cboProductoTipoProducto"
+                                                     value="#{productoTipoProductoCaracteristicaFrm.registro.idProductoTipoProducto}"
+                                                     converter="#{productoTipoProductoConverter}"
+                                                     required="true"
+                                                     requiredMessage="#{msg['productoTipoProductoCaracteristica.productoTipoProducto.requerido']}"
+                                                     style="width: 300px;">
+                                        <f:selectItem itemLabel="#{msg['productoTipoProductoCaracteristica.seleccione']}"
+                                                      itemValue="#{null}"
+                                                      noSelectionOption="true"/>
+                                        <f:selectItems value="#{productoTipoProductoCaracteristicaFrm.listaProductoTipoProducto}"
+                                                       var="ptp"
+                                                       itemLabel="#{ptp.id}"
+                                                       itemValue="#{ptp}"/>
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel for="cboTipoProductoCaracteristica"
+                                                   value="#{msg['productoTipoProductoCaracteristica.form.tipoProductoCaracteristica']}"/>
+                                    <p:selectOneMenu id="cboTipoProductoCaracteristica"
+                                                     value="#{productoTipoProductoCaracteristicaFrm.registro.idTipoProductoCaracteristica}"
+                                                     converter="#{tipoProductoCaracteristicaConverter}"
+                                                     required="true"
+                                                     requiredMessage="#{msg['productoTipoProductoCaracteristica.tipoProductoCaracteristica.requerido']}"
+                                                     style="width: 300px;">
+                                        <f:selectItem itemLabel="#{msg['productoTipoProductoCaracteristica.seleccione']}"
+                                                      itemValue="#{null}"
+                                                      noSelectionOption="true"/>
+                                        <f:selectItems value="#{productoTipoProductoCaracteristicaFrm.listaTipoProductoCaracteristica}"
+                                                       var="tpc"
+                                                       itemLabel="#{tpc.caracteristica != null ? tpc.caracteristica.nombre : tpc.id}"
+                                                       itemValue="#{tpc}"/>
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel for="txtValor"
+                                                   value="#{msg['productoTipoProductoCaracteristica.form.valor']}"/>
+                                    <h:inputTextarea id="txtValor"
+                                                     value="#{productoTipoProductoCaracteristicaFrm.registro.valor}"
+                                                     rows="3"
+                                                     style="width: 300px;"/>
+
+                                    <h:outputLabel for="txtObservaciones"
+                                                   value="#{msg['productoTipoProductoCaracteristica.form.observaciones']}"/>
+                                    <h:inputTextarea id="txtObservaciones"
+                                                     value="#{productoTipoProductoCaracteristicaFrm.registro.observaciones}"
+                                                     rows="4"
+                                                     style="width: 300px;"/>
+                                </h:panelGrid>
+                            </p:tab>
+
+                            <!-- Tab 2: Resumen -->
+                            <p:tab title="Resumen">
+                                <p:panelGrid id="gridResumen"
+                                             columns="2"
+                                             layout="grid"
+                                             columnClasses="col-label col-value"
+                                             styleClass="resumen-grid"
+                                             style="margin-top:10px">
+
+                                    <h:outputText value="ID:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty productoTipoProductoCaracteristicaFrm.registro.id ? msg['productoTipoProductoCaracteristica.id.autogenerado'] : productoTipoProductoCaracteristicaFrm.registro.id}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="#{msg['productoTipoProductoCaracteristica.form.productoTipoProducto']}:"
+                                                  styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty productoTipoProductoCaracteristicaFrm.registro.idProductoTipoProducto ? '-' : productoTipoProductoCaracteristicaFrm.registro.idProductoTipoProducto.id}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="#{msg['productoTipoProductoCaracteristica.form.tipoProductoCaracteristica']}:"
+                                                  styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty productoTipoProductoCaracteristicaFrm.registro.idTipoProductoCaracteristica ? '-' : (productoTipoProductoCaracteristicaFrm.registro.idTipoProductoCaracteristica.caracteristica != null ? productoTipoProductoCaracteristicaFrm.registro.idTipoProductoCaracteristica.caracteristica.nombre : productoTipoProductoCaracteristicaFrm.registro.idTipoProductoCaracteristica.id)}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="#{msg['productoTipoProductoCaracteristica.form.valor']}:"
+                                                  styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty productoTipoProductoCaracteristicaFrm.registro.valor ? '-' : productoTipoProductoCaracteristicaFrm.registro.valor}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="#{msg['productoTipoProductoCaracteristica.form.observaciones']}:"
+                                                  styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty productoTipoProductoCaracteristicaFrm.registro.observaciones ? '-' : productoTipoProductoCaracteristicaFrm.registro.observaciones}"/>
+                                    </p:outputPanel>
+
+                                </p:panelGrid>
+                            </p:tab>
+
+                        </p:tabView>
+
+                        <!-- Botones Crear / Modificar / Eliminar -->
+                        <h:panelGrid columns="1" style="margin-top: 15px;">
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="crud"/>
+                                <ui:param name="bean" value="#{productoTipoProductoCaracteristicaFrm}"/>
+                            </ui:include>
+                        </h:panelGrid>
+                    </h:form>
+
+                    <!-- Botón Cancelar -->
+                    <h:form id="frmCancelar" rendered="#{productoTipoProductoCaracteristicaFrm.estado != 'NADA'}">
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="cancelar"/>
+                            <ui:param name="bean" value="#{productoTipoProductoCaracteristicaFrm}"/>
+                        </ui:include>
+                    </h:form>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>

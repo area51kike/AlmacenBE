@@ -1,7 +1,6 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity;
 
 import jakarta.persistence.*;
-
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -12,11 +11,11 @@ public class ProductoTipoProducto {
     @Column(name = "id_producto_tipo_producto", nullable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_producto")
     private Producto idProducto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_tipo_producto")
     private TipoProducto idTipoProducto;
 
@@ -78,4 +77,16 @@ public class ProductoTipoProducto {
         this.observaciones = observaciones;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductoTipoProducto that = (ProductoTipoProducto) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

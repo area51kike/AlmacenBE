@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <meta charset="UTF-8"/>
+    <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>Producto Tipo Producto</title>
+</h:head>
+<h:body>
+    <div class="page-container">
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+        <div class="container">
+            <div class="header">
+                <h1>Producto Tipo Producto</h1>
+            </div>
+            <div class="content">
+                <!-- PANEL TABLA -->
+                <h:panelGroup id="pnlTabla" layout="block"
+                              style="display:#{productoTipoProductoFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTop">
+                            <p:dataTable id="tabla-top"
+                                         lazy="true"
+                                         rendered="#{productoTipoProductoFrm.estado == 'NADA'}"
+                                         rows="5"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{productoTipoProductoFrm.modelo}"
+                                         var="reg"
+                                         selectionMode="single"
+                                         selection="#{productoTipoProductoFrm.registro}"
+                                         rowKey="#{reg.id}">
+                                <p:ajax event="rowSelect" listener="#{productoTipoProductoFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle"/>
+                                <p:column headerText="ID">
+                                    <h:outputText value="#{reg.id}"/>
+                                </p:column>
+                                <p:column headerText="Producto">
+                                    <h:outputText value="#{reg.idProducto.nombreProducto}"/>
+                                </p:column>
+                                <p:column headerText="Tipo Producto">
+                                    <h:outputText value="#{reg.idTipoProducto.nombre}"/>
+                                </p:column>
+                                <p:column headerText="Fecha Creación">
+                                    <h:outputText value="#{reg.fechaCreacion}" converter="offsetDateTimeConverter"/>
+                                </p:column>
+                                <p:column headerText="Estado">
+                                    <h:outputText value="#{reg.activo ? 'Activo' : 'Inactivo'}"
+                                                  styleClass="#{reg.activo?'estado-activo':'estado-inactivo'}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                            <!-- Botón Nuevo -->
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="nuevo"/>
+                                <ui:param name="bean" value="#{productoTipoProductoFrm}"/>
+                            </ui:include>
+                        </h:form>
+
+                        <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
+                    </div>
+                </h:panelGroup>
+
+                <!-- PANEL DETALLE CON TABVIEW -->
+                <h:panelGroup id="pnlDetalle">
+                    <h:form id="frmCrear" rendered="#{productoTipoProductoFrm.estado != 'NADA'}">
+
+                        <!-- TabView con dos pestañas -->
+                        <p:tabView id="tabViewProductoTipoProducto">
+
+                            <!-- Tab 1: Generalidades -->
+                            <p:tab title="Generalidades">
+                                <h:panelGrid columns="2" cellpadding="5" style="margin-top: 10px;">
+                                    <h:outputLabel for="txtIdPanel" value="ID:"/>
+                                    <h:panelGroup id="txtIdPanel">
+                                        <h:outputText rendered="#{empty productoTipoProductoFrm.registro.id}"
+                                                      value="(Autogenerado)"/>
+                                        <h:inputText id="txtId"
+                                                     value="#{productoTipoProductoFrm.registro.id}"
+                                                     rendered="#{not empty productoTipoProductoFrm.registro.id}"
+                                                     disabled="true"/>
+                                    </h:panelGroup>
+
+                                    <h:outputLabel for="cmbProducto" value="Producto:"/>
+                                    <p:selectOneMenu id="cmbProducto"
+                                                     value="#{productoTipoProductoFrm.registro.idProducto}"
+                                                     required="true"
+                                                     requiredMessage="El producto es requerido"
+                                                     style="width: 300px;">
+                                        <f:selectItem itemLabel="-- Seleccione Producto --" itemValue="#{null}"/>
+                                        <f:selectItems value="#{productoTipoProductoFrm.listaProductos}"
+                                                       var="prod"
+                                                       itemLabel="#{prod.nombreProducto}"
+                                                       itemValue="#{prod}"/>
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel for="cmbTipoProducto" value="Tipo Producto:"/>
+                                    <p:selectOneMenu id="cmbTipoProducto"
+                                                     value="#{productoTipoProductoFrm.registro.idTipoProducto}"
+                                                     required="true"
+                                                     requiredMessage="El tipo de producto es requerido"
+                                                     style="width: 300px;">
+                                        <f:selectItem itemLabel="-- Seleccione Tipo Producto --" itemValue="#{null}"/>
+                                        <f:selectItems value="#{productoTipoProductoFrm.listaTipoProductos}"
+                                                       var="tipo"
+                                                       itemLabel="#{tipo.nombre}"
+                                                       itemValue="#{tipo}"/>
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel for="calFechaCreacion" value="Fecha Creación:"/>
+                                    <p:calendar id="calFechaCreacion"
+                                                value="#{productoTipoProductoFrm.fechaCreacionDate}"
+                                                pattern="dd/MM/yyyy HH:mm"
+                                                showTime="true"
+                                                hourFormat="24"
+                                                locale="es"
+                                                showButtonBar="true"
+                                                showIcon="true"
+                                                required="true"
+                                                requiredMessage="La fecha de creación es requerida"
+                                                style="width: 300px;">
+                                        <p:ajax event="dateSelect" update="@this"/>
+                                    </p:calendar>
+
+                                    <h:outputLabel for="chkActivo" value="Activo:"/>
+                                    <h:selectBooleanCheckbox id="chkActivo"
+                                                             value="#{productoTipoProductoFrm.registro.activo}"/>
+
+                                    <h:outputLabel for="txtObservaciones" value="Observaciones:"/>
+                                    <h:inputTextarea id="txtObservaciones"
+                                                     value="#{productoTipoProductoFrm.registro.observaciones}"
+                                                     rows="4"
+                                                     cols="40"
+                                                     style="width: 300px;"/>
+                                </h:panelGrid>
+                            </p:tab>
+
+                            <!-- Tab 2: Resumen -->
+                            <p:tab title="Resumen">
+                                <p:panelGrid id="gridResumen"
+                                             columns="2"
+                                             layout="grid"
+                                             columnClasses="col-label col-value"
+                                             styleClass="resumen-grid"
+                                             style="margin-top:10px">
+
+                                    <h:outputText value="ID:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty productoTipoProductoFrm.registro.id ? '(Autogenerado)' : productoTipoProductoFrm.registro.id}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="Producto:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty productoTipoProductoFrm.registro.idProducto ? '-' : productoTipoProductoFrm.registro.idProducto.nombreProducto}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="Tipo Producto:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty productoTipoProductoFrm.registro.idTipoProducto ? '-' : productoTipoProductoFrm.registro.idTipoProducto.nombre}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="Fecha Creación:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{productoTipoProductoFrm.registro.fechaCreacion}"
+                                                      converter="offsetDateTimeConverter"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="Estado:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{productoTipoProductoFrm.registro.activo ? 'Activo' : 'Inactivo'}"
+                                                      styleClass="#{productoTipoProductoFrm.registro.activo ? 'estado-activo' : 'estado-inactivo'}"/>
+                                    </p:outputPanel>
+
+                                    <h:outputText value="Observaciones:" styleClass="lbl"/>
+                                    <p:outputPanel styleClass="cuadro">
+                                        <h:outputText value="#{empty productoTipoProductoFrm.registro.observaciones ? '-' : productoTipoProductoFrm.registro.observaciones}"/>
+                                    </p:outputPanel>
+
+                                </p:panelGrid>
+                            </p:tab>
+
+                        </p:tabView>
+
+                        <!-- Botones Crear / Modificar / Eliminar -->
+                        <h:panelGrid columns="1" style="margin-top: 15px;">
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="crud"/>
+                                <ui:param name="bean" value="#{productoTipoProductoFrm}"/>
+                            </ui:include>
+                        </h:panelGrid>
+                    </h:form>
+
+                    <!-- Botón Cancelar: su propio form  -->
+                    <h:form id="frmCancelar">
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="cancelar"/>
+                            <ui:param name="bean" value="#{productoTipoProductoFrm}"/>
+                        </ui:include>
+                    </h:form>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>
