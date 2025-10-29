@@ -71,6 +71,21 @@
             <version>5.19.0</version>
             <scope>test</scope>
         </dependency>
+        <!-- Framework para pruebas con objetos simulados -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.19.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Integración de Mockito con JUnit 5 - AGREGAR ESTO -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.19.0</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Biblioteca de componentes JSF modernos -->
         <dependency>

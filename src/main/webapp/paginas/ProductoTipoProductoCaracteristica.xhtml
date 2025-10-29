@@ -88,7 +88,7 @@
                                                    value="#{msg['productoTipoProductoCaracteristica.form.productoTipoProducto']}"/>
                                     <p:selectOneMenu id="cboProductoTipoProducto"
                                                      value="#{productoTipoProductoCaracteristicaFrm.registro.idProductoTipoProducto}"
-                                                     converter="#{productoTipoProductoConverter}"
+                                                     converter="productoTipoProductoConverter"
                                                      required="true"
                                                      requiredMessage="#{msg['productoTipoProductoCaracteristica.productoTipoProducto.requerido']}"
                                                      style="width: 300px;">
@@ -105,7 +105,7 @@
                                                    value="#{msg['productoTipoProductoCaracteristica.form.tipoProductoCaracteristica']}"/>
                                     <p:selectOneMenu id="cboTipoProductoCaracteristica"
                                                      value="#{productoTipoProductoCaracteristicaFrm.registro.idTipoProductoCaracteristica}"
-                                                     converter="#{tipoProductoCaracteristicaConverter}"
+                                                     converter="tipoProductoCaracteristicaConverter"
                                                      required="true"
                                                      requiredMessage="#{msg['productoTipoProductoCaracteristica.tipoProductoCaracteristica.requerido']}"
                                                      style="width: 300px;">
