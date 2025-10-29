@@ -191,4 +191,5 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
             throw new IllegalStateException("Error al eliminar el registro por ID", ex);
         }
     }
+
 }
