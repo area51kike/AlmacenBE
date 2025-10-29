@@ -15,6 +15,21 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
     }
 
     public abstract EntityManager getEntityManager();
+    public T find(Object id) throws IllegalArgumentException {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID no puede ser nulo");
+        }
+
+        try {
+            EntityManager em = getEntityManager();
+            if (em == null) {
+                throw new IllegalStateException("EntityManager no disponible");
+            }
+            return em.find(entityClass, id);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Error al buscar el registro por ID", ex);
+        }
+    }
 
     public List<T> findAll() throws IllegalArgumentException {
         try {
@@ -34,27 +49,37 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
         }
     }
 
-    public List<T> findRange(int first, int max) throws IllegalArgumentException {
-        if (first < 0 || max < 1) {
-            throw new IllegalArgumentException("Parámetros inválidos: first debe ser >= 0, max debe ser >= 1");
+    public List<T> findRange(int first, int pageSize) {
+        // Validación y corrección de parámetros
+        if (first < 0) {
+            System.err.println("ADVERTENCIA: first=" + first + " es negativo, ajustando a 0");
+            first = 0;
         }
 
-        try {
-            EntityManager em = getEntityManager();
-            if (em == null) {
-                throw new IllegalStateException("EntityManager no disponible");
-            }
+        if (pageSize <= 0) {
+            System.err.println("ADVERTENCIA: pageSize=" + pageSize + " es inválido, ajustando a 10");
+            pageSize = 10;
+        }
 
-            CriteriaBuilder cb = em.getCriteriaBuilder();
+        System.out.println("findRange llamado con first=" + first + ", pageSize=" + pageSize);
+
+        try {
+            CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
             CriteriaQuery<T> cq = cb.createQuery(entityClass);
             Root<T> root = cq.from(entityClass);
             cq.select(root);
-            TypedQuery<T> query = em.createQuery(cq);
+
+            TypedQuery<T> query = getEntityManager().createQuery(cq);
             query.setFirstResult(first);
-            query.setMaxResults(max);
-            return query.getResultList();
-        } catch (Exception ex) {
-            throw new IllegalStateException("Error al acceder al rango de registros", ex);
+            query.setMaxResults(pageSize);
+
+            List<T> results = query.getResultList();
+            System.out.println("findRange retornó " + results.size() + " registros");
+            return results;
+        } catch (Exception e) {
+            System.err.println("Error en findRange: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -73,6 +98,23 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
             return query.getSingleResult().intValue();
         } catch (Exception ex) {
             throw new IllegalStateException("Error al contar registros", ex);
+        }
+    }
+    public T findById(Object id) throws IllegalArgumentException {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID no puede ser nulo");
+        }
+
+        try {
+            EntityManager em = getEntityManager();
+            if (em == null) {
+                throw new IllegalStateException("EntityManager no disponible");
+            }
+            return em.find(entityClass, id);
+        } catch (Exception ex) {
+            System.err.println("Error al buscar por ID: " + ex.getMessage());
+            ex.printStackTrace();
+            throw new IllegalStateException("Error al buscar el registro por ID", ex);
         }
     }
 
