@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <meta charset="UTF-8"/>
+    <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['compra.titulo']}</title>
+</h:head>
+<h:body>
+    <div class="page-container">
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['compra.titulo']}</h1>
+            </div>
+            <div class="content">
+
+                <h:panelGroup id="pnlTabla" layout="block"
+                              style="display:#{compraFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTop">
+                            <p:dataTable id="tabla-top"
+                                         lazy="true"
+                                         rendered="#{compraFrm.estado == 'NADA'}"
+                                         rows="8"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{compraFrm.modelo}"
+                                         var="reg"
+                                         selectionMode="single"
+                                         selection="#{compraFrm.registro}"
+                                         rowKey="#{reg.id}">
+
+                                <p:ajax event="rowSelect" listener="#{compraFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle"/>
+
+                                <p:column headerText="#{msg['compra.tabla.id']}"><h:outputText value="#{reg.id}"/></p:column>
+                                <p:column headerText="#{msg['compra.tabla.proveedor']}"><h:outputText value="#{reg.idProveedor}"/></p:column>
+                                <p:column headerText="#{msg['compra.tabla.fecha']}">
+                                    <h:outputText value="#{reg.fecha}">
+                                        <f:converter converterId="offsetDateTimeConverter"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="#{msg['compra.tabla.estado']}"><h:outputText value="#{reg.estado}"/></p:column>
+                                <p:column headerText="#{msg['compra.tabla.observaciones']}"><h:outputText value="#{reg.observaciones}"/></p:column>
+
+                            </p:dataTable>
+
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="nuevo"/>
+                                <ui:param name="bean" value="#{compraFrm}"/>
+                            </ui:include>
+                        </h:form>
+
+                        <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup id="pnlDetalle">
+                    <h:form id="frmCrear" rendered="#{compraFrm.estado != 'NADA'}">
+
+                        <p:messages id="msgGlobal" showDetail="true" autoUpdate="true"/>
+
+                        <h:panelGrid columns="2" cellpadding="5">
+
+                            <h:outputLabel for="txtIdPanel" value="ID Compra:"/>
+                            <h:panelGroup id="txtIdPanel">
+                                <h:outputText rendered="#{empty compraFrm.registro.id}"
+                                              value="(Autogenerado)"/>
+                                <h:inputText id="txtId"
+                                             value="#{compraFrm.registro.id}"
+                                             rendered="#{not empty compraFrm.registro.id}"
+                                             disabled="true"/>
+                            </h:panelGroup>
+
+                            <h:outputLabel for="selectProveedor" value="#{msg['compra.form.proveedor']}"/>
+                            <p:selectOneMenu id="selectProveedor"
+                                             value="#{compraFrm.registro.idProveedor}"
+                                             required="true"
+                                             requiredMessage="#{msg['compra.proveedor.requerido']}"
+                                             filter="true">
+                                <f:selectItem itemLabel="--- Seleccione Proveedor ---" itemValue="#{null}"/>
+                                <f:selectItems value="#{compraFrm.proveedoresDisponibles}"
+                                               var="p"
+                                               itemLabel="#{p.nombre} (ID: #{p.id})"
+                                               itemValue="#{p.id}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="calFecha" value="#{msg['compra.form.fecha']}"/>
+                            <p:calendar id="calFecha"
+                                        value="#{compraFrm.registro.fecha}"
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        showOn="button"
+                                        showTime="true"
+                                        timeInput="true"
+                                        mask="true"
+                                        required="true"
+                                        requiredMessage="#{msg['compra.fecha.requerida']}">
+                                <f:converter converterId="offsetDateTimeConverter"/>
+                            </p:calendar>
+
+                            <h:outputLabel for="selectEstado" value="#{msg['compra.form.estado']}"/>
+                            <p:selectOneMenu id="selectEstado"
+                                             value="#{compraFrm.registro.estado}"
+                                             required="true"
+                                             requiredMessage="#{msg['compra.estado.requerido']}">
+                                <f:selectItem itemLabel="--- Seleccione Estado ---" itemValue="#{null}"/>
+                                <f:selectItems value="#{compraFrm.estadosDisponibles}"
+                                               var="est"
+                                               itemLabel="#{est}"
+                                               itemValue="#{est.name()}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="txtObs" value="Observaciones:"/>
+                            <h:inputTextarea id="txtObs"
+                                             value="#{compraFrm.registro.observaciones}"
+                                             rows="3"
+                                             cols="30"/>
+
+                        </h:panelGrid>
+
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="crud"/>
+                            <ui:param name="bean" value="#{compraFrm}"/>
+                        </ui:include>
+                    </h:form>
+
+                    <h:form id="frmCancelar">
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="cancelar"/>
+                            <ui:param name="bean" value="#{compraFrm}"/>
+                        </ui:include>
+                    </h:form>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>
