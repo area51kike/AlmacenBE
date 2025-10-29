@@ -40,11 +40,12 @@ public class TipoProductoDao extends InventarioDefaultDataAccess<TipoProducto> i
             throw new IllegalArgumentException("El ID no puede ser nulo");
         }
 
+        EntityManager em = getEntityManager();
+        if (em == null) {
+            throw new IllegalStateException("EntityManager no disponible");
+        }
+
         try {
-            EntityManager em = getEntityManager();
-            if (em == null) {
-                throw new IllegalStateException("EntityManager no disponible");
-            }
             return em.find(TipoProducto.class, id);
         } catch (Exception ex) {
             throw new IllegalStateException("Error al buscar el registro por ID", ex);
