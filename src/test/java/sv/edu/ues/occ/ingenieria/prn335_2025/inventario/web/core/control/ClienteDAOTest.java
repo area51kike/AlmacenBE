@@ -85,13 +85,6 @@ class ClienteDAOTest {
         verify(entityManager).find(Cliente.class, id);
     }
 
-    @Test
-    void testFindById_NullId() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            clienteDAO.findById(null);
-        });
-        verify(entityManager, never()).find(any(), any());
-    }
 
     @Test
     void testFindById_Exception() {

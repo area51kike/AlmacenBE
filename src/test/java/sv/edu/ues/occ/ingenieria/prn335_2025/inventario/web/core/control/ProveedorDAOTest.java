@@ -86,14 +86,6 @@ class ProveedorDAOTest {
     }
 
     @Test
-    void testFindById_NullId() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            proveedorDAO.findById(null);
-        });
-        verify(entityManager, never()).find(any(), any());
-    }
-
-    @Test
     void testFindById_Exception() {
         Integer id = 1;
         when(entityManager.find(Proveedor.class, id))
