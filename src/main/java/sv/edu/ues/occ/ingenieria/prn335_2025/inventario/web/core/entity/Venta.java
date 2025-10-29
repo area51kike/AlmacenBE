@@ -2,6 +2,7 @@ package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.conversores.OffsetDateTimeJpaConverter;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -13,10 +14,9 @@ public class Venta {
     @Column(name = "id_venta", nullable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_cliente")
-    private Cliente idCliente;
 
+    // 2. AJUSTE: CONVERSOR para OffsetDateTime
+    @Convert(converter = OffsetDateTimeJpaConverter.class)
     @Column(name = "fecha")
     private OffsetDateTime fecha;
 
@@ -28,9 +28,14 @@ public class Venta {
     @Column(name = "observaciones")
     private String observaciones;
 
+    // Relación ManyToOne con la entidad Cliente
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_cliente")
+    private Cliente idCliente; // Mantiene el nombre original de la relación
     public UUID getId() {
         return id;
     }
+
 
     public void setId(UUID id) {
         this.id = id;

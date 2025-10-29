@@ -46,6 +46,8 @@ public abstract class DefaultFrm<T> implements Serializable {
             public String getRowKey(T object) {
                 if (object != null) {
                     try {
+                        String id = getIdAsText(object);
+                        System.out.println("🔍 getRowKey: " + id);
                         return getIdAsText(object);
                     } catch (Exception e) {
                         Logger.getLogger(DefaultFrm.class.getName()).log(Level.SEVERE, null, e);
@@ -59,6 +61,7 @@ public abstract class DefaultFrm<T> implements Serializable {
             public T getRowData(String rowKey) {
                 if (rowKey != null) {
                     try {
+                        System.out.println("🔍 getRowData: " + rowKey);
                         return getIdByText(rowKey);
                     } catch (Exception e) {
                         Logger.getLogger(DefaultFrm.class.getName()).log(Level.SEVERE, null, e);
@@ -80,6 +83,7 @@ public abstract class DefaultFrm<T> implements Serializable {
             @Override
             public List<T> load(int first, int max, Map<String, SortMeta> map, Map<String, FilterMeta> map1) {
                 try {
+                    System.out.println("🔍 LazyDataModel.load llamado con first=" + first + ", max=" + max);
                     return getDao().findRange(first, max);
                 } catch (Exception e) {
                     Logger.getLogger(DefaultFrm.class.getName()).log(Level.SEVERE, null, e);
@@ -102,6 +106,8 @@ public abstract class DefaultFrm<T> implements Serializable {
     public void btnNuevoHandler(ActionEvent actionEvent) {
         this.registro = nuevoRegistro();
         this.estado = ESTADO_CRUD.CREAR;
+        System.out.println("🧠 Botón Nuevo presionado, estado = " + this.estado);
+
     }
 
     public void btnCancelarHandler(ActionEvent actionEvent) {

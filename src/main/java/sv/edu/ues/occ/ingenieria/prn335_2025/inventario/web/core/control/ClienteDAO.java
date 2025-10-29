@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Cliente;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Stateless
 @LocalBean
@@ -24,4 +25,8 @@ public class ClienteDAO extends InventarioDefaultDataAccess<Cliente> implements 
     }
 
     public ClienteDAO() { super(Cliente.class); }
+    // En ClienteDAO.java
+    public Cliente findById(UUID id) {
+        return getEntityManager().find(Cliente.class, id);
+    }
 }

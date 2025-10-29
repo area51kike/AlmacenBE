@@ -9,6 +9,7 @@ import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.Product
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Named
 @ViewScoped
@@ -83,4 +84,9 @@ public class ProductoFrm extends DefaultFrm<Producto> implements Serializable {
         String nombre = registro.getNombreProducto();
         return nombre == null || nombre.trim().isEmpty();
     }
+    // Dentro de ProductoDao.java (Data Access Object para la entidad Producto)
+
+// Asume que la clase hereda de InventarioDefaultDataAccess<Producto>
+
+
 }

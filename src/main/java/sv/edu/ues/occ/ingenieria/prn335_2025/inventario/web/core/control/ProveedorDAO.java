@@ -23,4 +23,12 @@ public class ProveedorDAO extends InventarioDefaultDataAccess<Proveedor> impleme
     }
 
     public ProveedorDAO() { super(Proveedor.class); }
+    // ⭐ MÉTODO NECESARIO PARA CompraFrm.java
+    public Proveedor findById(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        // Asumiendo que la clave primaria de Proveedor es Integer (que es lo que el log sugiere)
+        return em.find(Proveedor.class, id);
+    }
 }

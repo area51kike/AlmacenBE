@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.converter.IntegerToLongConverter; // <-- Importación necesaria
+
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.conversores.OffsetDateTimeJpaConverter;
 
 @Entity
 @Access(AccessType.FIELD)
@@ -29,7 +30,7 @@ public class Compra implements Serializable {
 
 
     // 4. OTROS CAMPOS DE COMPRA
-    @Convert(converter = sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.converter.OffsetDateTimeJpaConverter.class)
+    @Convert(converter = OffsetDateTimeJpaConverter.class)
     @Column(name = "fecha")
     private OffsetDateTime fecha;
 

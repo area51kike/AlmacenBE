@@ -15,43 +15,44 @@ import java.time.format.DateTimeParseException;
 @ApplicationScoped
 public class OffsetDateTimeConverter implements Converter<OffsetDateTime> {
 
-    // Con offset: 2025-10-14T13:45-06:00
+    // ✅ CORRECCIÓN 1: Eliminar la 'T' para que coincida con el patrón del p:calendar (yyyy-MM-dd HH:mm)
     private static final DateTimeFormatter FMT_WITH_OFFSET =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmXXX");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mmXXX"); // Usar espacio, no 'T'
 
-    // Sin offset: 2025-10-14T13:45 (lo que envía típicamente el datePicker)
+    // ✅ CORRECCIÓN 2: Eliminar la 'T' para que coincida con el patrón del p:calendar (yyyy-MM-dd HH:mm)
     private static final DateTimeFormatter FMT_NO_OFFSET =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); // Usar espacio, no 'T'
 
-    // Zona por defecto (ajústala si usas otra)
+    // Zona por defecto (está bien, asumiendo que es la correcta)
     private static final ZoneId DEFAULT_ZONE = ZoneId.of("America/El_Salvador");
 
     @Override
-
     public OffsetDateTime getAsObject(FacesContext ctx, UIComponent comp, String value) {
         if (value == null || value.isBlank()) return null;
 
-        // Normalizar: colapsa espacios después de 'T'
-        String v = value.trim().replaceFirst("T\\s+", "T");
+        // Quitar el manejo de la 'T' si ya no está en el patrón
+        String v = value.trim();
+
         try {
             // Si trae offset al final, úsalo...
             if (v.matches(".*[+-]\\d{2}:\\d{2}$")) {
-                return OffsetDateTime.parse(v, FMT_WITH_OFFSET); // yyyy-MM-dd'T'HH:mmXXX
+                return OffsetDateTime.parse(v, FMT_WITH_OFFSET);
             }
             // ...si no, asume tu zona
-            LocalDateTime ldt = LocalDateTime.parse(v, FMT_NO_OFFSET); // yyyy-MM-dd'T'HH:mm
+            LocalDateTime ldt = LocalDateTime.parse(v, FMT_NO_OFFSET);
             return ldt.atZone(DEFAULT_ZONE).toOffsetDateTime();
         } catch (DateTimeParseException e) {
+            // Ajustar el mensaje de error para reflejar el patrón correcto
             throw new ConverterException(
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fecha inválida",
-                            "Usa 2025-10-14T13:45 (o con offset: 2025-10-14T13:45-06:00)"));
+                            "Usa yyyy-MM-dd HH:mm o con offset: yyyy-MM-dd HH:mm-06:00"));
         }
     }
 
     @Override
     public String getAsString(FacesContext ctx, UIComponent comp, OffsetDateTime value) {
         if (value == null) return "";
-        // Devuelve SIN offset porque el datePicker normalmente trabaja sin offset
+        // ✅ CRÍTICO: Usar el patrón corregido (FMT_NO_OFFSET)
         return value.atZoneSameInstant(DEFAULT_ZONE).toLocalDateTime().format(FMT_NO_OFFSET);
     }
 }

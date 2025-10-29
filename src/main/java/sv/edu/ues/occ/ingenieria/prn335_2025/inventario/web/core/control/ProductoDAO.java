@@ -43,6 +43,7 @@ public class ProductoDAO extends InventarioDefaultDataAccess<Producto> {
             throw new IllegalStateException("Error al crear el registro", ex);
         }
     }
+
     public Producto findById(UUID id) {
         if (id == null) {
             throw new IllegalArgumentException("El ID no puede ser nulo");

@@ -1,4 +1,4 @@
-package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.converter;
+package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.conversores;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.faces.component.UIComponent;
