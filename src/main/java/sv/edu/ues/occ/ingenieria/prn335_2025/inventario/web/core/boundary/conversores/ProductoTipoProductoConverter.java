@@ -19,7 +19,7 @@ public class ProductoTipoProductoConverter implements Converter<ProductoTipoProd
     private static final Logger LOGGER = Logger.getLogger(ProductoTipoProductoConverter.class.getName());
 
     @Inject
-    private ProductoTipoProductoDAO productoTipoProductoDAO;
+    private ProductoTipoProductoDAO ProductoTipoProductoDAO;
 
     @Override
     public ProductoTipoProducto getAsObject(FacesContext context, UIComponent component, String value) {
@@ -29,7 +29,7 @@ public class ProductoTipoProductoConverter implements Converter<ProductoTipoProd
 
         try {
             UUID id = UUID.fromString(value);
-            ProductoTipoProducto result = productoTipoProductoDAO.find(id);
+            ProductoTipoProducto result = ProductoTipoProductoDAO.find(id);
 
             if (result == null) {
                 LOGGER.log(Level.WARNING, "No se encontró ProductoTipoProducto con ID: {0}", id);

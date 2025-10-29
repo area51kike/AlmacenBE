@@ -28,7 +28,7 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
     private ProductoTipoProductoCaracteristicaDAO productoTipoProductoCaracteristicaDAO;
 
     @EJB
-    private ProductoTipoProductoDAO productoTipoProductoDAO;
+    private ProductoTipoProductoDAO ProductoTipoProductoDAO;
 
     @EJB
     private TipoProductoCaracteristicaDAO tipoProductoCaracteristicaDAO;
@@ -110,7 +110,7 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
 
     private void cargarListas() {
         try {
-            this.listaProductoTipoProducto = productoTipoProductoDAO.findAll();
+            this.listaProductoTipoProducto = ProductoTipoProductoDAO.findAll();
             this.listaTipoProductoCaracteristica = tipoProductoCaracteristicaDAO.findAll();
 
             System.out.println("ProductoTipoProducto cargados: " +
