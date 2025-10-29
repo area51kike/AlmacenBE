@@ -1,10 +1,9 @@
-package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.converter;
+package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.conversores;
 
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
-import jakarta.inject.Inject;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ClienteDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Cliente;
 
@@ -13,14 +12,15 @@ import java.util.UUID;
 @FacesConverter(value = "clienteConverter", managed = true)
 public class ClienteConverter implements Converter<Cliente> {
 
-    @Inject
-    private ClienteDAO clienteDao;
+    private ClienteDAO clienteDao = new ClienteDAO();
 
     @Override
     public Cliente getAsObject(FacesContext context, UIComponent component, String value) {
         if (value == null || value.isBlank()) return null;
         try {
             UUID id = UUID.fromString(value);
+            System.out.println("🔍 UUID recibido en converter: " + value);
+
             return clienteDao.findById(id);
         } catch (IllegalArgumentException e) {
             return null;

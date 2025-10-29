@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['compraDetalle.titulo.principal']}</title>
+</h:head>
+
+<h:body>
+    <div class="page-container">
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['compraDetalle.titulo.principal']}</h1>
+            </div>
+
+            <div class="content">
+
+                <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
+
+                <h:panelGroup id="pnlTabla" layout="block"
+                              style="display:#{compraDetalleFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTabla">
+                            <p:dataTable id="tblCompraDetalle"
+                                         lazy="true"
+                                         rendered="#{compraDetalleFrm.estado == 'NADA'}"
+                                         rows="#{compraDetalleFrm.pageSize}"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{compraDetalleFrm.modelo}"
+                                         var="item"
+                                         selectionMode="single"
+                                         selection="#{compraDetalleFrm.registro}"
+                                         rowKey="#{item.id}">
+
+                                <p:ajax event="rowSelect" listener="#{compraDetalleFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle, :messages"/>
+                                <p:ajax event="rowUnselect" listener="#{compraDetalleFrm.btnCancelarHandler}"
+                                        update=":pnlTabla :pnlDetalle, :messages"/>
+
+                                <p:column headerText="#{msg['tabla.compraDetalle.columna.id']}" width="150" sortBy="#{item.id}"><h:outputText value="#{item.id}"/></p:column>
+                                <p:column headerText="#{msg['tabla.compraDetalle.columna.compra']}" sortBy="#{item.idCompra.id}"><h:outputText value="#{item.idCompra.id}"/></p:column>
+                                <p:column headerText="#{msg['tabla.compraDetalle.columna.producto']}" sortBy="#{item.idProducto.nombreProducto}"><h:outputText value="#{item.idProducto.nombreProducto}"/></p:column>
+                                <p:column headerText="#{msg['tabla.compraDetalle.columna.cantidad']}" sortBy="#{item.cantidad}"><h:outputText value="#{item.cantidad}"/></p:column>
+                                <p:column headerText="#{msg['tabla.compraDetalle.columna.precio']}" sortBy="#{item.precio}"><h:outputText value="#{item.precio}"><f:convertNumber type="currency" currencySymbol="$"/></h:outputText></p:column>
+                                <p:column headerText="#{msg['tabla.compraDetalle.columna.estado']}" sortBy="#{item.estado}"><h:outputText value="#{item.estado}"/></p:column>
+                            </p:dataTable>
+
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="nuevo"/>
+                                <ui:param name="bean" value="#{compraDetalleFrm}"/>
+                            </ui:include>
+                        </h:form>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup id="pnlDetalle" layout="block"
+                              style="display:#{compraDetalleFrm.estado ne 'NADA' ? 'block' : 'none'}">
+                    <h:form id="frmCrear" rendered="#{compraDetalleFrm.estado != 'NADA'}">
+
+                        <h:panelGrid columns="2" cellpadding="5" style="margin-top: 10px; width: 50%;">
+
+                            <h:outputLabel for="txtIdPanel" value="#{msg['compraDetalle.campo.id']}"/>
+                            <h:panelGroup id="txtIdPanel">
+                                <h:outputText rendered="#{empty compraDetalleFrm.registro.id}" value="(#{msg['compraDetalle.id.autogenerado']})"/>
+                                <h:inputText id="txtId" value="#{compraDetalleFrm.registro.id}" rendered="#{not empty compraDetalleFrm.registro.id}" disabled="true"/>
+                            </h:panelGroup>
+
+                            <h:outputLabel for="selCompra" value="#{msg['compraDetalle.campo.compra']}"/>
+                            <p:selectOneMenu id="selCompra"
+                                             value="#{compraDetalleFrm.registro.idCompra.id}"
+                                             required="true"
+                                             requiredMessage="#{msg['mensaje.validacion.compra.requerida']}"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             style="width: 280px;">
+                                <f:selectItem itemLabel="Seleccione Compra" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{compraDetalleFrm.comprasDisponibles}" var="compra"
+                                               itemLabel="ID: #{compra.id} | Estado: #{compra.estado} | Obs: #{compra.observaciones}" itemValue="#{compra.id}" />
+                            </p:selectOneMenu>
+                            <h:outputLabel for="selProducto" value="#{msg['compraDetalle.campo.producto']}"/>
+                            <p:selectOneMenu id="selProducto"
+                                             value="#{compraDetalleFrm.registro.idProducto.id}"
+                                             required="true"
+                                             requiredMessage="#{msg['mensaje.validacion.producto.requerido']}"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             style="width: 280px;">
+                                <f:selectItem itemLabel="Seleccione Producto" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{compraDetalleFrm.productosDisponibles}" var="prod"
+                                               itemLabel="#{prod.nombreProducto} (Ref: #{prod.referenciaExterna})" itemValue="#{prod.id}" />
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="txtCantidad" value="#{msg['compraDetalle.campo.cantidad']}"/>
+                            <p:inputNumber id="txtCantidad"
+                                           value="#{compraDetalleFrm.registro.cantidad}"
+                                           required="true"
+                                           requiredMessage="#{msg['mensaje.validacion.cantidad.requerida']}"
+                                           minValue="0.1" decimalPlaces="1"/>
+
+                            <h:outputLabel for="txtPrecio" value="#{msg['compraDetalle.campo.precio']}"/>
+                            <p:inputNumber id="txtPrecio"
+                                           value="#{compraDetalleFrm.registro.precio}"
+                                           required="true"
+                                           requiredMessage="#{msg['mensaje.validacion.precio.requerido']}"
+                                           symbol="$" symbolPosition="p"
+                                           minValue="0.00" decimalPlaces="2"/>
+
+                            <h:outputLabel for="selEstado" value="#{msg['compraDetalle.campo.estado']}"/>
+                            <p:selectOneMenu id="selEstado"
+                                             value="#{compraDetalleFrm.registro.estado}"
+                                             required="true"
+                                             requiredMessage="#{msg['mensaje.validacion.estado.requerido']}"
+                                             style="width: 150px;">
+                                <f:selectItem itemLabel="Seleccione Estado" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{compraDetalleFrm.estadosDisponibles}" var="e"
+                                               itemLabel="#{e}" itemValue="#{e}" />
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="txtObs" value="#{msg['compraDetalle.campo.observaciones']}"/>
+                            <p:inputTextarea id="txtObs"
+                                             value="#{compraDetalleFrm.registro.observaciones}"
+                                             rows="3" cols="40"
+                                             style="width: 100%;"/>
+
+                        </h:panelGrid>
+
+                        <h:panelGroup layout="block" style="margin-top: 15px;">
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="crud"/>
+                                <ui:param name="bean" value="#{compraDetalleFrm}"/>
+                            </ui:include>
+                        </h:panelGroup>
+                    </h:form>
+
+                    <h:form id="frmCancelar">
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="cancelar"/>
+                            <ui:param name="bean" value="#{compraDetalleFrm}"/>
+                        </ui:include>
+                    </h:form>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>

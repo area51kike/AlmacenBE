@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['venta.titulo.principal']}</title>
+</h:head>
+
+<h:body>
+    <f:event type="preRenderView" listener="#{ventaFrm.inicializar}"/>
+
+    <div class="page-container">
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['venta.titulo.principal']}</h1>
+            </div>
+
+            <div class="content">
+                <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
+                <h:panelGroup id="pnlTabla"
+                              rendered="#{ventaFrm.estado eq 'NADA'}"
+                              style="display:#{ventaFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTabla">
+                            <p:dataTable id="tblVentas"
+                                         lazy="true"
+                                         rendered="#{ventaFrm.estado == 'NADA'}"
+                                         rows="#{ventaFrm.pageSize}"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{ventaFrm.modelo}"
+                                         var="item"
+                                         selectionMode="single"
+                                         selection="#{ventaFrm.registro}"
+                                         rowKey="#{item.id}">
+
+                                <p:ajax event="rowSelect" listener="#{ventaFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle, :messages"/>
+
+                                <p:column headerText="#{msg['tabla.venta.columna.id']}" width="200" sortBy="#{item.id}">
+                                    <h:outputText value="#{item.id}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.venta.columna.cliente']}" sortBy="#{item.idCliente.nombre}">
+                                    <h:outputText value="#{item.idCliente.nombre}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.venta.columna.fecha']}" sortBy="#{item.fecha}">
+                                    <h:outputText value="#{item.fecha}">
+                                        <f:converter converterId="offsetDateTimeConverter"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.venta.columna.estado']}" sortBy="#{item.estado}" width="120">
+                                    <h:outputText value="#{item.estado}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.venta.columna.observaciones']}" sortBy="#{item.observaciones}" width="200">
+                                    <h:outputText value="#{item.observaciones}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </h:form>
+                        <h:form id="frmBotonNuevo">
+                            <p:commandButton id="btnNuevo" value="#{msg['boton.nuevo']}"
+                                             rendered="#{ventaFrm.estado == 'NADA' or ventaFrm.estado.name() == 'NADA'}"
+                                             styleClass="btn-nuevo"
+                                             actionListener="#{ventaFrm.btnNuevoHandler}"
+                                             process="@this"
+                                             update=":pnlDetalle :pnlTabla :messages"/>
+                        </h:form>
+
+
+                    </div>
+                </h:panelGroup>
+
+
+                <p:outputPanel  id="pnlDetalle"
+                                deferred="false"
+                                layout="block"
+                                visible="#{ventaFrm.estado ne 'NADA'}">>
+
+                    <h:form id="frmCrear" >
+                        <h:outputText value="Estado actual: #{ventaFrm.estado}" />
+
+
+                        <h:panelGrid columns="2" cellpadding="5"  rendered="#{ventaFrm.estado != 'NADA' }" >
+                            <h:outputText value="🧪 pnlDetalle visible, estado: #{ventaFrm.estado}" />
+                            <h:outputLabel for="txtIdPanel" value="#{msg['venta.campo.id']}:"/>
+                            <h:panelGroup id="txtIdPanel">
+                                <h:outputText rendered="#{empty ventaFrm.registro.id}"
+                                              value="(#{msg['venta.id.autogenerado']})"/>
+                                <h:inputText id="txtId"
+                                             value="#{ventaFrm.registro.id}"
+                                             rendered="#{not empty ventaFrm.registro.id}"
+                                             disabled="true"/>
+                            </h:panelGroup>
+
+                            <h:outputLabel for="selCliente" value="#{msg['venta.campo.cliente']}"/>
+                            <p:selectOneMenu id="selCliente"
+                                             value="#{ventaFrm.registro.idCliente.id}"
+                                             required="true"
+                                             filter="true"
+                                             style="width: 250px;">
+
+                                <f:selectItem itemLabel="Seleccione Cliente" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{ventaFrm.clientesDisponibles}" var="c"
+                                               itemLabel="#{c.nombre} - #{c.dui}" itemValue="#{c.id}" />
+                            </p:selectOneMenu>
+
+
+
+                            <h:outputLabel for="selEstado" value="#{msg['venta.campo.estado']}"/>
+                            <p:selectOneMenu id="selEstado"
+                                             value="#{ventaFrm.registro.estado}"
+                                             required="true"
+                                             requiredMessage="#{msg['mensaje.validacion.estado.requerido']}"
+                                             style="width: 200px;">
+                                <f:selectItem itemLabel="Seleccione Estado" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{ventaFrm.estadosDisponibles}" var="e"
+                                               itemLabel="#{e}" itemValue="#{e}" />
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="txtFecha" value="#{msg['venta.campo.fecha']}"/>
+                            <p:calendar id="txtFecha"
+                                        value="#{ventaFrm.registro.fecha}"
+                                        pattern="dd/MM/yyyy HH:mm"
+                                        showTime="true"
+                                        timeZone="CST"
+                                        converter="offsetDateTimeConverter"
+                                        required="true"
+                                        requiredMessage="La fecha es obligatoria"/>
+
+                            <h:outputLabel for="txtObs" value="#{msg['venta.campo.observaciones']}"/>
+                            <p:inputTextarea id="txtObs"
+                                             value="#{ventaFrm.registro.observaciones}"
+                                             rows="5" cols="40"
+                                             style="width: 100%;"/>
+                        </h:panelGrid>
+
+                        <h:panelGroup layout="block" style="margin-top: 15px;">
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="crud"/>
+                                <ui:param name="bean" value="#{ventaFrm}"/>
+                            </ui:include>
+
+
+                        </h:panelGroup>
+
+                            <h:form id="frmCancelar">
+                                <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                    <ui:param name="section" value="cancelar"/>
+                                    <ui:param name="bean" value="#{ventaFrm}"/>
+                                </ui:include>
+                            </h:form>
+
+                    </h:form>
+
+
+                </p:outputPanel>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>
