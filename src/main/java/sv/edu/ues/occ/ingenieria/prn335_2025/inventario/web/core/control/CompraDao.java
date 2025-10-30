@@ -23,40 +23,25 @@ public class CompraDao extends InventarioDefaultDataAccess <Compra> {
     public EntityManager getEntityManager() {
         return em;
     }
+
     @Override
-
-    public void crear(Compra registro) throws IllegalArgumentException {
-        if (registro == null) {
-            throw new IllegalArgumentException("El registro no puede ser nulo");
-        }
-
-        if (registro.getIdProveedor() == null) {
-            throw new IllegalArgumentException("Debe seleccionar un proveedor.");
-        }
-
-        Proveedor proveedorExistente = em.find(Proveedor.class, registro.getIdProveedor());
-        if (proveedorExistente == null) {
-            throw new IllegalArgumentException("El proveedor con ID " + registro.getIdProveedor() + " no existe.");
-        }
-
-        registro.setProveedor(proveedorExistente); // Opcional
-
-        em.persist(registro);
+    public void eliminar(Compra registro) {
+        // Llamamos a la lógica de eliminación que ya está definida en la clase base.
+        // El contenedor EJB se asegura de hacer el COMMIT después de que esta línea termine.
+        super.eliminar(registro);
     }
 
-
-
-    // Dentro de CompraDao.java
-// Asegúrate de que esta clase herede de InventarioDefaultDataAccess<Compra>
-// y que getEntityManager() esté implementado.
-
-    public Compra findById(Long id) {
-        // Usamos el método find() del EntityManager
-        return getEntityManager().find(Compra.class, id);
-    }
-    private Long generarIdCompraManual() {
-        Long maxId = (Long) em.createQuery("SELECT COALESCE(MAX(c.id), 0) FROM Compra c").getSingleResult();
-        return maxId + 1;
+    @Override
+    public void crear(Compra entidad) {
+        // Llamamos a la lógica de eliminación que ya está definida en la clase base.
+        // El contenedor EJB se asegura de hacer el COMMIT después de que esta línea termine.
+        super.crear(entidad);
     }
 
+    @Override
+    public Compra findById(Object id) {
+
+        return super.findById(id);
+
+    }
 }

@@ -51,6 +51,8 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
         return nuevaCompra;
     }
 
+
+
     @Override
     protected Compra buscarRegistroPorId(Object id) {
         if (id instanceof Long) {
@@ -62,6 +64,33 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
         }
         return null;
     }
+
+
+    protected void crearEntidad(Compra entidad) throws Exception {
+        if (entidad.getFecha() == null || entidad.getIdProveedor() == null || entidad.getEstado() == null) {
+            throw new Exception("Los campos fecha, proveedor y estado son obligatorios");
+        }
+
+        // Asignar el ID de la compra igual al ID del proveedor
+        Integer idProveedor = entidad.getIdProveedor();
+        entidad.setId(idProveedor.longValue());
+
+        // Verificar si ya existe una compra con ese ID
+        Compra existente = compraDao.findById(idProveedor.longValue());
+        if (existente != null) {
+            throw new Exception("Ya existe una compra para este proveedor.");
+        }
+
+        // Asignar el proveedor completo (entidad)
+        Proveedor proveedorEntity = proveedorDao.findById(idProveedor);
+        if (proveedorEntity == null) {
+            throw new Exception("El proveedor seleccionado no existe.");
+        }
+        entidad.setProveedor(proveedorEntity);
+
+        compraDao.crear(entidad);
+    }
+
 
     @Override
     protected String getIdAsText(Compra r) {
@@ -127,7 +156,7 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
                 }
 
                 if (this.estado == ESTADO_CRUD.CREAR) {
-                    getDao().crear(this.registro);
+                    crearEntidad(this.registro);
                 } else if (this.estado == ESTADO_CRUD.MODIFICAR) {
                     getDao().modificar(this.registro);
                 }
