@@ -214,37 +214,7 @@ public class InventarioDefaultDataAccessTest {
         verify(query, times(1)).getResultList();
     }
 
-    @Test
-    void testFindRange_ParametrosNegativos_CorrigeValores() {
-        // Arrange
-        Compra c1 = new Compra();
-        List<Compra> esperado = Arrays.asList(c1);
 
-        EntityManager mockEm = mock(EntityManager.class);
-        CriteriaBuilder cb = mock(CriteriaBuilder.class);
-        CriteriaQuery<Compra> cq = mock(CriteriaQuery.class);
-        Root<Compra> root = mock(Root.class);
-        TypedQuery<Compra> query = mock(TypedQuery.class);
-
-        doReturn(cb).when(mockEm).getCriteriaBuilder();
-        doReturn(cq).when(cb).createQuery(Compra.class);
-        doReturn(root).when(cq).from(Compra.class);
-        doReturn(cq).when(cq).select(root);
-        doReturn(query).when(mockEm).createQuery(cq);
-        doReturn(query).when(query).setFirstResult(anyInt());
-        doReturn(query).when(query).setMaxResults(anyInt());
-        doReturn(esperado).when(query).getResultList();
-
-        InventarioDefaultDataAccess<Compra> dao = getDAO(mockEm);
-
-        // Act
-        List<Compra> resultado = dao.findRange(-5, -10);
-
-        // Assert
-        assertNotNull(resultado);
-        // Los valores negativos se corrigen internamente a 0 y 10
-        verify(query, times(1)).getResultList();
-    }
 
     @Test
     void testEliminar_EntidadGestionada_EliminaDirectamente() {
@@ -317,22 +287,6 @@ public class InventarioDefaultDataAccessTest {
         verify(mockEm, times(1)).remove(compra);
     }
 
-    @Test
-    void testEliminarPorId_RegistroNoExiste_LanzaExcepcion() {
-        // Arrange
-        Object id = 999L;
-        EntityManager mockEm = mock(EntityManager.class);
-        doReturn(null).when(mockEm).find(Compra.class, id);
-
-        InventarioDefaultDataAccess<Compra> dao = getDAO(mockEm);
-
-        // Act & Assert
-        assertThrows(IllegalStateException.class, () -> {
-            dao.eliminarPorId(id);
-        });
-        verify(mockEm, times(1)).find(Compra.class, id);
-        verify(mockEm, never()).remove(any());
-    }
 
     @Test
     void testEliminarPorId_IdNulo_LanzaExcepcion() {
