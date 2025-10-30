@@ -27,4 +27,10 @@
         <param-name>jakarta.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>
+
+    <!-- AGREGAR ESTA SECCIÓN PARA LA PÁGINA DE INICIO -->
+    <welcome-file-list>
+        <welcome-file>paginas/Inicio.jsf</welcome-file>
+    </welcome-file-list>
+
 </web-app>
