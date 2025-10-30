@@ -54,4 +54,21 @@ public class TipoAlmacen {
         this.obsevaciones = obsevaciones;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TipoAlmacen that = (TipoAlmacen) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "TipoAlmacen{id=" + id + ", nombre='" + nombre + "'}";
+    }
 }

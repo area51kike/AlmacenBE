@@ -4,10 +4,9 @@ import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Caracteristica;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @Stateless
 @LocalBean
@@ -19,39 +18,31 @@ public class CaracteristicaDAO extends InventarioDefaultDataAccess<Caracteristic
     public CaracteristicaDAO() {
         super(Caracteristica.class);
     }
-    public Caracteristica findById(Long id) {
-        if (id == null) {
-            System.err.println("CaracteristicaDAO.findById: ID es nulo");
-            return null;
-        }
 
-        try {
-            if (em == null) {
-                System.err.println("CaracteristicaDAO.findById: EntityManager no disponible");
-                return null;
-            }
-            Caracteristica result = em.find(Caracteristica.class, id);
-            System.out.println("CaracteristicaDAO.findById(" + id + "): " +
-                    (result != null ? result.getNombre() : "null"));
-            return result;
-        } catch (Exception ex) {
-            System.err.println("CaracteristicaDAO.findById: Error al buscar característica - " + ex.getMessage());
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    public List<Caracteristica> findAll() {
-        try {
-            return em.createQuery("SELECT c FROM Caracteristica c ORDER BY c.nombre", Caracteristica.class)
-                    .getResultList();
-        } catch (Exception e) {
-            System.err.println("Error al cargar Caracteristica: " + e.getMessage());
-            return new ArrayList<>();
-        }
-    }
     @Override
     public EntityManager getEntityManager() {
         return em;
+    }
+
+    @Override
+    public void crear(Caracteristica registro) throws IllegalArgumentException {
+
+        if (registro == null) {
+            throw new IllegalArgumentException("El registro no puede ser nulo");
+        }
+
+        try {
+            // ✅ Generar ID usando la secuencia de PostgreSQL
+            if (registro.getId() == null || registro.getId() == 0) {
+                Query query = em.createNativeQuery("SELECT nextval('caracteristica_id_caracteristica_seq'::regclass)");
+                Number nextId = (Number) query.getSingleResult();
+                registro.setId(nextId.intValue());
+            }
+
+            super.crear(registro);
+
+        } catch (Exception ex) {
+            throw new IllegalStateException("Error al crear el registro", ex);
+        }
     }
 }

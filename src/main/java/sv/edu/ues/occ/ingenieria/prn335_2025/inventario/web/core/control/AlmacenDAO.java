@@ -4,6 +4,7 @@ import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Almacen;
 import java.io.Serializable;
 
@@ -14,14 +15,8 @@ public class AlmacenDAO extends InventarioDefaultDataAccess<Almacen> implements 
     @PersistenceContext(unitName = "inventarioPU")
     EntityManager em;
 
-    // ✅ Constructor vacío PRIMERO
     public AlmacenDAO() {
         super(Almacen.class);
-    }
-
-    // Constructor con parámetro
-    public AlmacenDAO(Class<Almacen> entityClass) {
-        super(entityClass);
     }
 
     @Override
@@ -29,16 +24,25 @@ public class AlmacenDAO extends InventarioDefaultDataAccess<Almacen> implements 
         return em;
     }
 
-    public Almacen findById(Integer id) {
+    @Override
+    public void crear(Almacen registro) throws IllegalArgumentException {
+
+        if (registro == null) {
+            throw new IllegalArgumentException("El registro no puede ser nulo");
+        }
+
         try {
-            if (id == null) {
-                return null;
+            if (registro.getId() == null || registro.getId() == 0) {
+                Query query = em.createNativeQuery("SELECT nextval('almacen_id_almacen_seq'::regclass)");
+                Number nextId = (Number) query.getSingleResult();
+                registro.setId(nextId.intValue());
             }
-            return getEntityManager().find(Almacen.class, id);
-        } catch (Exception e) {
-            System.err.println("Error en AlmacenDAO.findById: " + e.getMessage());
-            e.printStackTrace();
-            return null;
+
+            super.crear(registro);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new IllegalStateException("Error al crear el almacén", ex);
         }
     }
 }

@@ -7,14 +7,14 @@
 <h:head>
     <meta charset="UTF-8"/>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
-    <title>Almacenes</title>
+    <title>#{msg['almacen.titulo']}</title>
 </h:head>
 <h:body>
     <div class="page-container">
         <ui:include src="/paginas/ues/Sidebar.xhtml"/>
         <div class="container">
             <div class="header">
-                <h1>Almacenes</h1>
+                <h1>#{msg['almacen.titulo']}</h1>
             </div>
             <div class="content">
                 <!-- PANEL TABLA -->
@@ -33,9 +33,8 @@
                                          selectionMode="single"
                                          selection="#{almacenFrm.registro}"
                                          rowKey="#{reg.id}">
-                                <p:ajax event="rowSelect"
-                                        listener="#{almacenFrm.selectionHandler}"
-                                        update=":pnlTabla :pnlDetalle"/>
+                                <p:ajax event="rowSelect" listener="#{almacenFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle :messages"/>
 
                                 <p:column headerText="ID">
                                     <h:outputText value="#{reg.id}"/>
@@ -45,125 +44,104 @@
                                     <h:outputText value="#{reg.idTipoAlmacen.nombre}"/>
                                 </p:column>
 
-                                <p:column headerText="Estado">
-                                    <h:outputText value="#{reg.activo ? 'Activo' : 'Inactivo'}"
-                                                  styleClass="#{reg.activo ? 'estado-activo' : 'estado-inactivo'}"/>
-                                </p:column>
-
                                 <p:column headerText="Observaciones">
                                     <h:outputText value="#{reg.observaciones}"/>
                                 </p:column>
+
+                                <p:column headerText="Estado">
+                                    <h:outputText value="#{reg.activo ? 'Activo' : 'Inactivo'}"
+                                                  styleClass="#{reg.activo?'estado-activo':'estado-inactivo'}"/>
+                                </p:column>
                             </p:dataTable>
 
-                            <!-- Botón Nuevo -->
-                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
-                                <ui:param name="section" value="nuevo"/>
-                                <ui:param name="bean" value="#{almacenFrm}"/>
-                            </ui:include>
+                            <!-- BOTÓN NUEVO -->
+                            <div style="margin-top: 20px; padding: 10px;">
+                                <h:commandButton value="NUEVO"
+                                                 action="#{almacenFrm.prepararNuevo}"
+                                                 styleClass="btn-nuevo"
+                                                 style="margin-right: 10px;">
+                                    <f:ajax execute="@this" render=":pnlTabla :pnlDetalle :messages"/>
+                                </h:commandButton>
+                            </div>
                         </h:form>
+
+                        <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
                     </div>
                 </h:panelGroup>
 
-                <!-- Growl FUERA de los forms para que sea accesible desde todos -->
-                <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
-
-                <!-- PANEL DETALLE CON TABVIEW -->
+                <!-- PANEL DETALLE -->
                 <h:panelGroup id="pnlDetalle">
                     <h:form id="frmCrear" rendered="#{almacenFrm.estado != 'NADA'}">
+                        <h:panelGrid columns="2" cellpadding="5" style="width: 100%;">
 
-                        <!-- TabView con dos pestañas -->
-                        <p:tabView id="tabViewAlmacen" dynamic="false" cache="true">
+                            <h:outputLabel for="txtIdPanel" value="ID:"/>
+                            <h:panelGroup id="txtIdPanel">
+                                <h:outputText rendered="#{empty almacenFrm.registro.id}"
+                                              value="(Generado automáticamente)"/>
+                                <h:inputText id="txtId"
+                                             value="#{almacenFrm.registro.id}"
+                                             rendered="#{not empty almacenFrm.registro.id}"
+                                             disabled="true"
+                                             styleClass="form-control-readonly"/>
+                            </h:panelGroup>
 
-                            <!-- Tab 1: Generalidades -->
-                            <p:tab title="Generalidades">
-                                <h:panelGrid columns="2" cellpadding="5" style="margin-top: 10px;">
-                                    <h:outputLabel for="txtIdPanel" value="ID:"/>
-                                    <h:panelGroup id="txtIdPanel">
-                                        <h:outputText rendered="#{empty almacenFrm.registro.id}"
-                                                      value="(Autogenerado)"/>
-                                        <h:inputText id="txtId"
-                                                     value="#{almacenFrm.registro.id}"
-                                                     rendered="#{not empty almacenFrm.registro.id}"
-                                                     disabled="true"/>
-                                    </h:panelGroup>
+                            <h:outputLabel for="cbTipoAlmacen" value="Tipo de Almacén:*"/>
+                            <h:selectOneMenu id="cbTipoAlmacen"
+                                             value="#{almacenFrm.idTipoSeleccionado}"
+                                             required="true"
+                                             requiredMessage="Seleccione un tipo de almacén"
+                                             style="width: 100%;">
+                                <f:selectItem itemLabel="-- Seleccione un tipo --" itemValue="#{null}"/>
+                                <f:selectItems value="#{almacenFrm.listaTiposAlmacen}"
+                                               var="tipo"
+                                               itemLabel="#{tipo.nombre}"
+                                               itemValue="#{tipo.id}"/>
+                            </h:selectOneMenu>
 
-                                    <h:outputLabel for="cmbTipoAlmacen" value="Tipo de Almacén:*"/>
-                                    <p:selectOneMenu id="cmbTipoAlmacen"
-                                                     value="#{almacenFrm.registro.idTipoAlmacen}"
-                                                     required="true"
-                                                     requiredMessage="El tipo de almacén es requerido"
-                                                     converter="tipoAlmacenConverter"
-                                                     style="width: 300px;">
-                                        <f:selectItem itemLabel="-- Seleccione un tipo --" itemValue="#{null}"/>
-                                        <f:selectItems value="#{almacenFrm.listaTiposAlmacen}"
-                                                       var="tipo"
-                                                       itemLabel="#{tipo.nombre}"
-                                                       itemValue="#{tipo}"/>
-                                    </p:selectOneMenu>
+                            <h:outputLabel for="txtObservaciones" value="Observaciones:"/>
+                            <h:inputTextarea id="txtObservaciones"
+                                             value="#{almacenFrm.registro.observaciones}"
+                                             rows="4"
+                                             style="width: 100%;"/>
 
-                                    <h:outputLabel for="chkActivo" value="Activo:"/>
-                                    <h:selectBooleanCheckbox id="chkActivo"
-                                                             value="#{almacenFrm.registro.activo}"/>
-
-                                    <h:outputLabel for="txtObservaciones" value="Observaciones:"/>
-                                    <h:inputTextarea id="txtObservaciones"
-                                                     value="#{almacenFrm.registro.observaciones}"
-                                                     rows="4"
-                                                     cols="40"
-                                                     maxlength="500"
-                                                     style="width: 300px;"/>
-                                </h:panelGrid>
-                            </p:tab>
-
-                            <!-- Tab 2: Resumen -->
-                            <p:tab title="Resumen">
-                                <p:panelGrid id="gridResumen"
-                                             columns="2"
-                                             layout="grid"
-                                             styleClass="resumen-grid"
-                                             style="margin-top:10px">
-
-                                    <h:outputText value="ID:"/>
-                                    <p:outputPanel styleClass="cuadro">
-                                        <h:outputText value="#{empty almacenFrm.registro.id ? '(Autogenerado)' : almacenFrm.registro.id}"/>
-                                    </p:outputPanel>
-
-                                    <h:outputText value="Tipo de Almacén:"/>
-                                    <p:outputPanel styleClass="cuadro">
-                                        <h:outputText value="#{empty almacenFrm.registro.idTipoAlmacen ? '-' : almacenFrm.registro.idTipoAlmacen.nombre}"/>
-                                    </p:outputPanel>
-
-                                    <h:outputText value="Estado:"/>
-                                    <p:outputPanel styleClass="cuadro">
-                                        <h:outputText value="#{almacenFrm.registro.activo ? 'Activo' : 'Inactivo'}"
-                                                      styleClass="#{almacenFrm.registro.activo ? 'estado-activo' : 'estado-inactivo'}"/>
-                                    </p:outputPanel>
-
-                                    <h:outputText value="Observaciones:"/>
-                                    <p:outputPanel styleClass="cuadro">
-                                        <h:outputText value="#{empty almacenFrm.registro.observaciones ? '-' : almacenFrm.registro.observaciones}"/>
-                                    </p:outputPanel>
-
-                                </p:panelGrid>
-                            </p:tab>
-
-                        </p:tabView>
-
-                        <!-- Botones Crear / Modificar / Eliminar -->
-                        <h:panelGrid columns="1" style="margin-top: 15px;">
-                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
-                                <ui:param name="section" value="crud"/>
-                                <ui:param name="bean" value="#{almacenFrm}"/>
-                            </ui:include>
+                            <h:outputLabel for="chkActivo" value="Activo:"/>
+                            <h:selectBooleanCheckbox id="chkActivo"
+                                                     value="#{almacenFrm.registro.activo}"/>
                         </h:panelGrid>
-                    </h:form>
 
-                    <!-- Botón Cancelar: su propio form  -->
-                    <h:form id="frmCancelar">
-                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
-                            <ui:param name="section" value="cancelar"/>
-                            <ui:param name="bean" value="#{almacenFrm}"/>
-                        </ui:include>
+                        <!-- BOTONES CRUD -->
+                        <div class="form-buttons">
+                            <h:commandButton value="GUARDAR"
+                                             action="#{almacenFrm.guardar}"
+                                             styleClass="btn-submit"
+                                             rendered="#{almacenFrm.estado == 'CREAR'}">
+                                <f:ajax execute="@form" render=":frmTop :pnlTabla :pnlDetalle :messages"/>
+                            </h:commandButton>
+
+                            <h:commandButton value="CANCELAR"
+                                             action="#{almacenFrm.cancelar}"
+                                             styleClass="btn-cancelar"
+                                             style="margin-right: 10px;"
+                                             immediate="true"
+                                             rendered="#{almacenFrm.estado == 'CREAR'}">
+                                <f:ajax execute="@this" render=":pnlTabla :pnlDetalle :messages" resetValues="true"/>
+                            </h:commandButton>
+
+                            <h:commandButton value="MODIFICAR"
+                                             action="#{almacenFrm.modificar}"
+                                             styleClass="btn-modificar"
+                                             style="margin-right: 10px;"
+                                             rendered="#{almacenFrm.estado == 'MODIFICAR'}">
+                                <f:ajax execute="@form" render=":frmTop :pnlTabla :pnlDetalle :messages"/>
+                            </h:commandButton>
+
+                            <h:commandButton value="ELIMINAR"
+                                             action="#{almacenFrm.eliminar}"
+                                             styleClass="btn-eliminar"
+                                             rendered="#{almacenFrm.estado == 'MODIFICAR'}">
+                                <f:ajax execute="@this" render=":frmTop :pnlTabla :pnlDetalle :messages"/>
+                            </h:commandButton>
+                        </div>
                     </h:form>
                 </h:panelGroup>
             </div>

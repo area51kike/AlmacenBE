@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <meta charset="UTF-8"/>
+    <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['caracteristica.titulo']}</title>
+</h:head>
+<h:body>
+    <div class="page-container">
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['caracteristica.titulo']}</h1>
+            </div>
+            <div class="content">
+                <!-- PANEL TABLA -->
+                <h:panelGroup id="pnlTabla" layout="block"
+                              style="display:#{caracteristicaFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTop">
+                            <p:dataTable id="tabla-top"
+                                         lazy="true"
+                                         rendered="#{caracteristicaFrm.estado == 'NADA'}"
+                                         rows="5"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{caracteristicaFrm.modelo}"
+                                         var="reg"
+                                         selectionMode="single"
+                                         selection="#{caracteristicaFrm.registro}"
+                                         rowKey="#{reg.id}">
+                                <p:ajax event="rowSelect" listener="#{caracteristicaFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle :messages"/>
+
+                                <p:column headerText="ID">
+                                    <h:outputText value="#{reg.id}"/>
+                                </p:column>
+
+                                <p:column headerText="Nombre">
+                                    <h:outputText value="#{reg.nombre}"/>
+                                </p:column>
+
+                                <p:column headerText="Tipo Unidad Medida">
+                                    <h:outputText value="#{reg.idTipoUnidadMedida.nombre}"/>
+                                </p:column>
+
+                                <p:column headerText="Descripción">
+                                    <h:outputText value="#{reg.descripcion}"/>
+                                </p:column>
+
+                                <p:column headerText="Estado">
+                                    <h:outputText value="#{reg.activo ? 'Activo' : 'Inactivo'}"
+                                                  styleClass="#{reg.activo?'estado-activo':'estado-inactivo'}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                            <!-- BOTÓN NUEVO -->
+                            <div style="margin-top: 20px; padding: 10px;">
+                                <h:commandButton value="NUEVO"
+                                                 action="#{caracteristicaFrm.prepararNuevo}"
+                                                 styleClass="btn-nuevo"
+                                                 style="margin-right: 10px;">
+                                    <f:ajax execute="@this" render=":pnlTabla :pnlDetalle :messages"/>
+                                </h:commandButton>
+                            </div>
+                        </h:form>
+
+                        <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
+                    </div>
+                </h:panelGroup>
+
+                <!-- PANEL DETALLE -->
+                <h:panelGroup id="pnlDetalle">
+                    <h:form id="frmCrear" rendered="#{caracteristicaFrm.estado != 'NADA'}">
+                        <h:panelGrid columns="2" cellpadding="5" style="width: 100%;">
+
+                            <h:outputLabel for="txtIdPanel" value="ID:"/>
+                            <h:panelGroup id="txtIdPanel">
+                                <h:outputText rendered="#{empty caracteristicaFrm.registro.id}"
+                                              value="(Generado automáticamente)"/>
+                                <h:inputText id="txtId"
+                                             value="#{caracteristicaFrm.registro.id}"
+                                             rendered="#{not empty caracteristicaFrm.registro.id}"
+                                             disabled="true"
+                                             styleClass="form-control-readonly"/>
+                            </h:panelGroup>
+
+                            <h:outputLabel for="txtNombre" value="Nombre:*"/>
+                            <h:inputText id="txtNombre"
+                                         value="#{caracteristicaFrm.registro.nombre}"
+                                         required="true"
+                                         requiredMessage="El nombre es requerido"
+                                         style="width: 100%;"/>
+
+                            <h:outputLabel for="cbTipoUnidad" value="Tipo Unidad Medida:*"/>
+                            <h:selectOneMenu id="cbTipoUnidad"
+                                             value="#{caracteristicaFrm.idTipoSeleccionado}"
+                                             required="true"
+                                             requiredMessage="Seleccione un tipo de unidad"
+                                             style="width: 100%;">
+                                <f:selectItem itemLabel="Seleccione un tipo" itemValue="#{null}"/>
+                                <f:selectItems value="#{caracteristicaFrm.tiposUnidadMedida}"
+                                               var="tipo"
+                                               itemLabel="#{tipo.nombre}"
+                                               itemValue="#{tipo.id}"/>
+                            </h:selectOneMenu>
+
+                            <h:outputLabel for="txtDescripcion" value="Descripción:"/>
+                            <h:inputTextarea id="txtDescripcion"
+                                             value="#{caracteristicaFrm.registro.descripcion}"
+                                             rows="4"
+                                             style="width: 100%;"/>
+
+                            <h:outputLabel for="chkActivo" value="Activo:"/>
+                            <h:selectBooleanCheckbox id="chkActivo"
+                                                     value="#{caracteristicaFrm.registro.activo}"/>
+                        </h:panelGrid>
+
+                        <!-- BOTONES CRUD -->
+                        <div class="form-buttons">
+                            <h:commandButton value="GUARDAR"
+                                             action="#{caracteristicaFrm.guardar}"
+                                             styleClass="btn-submit"/>
+
+                            <h:commandButton value="CANCELAR"
+                                             action="#{caracteristicaFrm.cancelar}"
+                                             styleClass="btn-cancelar"
+                                             style="margin-right: 10px;"
+                                             immediate="true"
+                                             rendered="#{caracteristicaFrm.estado == 'CREAR'}">
+                                <f:ajax execute="@this" render=":pnlTabla :pnlDetalle :messages" resetValues="true"/>
+                            </h:commandButton>
+
+                            <h:commandButton value="MODIFICAR"
+                                             action="#{caracteristicaFrm.guardar}"
+                                             styleClass="btn-modificar"
+                                             style="margin-right: 10px;"
+                                             rendered="#{caracteristicaFrm.estado == 'MODIFICAR'}">
+                                <f:ajax execute="@form" render=":frmTop :pnlTabla :pnlDetalle :messages"/>
+                            </h:commandButton>
+
+                            <h:commandButton value="ELIMINAR"
+                                             action="#{caracteristicaFrm.eliminar}"
+                                             styleClass="btn-eliminar"
+                                             rendered="#{caracteristicaFrm.estado == 'MODIFICAR'}">
+                                <f:ajax execute="@this" render=":frmTop :pnlTabla :pnlDetalle :messages"/>
+                            </h:commandButton>
+                        </div>
+                    </h:form>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>

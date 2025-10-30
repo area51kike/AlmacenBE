@@ -63,5 +63,4 @@ public class Caracteristica {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-
 }

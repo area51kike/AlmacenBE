@@ -6,9 +6,9 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.UnidadMedidaDAO;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CaracteristicaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoUnidadMedidaDAO;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.UnidadMedida;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Caracteristica;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoUnidadMedida;
 
 import java.io.Serializable;
@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 
 @Named
 @ViewScoped
-public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Serializable {
+public class CaracteristicaFrm extends DefaultFrm<Caracteristica> implements Serializable {
 
     @Inject
-    UnidadMedidaDAO unidadMedidaDAO;
+    CaracteristicaDAO caracteristicaDAO;
 
     @Inject
     TipoUnidadMedidaDAO tipoUnidadMedidaDAO;
@@ -28,8 +28,8 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
     private List<TipoUnidadMedida> tiposUnidadMedida;
     private Integer idTipoSeleccionado;
 
-    public UnidadMedidaFrm() {
-        this.nombreBean = "Unidad de Medida";
+    public CaracteristicaFrm() {
+        this.nombreBean = "Característica";
     }
 
     @Override
@@ -38,22 +38,22 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
     }
 
     @Override
-    protected InventarioDefaultDataAccess<UnidadMedida> getDao() {
-        return unidadMedidaDAO;
+    protected InventarioDefaultDataAccess<Caracteristica> getDao() {
+        return caracteristicaDAO;
     }
 
     @Override
-    protected UnidadMedida nuevoRegistro() {
-        UnidadMedida unidadMedida = new UnidadMedida();
-        unidadMedida.setActivo(true);
-        return unidadMedida;
+    protected Caracteristica nuevoRegistro() {
+        Caracteristica caracteristica = new Caracteristica();
+        caracteristica.setActivo(true);
+        return caracteristica;
     }
 
     @Override
-    protected UnidadMedida buscarRegistroPorId(Object id) {
+    protected Caracteristica buscarRegistroPorId(Object id) {
         if (id != null && id instanceof Integer) {
             try {
-                UnidadMedida resultado = unidadMedidaDAO.findById(id);
+                Caracteristica resultado = caracteristicaDAO.findById(id);
                 return resultado;
             } catch (Exception e) {
             }
@@ -62,17 +62,17 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
     }
 
     @Override
-    protected String getIdAsText(UnidadMedida r) {
+    protected String getIdAsText(Caracteristica r) {
         String resultado = (r != null && r.getId() != null) ? r.getId().toString() : null;
         return resultado;
     }
 
     @Override
-    protected UnidadMedida getIdByText(String id) {
+    protected Caracteristica getIdByText(String id) {
         if (id != null && !id.trim().isEmpty()) {
             try {
                 Integer buscado = Integer.parseInt(id);
-                UnidadMedida resultado = unidadMedidaDAO.findById(buscado);
+                Caracteristica resultado = caracteristicaDAO.findById(buscado);
                 return resultado;
             } catch (NumberFormatException e) {
             }
@@ -94,6 +94,7 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
         return tiposUnidadMedida;
     }
 
+
     public String prepararNuevo() {
         this.registro = nuevoRegistro();
         this.estado = ESTADO_CRUD.CREAR;
@@ -103,7 +104,6 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
     public String guardar() {
         try {
             if (this.registro != null) {
-
 
                 if (this.idTipoSeleccionado == null) {
                     FacesContext.getCurrentInstance().addMessage("frmCrear:cbTipoUnidad",
@@ -118,19 +118,20 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
                 }
 
                 if (this.estado == ESTADO_CRUD.CREAR) {
-                    unidadMedidaDAO.crear(this.registro);
+                    System.out.println("💾 Creando nuevo registro...");
+                    caracteristicaDAO.crear(this.registro);
                     FacesContext.getCurrentInstance().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
                                     "Éxito", "Registro creado correctamente"));
                 } else if (this.estado == ESTADO_CRUD.MODIFICAR) {
-                    unidadMedidaDAO.modificar(this.registro);
+                    caracteristicaDAO.modificar(this.registro);
                     FacesContext.getCurrentInstance().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
                                     "Éxito", "Registro modificado correctamente"));
                 }
 
                 this.registro = null;
-                this.idTipoSeleccionado = null; // ✅ AGREGAR ESTA LÍNEA
+                this.idTipoSeleccionado = null;
                 this.estado = ESTADO_CRUD.NADA;
                 this.tiposUnidadMedida = null;
                 inicializarRegistros();
@@ -147,7 +148,7 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
     public String eliminar() {
         try {
             if (this.registro != null) {
-                unidadMedidaDAO.eliminar(this.registro);
+                caracteristicaDAO.eliminar(this.registro);
                 this.registro = null;
                 this.estado = ESTADO_CRUD.NADA;
             }
@@ -180,6 +181,5 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
             } catch (Exception e) {
             }
         }
-
     }
 }

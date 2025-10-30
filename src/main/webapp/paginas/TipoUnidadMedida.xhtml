@@ -7,44 +7,67 @@
 <h:head>
     <meta charset="UTF-8"/>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
-    <title>#{msg['tum.titulo']}</title>
+    <title>Unidad de Medida</title>
 </h:head>
 <h:body>
     <div class="page-container">
         <ui:include src="/paginas/ues/Sidebar.xhtml"/>
         <div class="container">
             <div class="header">
-                <h1>#{msg['tipoUnidadMedida.titulo']}</h1>
+                <h1>Unidad de Medida</h1>
             </div>
             <div class="content">
                 <!-- PANEL TABLA -->
                 <h:panelGroup id="pnlTabla" layout="block"
-                              style="display:#{tipoUnidadMedidaFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                              style="display:#{unidadMedidaFrm.estado eq 'NADA' ? 'block' : 'none'}">
                     <div class="content-tabla">
                         <h:form id="frmTop">
                             <p:dataTable id="tabla-top"
                                          lazy="true"
-                                         rendered="#{tipoUnidadMedidaFrm.estado == 'NADA'}"
+                                         rendered="#{unidadMedidaFrm.estado == 'NADA'}"
                                          rows="5"
                                          paginator="true"
                                          paginatorPosition="bottom"
-                                         value="#{tipoUnidadMedidaFrm.modelo}"
+                                         value="#{unidadMedidaFrm.modelo}"
                                          var="reg"
                                          selectionMode="single"
-                                         selection="#{tipoUnidadMedidaFrm.registro}" rowKey="#{reg.id}">
-                                <p:ajax event="rowSelect" listener="#{tipoUnidadMedidaFrm.selectionHandler}"
-                                        update=":pnlTabla :pnlDetalle"/>
-                                <p:column headerText="#{msg['tum.tabla.id']}"><h:outputText value="#{reg.id}"/></p:column>
-                                <p:column headerText="#{msg['tum.tabla.nombre']}"><h:outputText value="#{reg.nombre}"/></p:column>
-                                <p:column headerText="#{msg['tum.tabla.unidadBase']}"><h:outputText value="#{reg.unidadBase}"/></p:column>
-                                <p:column headerText="#{msg['tum.tabla.comentarios']}"><h:outputText value="#{reg.comentarios}"/></p:column>
-                                <p:column headerText="#{msg['tum.tabla.estado']}"><h:outputText value="#{reg.activo ? msg['tum.estado.activo'] : msg['tum.estado.inactivo']}" styleClass="#{reg.activo?'estado-activo':'estado-inactivo'}"/></p:column>
+                                         selection="#{unidadMedidaFrm.registro}"
+                                         rowKey="#{reg.id}">
+                                <p:ajax event="rowSelect" listener="#{unidadMedidaFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle :messages"/>
+
+                                <p:column headerText="ID">
+                                    <h:outputText value="#{reg.id}"/>
+                                </p:column>
+
+                                <p:column headerText="Tipo Unidad">
+                                    <h:outputText value="#{reg.idTipoUnidadMedida.nombre}"/>
+                                </p:column>
+
+                                <p:column headerText="Equivalencia">
+                                    <h:outputText value="#{reg.equivalencia}">
+                                        <f:convertNumber pattern="#0.00"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Expresión Regular">
+                                    <h:outputText value="#{reg.expresionRegular}"/>
+                                </p:column>
+
+                                <p:column headerText="Comentarios">
+                                    <h:outputText value="#{reg.comentarios}"/>
+                                </p:column>
+
+                                <p:column headerText="Estado">
+                                    <h:outputText value="#{reg.activo ? 'Activo' : 'Inactivo'}"
+                                                  styleClass="#{reg.activo?'estado-activo':'estado-inactivo'}"/>
+                                </p:column>
                             </p:dataTable>
 
-                            <!-- Botón Nuevo (incluimos BotonesTop pasando el bean correcto) -->
+                            <!-- Botón Nuevo (igual que en tu TipoUnidadMedida) -->
                             <ui:include src="/paginas/ues/BotonesTop.xhtml">
                                 <ui:param name="section" value="nuevo"/>
-                                <ui:param name="bean" value="#{tipoUnidadMedidaFrm}"/>
+                                <ui:param name="bean" value="#{unidadMedidaFrm}"/>
                             </ui:include>
                         </h:form>
 
@@ -54,56 +77,76 @@
 
                 <!-- PANEL DETALLE -->
                 <h:panelGroup id="pnlDetalle">
-                    <h:form id="frmCrear" rendered="#{tipoUnidadMedidaFrm.estado != 'NADA'}">
+                    <h:form id="frmCrear" rendered="#{unidadMedidaFrm.estado != 'NADA'}">
                         <h:panelGrid columns="2" cellpadding="5">
 
-                            <h:outputLabel for="txtIdPanel" value="#{msg['tum.tabla.id']}:"/>
+                            <!-- ID (igual que en tu código) -->
+                            <h:outputLabel for="txtIdPanel" value="ID:"/>
                             <h:panelGroup id="txtIdPanel">
-                                <h:outputText rendered="#{empty tipoUnidadMedidaFrm.registro.id}"
-                                              value="(#{msg['tum.id.autogenerado']})"/>
+                                <h:outputText rendered="#{empty unidadMedidaFrm.registro.id}"
+                                              value="(Generado automáticamente)"/>
                                 <h:inputText id="txtId"
-                                             value="#{tipoUnidadMedidaFrm.registro.id}"
-                                             rendered="#{not empty tipoUnidadMedidaFrm.registro.id}"
+                                             value="#{unidadMedidaFrm.registro.id}"
+                                             rendered="#{not empty unidadMedidaFrm.registro.id}"
                                              disabled="true"/>
                             </h:panelGroup>
 
-                            <h:outputLabel for="txtNombre" value="#{msg['tum.form.nombre']}"/>
-                            <h:inputText id="txtNombre"
-                                         value="#{tipoUnidadMedidaFrm.registro.nombre}"
-                                         required="true"
-                                         requiredMessage="#{msg['tum.nombre.requerido']}"/>
+                            <!-- CAMPOS ESPECÍFICOS DE UNIDAD MEDIDA (del primer código) -->
+                            <h:outputLabel for="cbTipoUnidad" value="Tipo Unidad Medida:*"/>
+                            <p:selectOneMenu id="cbTipoUnidad"
+                                             value="#{unidadMedidaFrm.registro.idTipoUnidadMedida}"
+                                             converter="tipoUnidadMedidaConverter"
+                                             style="width: 100%;"
+                                             required="true"
+                                             requiredMessage="Debe seleccionar un tipo de unidad de medida">
+                                <f:selectItem itemLabel="-- Seleccione un tipo --" itemValue="#{null}"/>
+                                <f:selectItems value="#{unidadMedidaFrm.tiposUnidadMedida}"
+                                               var="tipo"
+                                               itemLabel="#{tipo.nombre}"
+                                               itemValue="#{tipo}"/>
+                            </p:selectOneMenu>
 
-                            <h:outputLabel for="txtUnidadBase" value="#{msg['tum.form.unidadBase']}"/>
-                            <h:inputText id="txtUnidadBase"
-                                         value="#{tipoUnidadMedidaFrm.registro.unidadBase}"
-                                         required="true"
-                                         requiredMessage="#{msg['tum.unidadBase.requerida']}"/>
+                            <h:outputLabel for="txtEquivalencia" value="Equivalencia:*"/>
+                            <p:inputNumber id="txtEquivalencia"
+                                           value="#{unidadMedidaFrm.registro.equivalencia}"
+                                           decimalPlaces="2"
+                                           minFractionDigits="2"
+                                           decimalSeparator="."
+                                           thousandSeparator=","
+                                           style="width: 100%;"
+                                           required="true"
+                                           requiredMessage="La equivalencia es requerida"/>
 
-                            <h:outputLabel for="txtComentarios" value="#{msg['tum.form.comentarios']}"/>
-                            <h:inputTextarea id="txtComentarios"
-                                             value="#{tipoUnidadMedidaFrm.registro.comentarios}"
+                            <h:outputLabel for="txtExpresionRegular" value="Expresión Regular:"/>
+                            <p:inputText id="txtExpresionRegular"
+                                         value="#{unidadMedidaFrm.registro.expresionRegular}"
+                                         style="width: 100%;"/>
+
+                            <h:outputLabel for="txtComentarios" value="Comentarios:"/>
+                            <p:inputTextarea id="txtComentarios"
+                                             value="#{unidadMedidaFrm.registro.comentarios}"
                                              rows="4"
-                                             cols="50"/>
+                                             style="width: 100%;"/>
 
-                            <h:outputLabel for="chkActivo" value="#{msg['tum.form.activo']}"/>
-                            <h:selectBooleanCheckbox id="chkActivo"
-                                                     value="#{tipoUnidadMedidaFrm.registro.activo}"/>
+                            <h:outputLabel for="chkActivo" value="Activo:"/>
+                            <p:selectBooleanCheckbox id="chkActivo"
+                                                     value="#{unidadMedidaFrm.registro.activo}"/>
                         </h:panelGrid>
 
-                        <!-- Botones Crear / Modificar / Eliminar -->
+                        <!-- Botones Crear/Modificar/Eliminar (igual que en tu código) -->
                         <h:panelGrid columns="3">
                             <ui:include src="/paginas/ues/BotonesTop.xhtml">
                                 <ui:param name="section" value="crud"/>
-                                <ui:param name="bean" value="#{tipoUnidadMedidaFrm}"/>
+                                <ui:param name="bean" value="#{unidadMedidaFrm}"/>
                             </ui:include>
                         </h:panelGrid>
                     </h:form>
 
-                    <!-- Botón Cancelar: su propio form  -->
+                    <!-- Botón Cancelar (igual que en tu código) -->
                     <h:form id="frmCancelar">
                         <ui:include src="/paginas/ues/BotonesTop.xhtml">
                             <ui:param name="section" value="cancelar"/>
-                            <ui:param name="bean" value="#{tipoUnidadMedidaFrm}"/>
+                            <ui:param name="bean" value="#{unidadMedidaFrm}"/>
                         </ui:include>
                     </h:form>
                 </h:panelGroup>

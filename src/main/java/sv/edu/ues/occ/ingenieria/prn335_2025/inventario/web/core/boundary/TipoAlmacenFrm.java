@@ -29,8 +29,6 @@ public class TipoAlmacenFrm extends DefaultFrm<TipoAlmacen> implements Serializa
     public TipoAlmacenFrm() {
         this.nombreBean = " Tipo de Almacen";
     }
-
-
     @Override
     protected FacesContext getFacesContext() {
         return facesContext;
