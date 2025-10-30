@@ -15,34 +15,28 @@ import java.time.format.DateTimeParseException;
 @ApplicationScoped
 public class OffsetDateTimeConverter implements Converter<OffsetDateTime> {
 
-    // ✅ CORRECCIÓN 1: Eliminar la 'T' para que coincida con el patrón del p:calendar (yyyy-MM-dd HH:mm)
-    private static final DateTimeFormatter FMT_WITH_OFFSET =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mmXXX"); // Usar espacio, no 'T'
+    // Formatos de fecha con y sin offset
+    private static final DateTimeFormatter FMT_WITH_OFFSET = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mmXXX");
+    private static final DateTimeFormatter FMT_NO_OFFSET = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    // ✅ CORRECCIÓN 2: Eliminar la 'T' para que coincida con el patrón del p:calendar (yyyy-MM-dd HH:mm)
-    private static final DateTimeFormatter FMT_NO_OFFSET =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); // Usar espacio, no 'T'
-
-    // Zona por defecto (está bien, asumiendo que es la correcta)
+    // Zona horaria predeterminada
     private static final ZoneId DEFAULT_ZONE = ZoneId.of("America/El_Salvador");
 
     @Override
     public OffsetDateTime getAsObject(FacesContext ctx, UIComponent comp, String value) {
         if (value == null || value.isBlank()) return null;
 
-        // Quitar el manejo de la 'T' si ya no está en el patrón
         String v = value.trim();
 
         try {
-            // Si trae offset al final, úsalo...
+            // Si tiene offset, usa el formato correspondiente
             if (v.matches(".*[+-]\\d{2}:\\d{2}$")) {
                 return OffsetDateTime.parse(v, FMT_WITH_OFFSET);
             }
-            // ...si no, asume tu zona
+            // Si no tiene offset, asume la zona por defecto
             LocalDateTime ldt = LocalDateTime.parse(v, FMT_NO_OFFSET);
             return ldt.atZone(DEFAULT_ZONE).toOffsetDateTime();
         } catch (DateTimeParseException e) {
-            // Ajustar el mensaje de error para reflejar el patrón correcto
             throw new ConverterException(
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fecha inválida",
                             "Usa yyyy-MM-dd HH:mm o con offset: yyyy-MM-dd HH:mm-06:00"));
@@ -52,7 +46,7 @@ public class OffsetDateTimeConverter implements Converter<OffsetDateTime> {
     @Override
     public String getAsString(FacesContext ctx, UIComponent comp, OffsetDateTime value) {
         if (value == null) return "";
-        // ✅ CRÍTICO: Usar el patrón corregido (FMT_NO_OFFSET)
+        // Devuelve la fecha en el formato sin offset
         return value.atZoneSameInstant(DEFAULT_ZONE).toLocalDateTime().format(FMT_NO_OFFSET);
     }
 }
