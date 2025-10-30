@@ -6,7 +6,6 @@
 
     <f:view locale="#{idiomaBean.locale}">
         <div class="sidebar">
-            <!-- Selector de idioma con dropdown -->
             <h:form class="language-selector">
                 <p:selectOneMenu value="#{idiomaBean.idioma}"
                                  styleClass="idioma-dropdown">
@@ -21,54 +20,24 @@
 
             <h2>#{msg['sidebar.titulo']}</h2>
             <ul>
-                <li><h:link value="#{msg['sidebar.inicio']}" outcome="/paginas/Inicio.jsf"/> </li>
-                <li><h:link value="#{msg['sidebar.almacen']}" outcome="/paginas/Almacen.jsf"/> </li>
-                <li><h:link value="#{msg['sidebar.caracteristica']}" outcome="/paginas/Caracteristica.jsf"/></li>
-                <li>
-                    <h:link outcome="/paginas/Cliente.jsf">
-                        <span class="menu-text">#{msg['sidebar.clientes']}</span>
-                        <i class="pi pi-check #{facesContext.viewRoot.viewId eq '/paginas/Cliente.xhtml' ? 'visible-check' : 'hidden-check'}"></i>
-                    </h:link>
-                </li>
-                <li><h:link value="#{msg['sidebar.compra']}" outcome="/paginas/Compra.jsf"/></li>
-                <li><h:link value="#{msg['sidebar.compraDetalle']}" outcome="/paginas/CompraDetalle.jsf"/></li>
-                <li><h:link value="#{msg['sidebar.kardexDetalle']}" outcome="/paginas/KardexDetalle.jsf"/></li>
-                <li>
-                    <h:link outcome="/paginas/Producto.jsf">
-                        <span class="menu-text">#{msg['sidebar.productos']}</span>
-                        <i class="pi pi-check #{facesContext.viewRoot.viewId eq '/paginas/Producto.xhtml' ? 'visible-check' : 'hidden-check'}"></i>
-                    </h:link>
-                </li>
-                <li><h:link value="#{msg['sidebar.productoTipoProducto']}" outcome="/paginas/ProductoTipoProducto.jsf"/></li>
-                <li><h:link value="#{msg['sidebar.productoTipoProductoCaracteristica']}" outcome="/paginas/ProductoTipoProductoCaracteristica.jsf"/></li>
-                <li>
-                    <h:link outcome="/paginas/Proveedor.jsf">
-                        <span class="menu-text">#{msg['sidebar.proveedores']}</span>
-                        <i class="pi pi-check #{facesContext.viewRoot.viewId eq '/paginas/Proveedor.xhtml' ? 'visible-check' : 'hidden-check'}"></i>
-                    </h:link>
-                </li>
-                <li>
-                    <h:link outcome="/paginas/TipoAlmacen.jsf">
-                        <span class="menu-text">#{msg['sidebar.tipoAlmacen']}</span>
-                        <i class="pi pi-check #{facesContext.viewRoot.viewId eq '/paginas/TipoAlmacen.xhtml' ? 'visible-check' : 'hidden-check'}"></i>
-                    </h:link>
-                </li>
-                <li>
-                    <h:link outcome="/paginas/TipoProducto.jsf">
-                        <span class="menu-text">#{msg['sidebar.tipoProducto']}</span>
-                        <i  class="pi pi-check #{facesContext.viewRoot.viewId eq '/paginas/TipoProducto.xhtml' ? 'visible-check' : 'hidden-check'}"></i>
-                    </h:link>
-                </li>
-                <li><h:link value="#{msg['sidebar.tipoProductoCaracteristica']}" outcome="/paginas/TipoProductoCaracteristica.jsf"/></li>
-                <li>
-                    <h:link outcome="/paginas/TipoUnidadMedida.jsf">
-                        <span class="menu-text">#{msg['sidebar.tipoUnidadMedida']}</span>
-                        <i  class="pi pi-check #{facesContext.viewRoot.viewId eq '/paginas/TipoUnidadMedida.xhtml' ? 'visible-check' : 'hidden-check'}"></i>
-                    </h:link>
-                </li>
-                <li><h:link value="#{msg['sidebar.unidadMedida']}" outcome="/paginas/UnidadMedida.jsf"/></li>
-                <li><h:link value="#{msg['sidebar.venta']}" outcome="/paginas/Venta.jsf"/></li>
-                <li><h:link value="#{msg['sidebar.ventaDetalle']}" outcome="/paginas/VentaDetalle.jsf"/></li>
+                <li><h:link value="#{msg['sidebar.inicio']}" outcome="/paginas/Inicio.jsf"> <i class="pi pi-home" style="margin-right: 8px;"></i></h:link> </li>
+                <li><h:link value="#{msg['sidebar.almacen']}" outcome="/paginas/Almacen.jsf"> <i class="pi pi-building" style="margin-right: 8px;"></i></h:link> </li>
+                <li><h:link value="#{msg['sidebar.caracteristica']}" outcome="/paginas/Caracteristica.jsf"> <i class="pi pi-list" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.clientes']}" outcome="/paginas/Cliente.jsf"> <i class="pi pi-users" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.compra']}" outcome="/paginas/Compra.jsf"> <i class="pi pi-shopping-cart" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.compraDetalle']}" outcome="/paginas/CompraDetalle.jsf"> <i class="pi pi-receipt" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.kardexDetalle']}" outcome="/paginas/KardexDetalle.jsf"> <i class="pi pi-book" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.productos']}" outcome="/paginas/Producto.jsf"> <i class="pi pi-box" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.productoTipoProducto']}" outcome="/paginas/ProductoTipoProducto.jsf"> <i class="pi pi-tags" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.productoTipoProductoCaracteristica']}" outcome="/paginas/ProductoTipoProductoCaracteristica.jsf"> <i class="pi pi-tag" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.proveedores']}" outcome="/paginas/Proveedor.jsf"> <i class="pi pi-truck" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.tipoAlmacen']}" outcome="/paginas/TipoAlmacen.jsf"> <i class="pi pi-warehouse" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.tipoProducto']}" outcome="/paginas/TipoProducto.jsf"> <i class="pi pi-th-large" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.tipoProductoCaracteristica']}" outcome="/paginas/TipoProductoCaracteristica.jsf"> <i class="pi pi-sliders-h" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.tipoUnidadMedida']}" outcome="/paginas/TipoUnidadMedida.jsf"> <i class="pi pi-cog" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.unidadMedida']}" outcome="/paginas/UnidadMedida.jsf"> <i class="pi pi-calculator" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.venta']}" outcome="/paginas/Venta.jsf"> <i class="pi pi-money-bill" style="margin-right: 8px;"></i></h:link></li>
+                <li><h:link value="#{msg['sidebar.ventaDetalle']}" outcome="/paginas/VentaDetalle.jsf"> <i class="pi pi-file" style="margin-right: 8px;"></i></h:link></li>
             </ul>
         </div>
     </f:view>
