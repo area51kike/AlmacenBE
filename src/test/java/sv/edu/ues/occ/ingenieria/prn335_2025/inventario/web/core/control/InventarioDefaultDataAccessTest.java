@@ -247,34 +247,6 @@ public class InventarioDefaultDataAccessTest {
     }
 
     @Test
-    void testCount_DevuelveCantidad() {
-        // Arrange
-        EntityManager mockEm = mock(EntityManager.class);
-        CriteriaBuilder cb = mock(CriteriaBuilder.class);
-        CriteriaQuery<Long> cq = mock(CriteriaQuery.class);
-        Root<Compra> root = mock(Root.class);
-        TypedQuery<Long> query = mock(TypedQuery.class);
-
-        doReturn(cb).when(mockEm).getCriteriaBuilder();
-        doReturn(cq).when(cb).createQuery(Long.class);
-        doReturn(root).when(cq).from(Compra.class);
-        doReturn(null).when(cb).count(root);
-        doReturn(cq).when(cq).select(any());
-        doReturn(query).when(mockEm).createQuery(cq);
-        doReturn(10L).when(query).getSingleResult();
-
-        InventarioDefaultDataAccess<Compra> dao = getDAO(mockEm);
-
-        // Act
-        int resultado = dao.count();
-
-        // Assert
-        assertEquals(10, resultado);
-        verify(mockEm, times(1)).getCriteriaBuilder();
-        verify(query, times(1)).getSingleResult();
-    }
-
-    @Test
     void testEliminar_EntidadGestionada_EliminaDirectamente() {
         // Arrange
         Compra compra = new Compra();

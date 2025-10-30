@@ -5,6 +5,7 @@
       <map>
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/Cliente.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/ManejarTodo.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/ProductoTipoProducto.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/TipoAlmacen.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/TipoProducto.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/TipoProductoCaracteristica.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />

@@ -1,29 +1,30 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.conversores;
 
-import jakarta.ejb.EJB;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDao;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto;
 
+@Named
 @FacesConverter(value = "tipoProductoConverter", managed = true)
 public class TipoProductoConverter implements Converter<TipoProducto> {
 
-    @EJB
-    private TipoProductoDao tipoProductoDAO;
+    @Inject
+    TipoProductoDao tipoProductoDao;
 
     @Override
     public TipoProducto getAsObject(FacesContext context, UIComponent component, String value) {
-        if (value == null || value.trim().isEmpty() || value.equals("null")) {
+        if (value == null || value.isEmpty()) {
             return null;
         }
         try {
-            Long id = Long.parseLong(value);
-            return tipoProductoDAO.findById(id);
-        } catch (Exception e) {
-            System.err.println("Error en TipoProductoConverter.getAsObject: " + e.getMessage());
+            Long id = Long.valueOf(value);
+            return tipoProductoDao.findById(id);
+        } catch (NumberFormatException e) {
             return null;
         }
     }
