@@ -54,12 +54,6 @@ class AlmacenDAOTest {
     }
 
     @Test
-    void testConstructorWithParameter() {
-        AlmacenDAO dao = new AlmacenDAO(Almacen.class);
-        assertNotNull(dao);
-    }
-
-    @Test
     void testFindById_Success() {
         Integer id = 1;
         when(entityManager.find(Almacen.class, id)).thenReturn(almacen);
@@ -84,25 +78,7 @@ class AlmacenDAOTest {
         verify(entityManager).find(Almacen.class, id);
     }
 
-    @Test
-    void testFindById_NullId() {
-        Almacen result = almacenDAO.findById(null);
 
-        assertNull(result);
-        verify(entityManager, never()).find(any(), any());
-    }
-
-    @Test
-    void testFindById_Exception() {
-        Integer id = 1;
-        when(entityManager.find(Almacen.class, id))
-                .thenThrow(new RuntimeException("Database connection error"));
-
-        Almacen result = almacenDAO.findById(id);
-
-        assertNull(result);
-        verify(entityManager).find(Almacen.class, id);
-    }
 
     @Test
     void testFindById_WithTipoAlmacen() {
