@@ -19,39 +19,33 @@
             <div class="content">
                 <!-- PANEL TABLA -->
                 <h:panelGroup id="pnlTabla" layout="block"
-                              style="display:#{unidadMedidaFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                              style="display:#{tipoUnidadMedidaFrm.estado eq 'NADA' ? 'block' : 'none'}">
                     <div class="content-tabla">
                         <h:form id="frmTop">
                             <p:dataTable id="tabla-top"
                                          lazy="true"
-                                         rendered="#{unidadMedidaFrm.estado == 'NADA'}"
+                                         rendered="#{tipoUnidadMedidaFrm.estado == 'NADA'}"
                                          rows="5"
                                          paginator="true"
                                          paginatorPosition="bottom"
-                                         value="#{unidadMedidaFrm.modelo}"
+                                         value="#{tipoUnidadMedidaFrm.modelo}"
                                          var="reg"
                                          selectionMode="single"
-                                         selection="#{unidadMedidaFrm.registro}"
+                                         selection="#{tipoUnidadMedidaFrm.registro}"
                                          rowKey="#{reg.id}">
-                                <p:ajax event="rowSelect" listener="#{unidadMedidaFrm.selectionHandler}"
+                                <p:ajax event="rowSelect" listener="#{tipoUnidadMedidaFrm.selectionHandler}"
                                         update=":pnlTabla :pnlDetalle :messages"/>
 
                                 <p:column headerText="ID">
                                     <h:outputText value="#{reg.id}"/>
                                 </p:column>
 
-                                <p:column headerText="Tipo Unidad">
-                                    <h:outputText value="#{reg.idTipoUnidadMedida.nombre}"/>
+                                <p:column headerText="Nombre">
+                                    <h:outputText value="#{reg.nombre}"/>
                                 </p:column>
 
-                                <p:column headerText="Equivalencia">
-                                    <h:outputText value="#{reg.equivalencia}">
-                                        <f:convertNumber pattern="#0.00"/>
-                                    </h:outputText>
-                                </p:column>
-
-                                <p:column headerText="Expresión Regular">
-                                    <h:outputText value="#{reg.expresionRegular}"/>
+                                <p:column headerText="Unidad Base">
+                                    <h:outputText value="#{reg.unidadBase}"/>
                                 </p:column>
 
                                 <p:column headerText="Comentarios">
@@ -64,10 +58,10 @@
                                 </p:column>
                             </p:dataTable>
 
-                            <!-- Botón Nuevo (igual que en tu TipoUnidadMedida) -->
+                            <!-- Botón Nuevo -->
                             <ui:include src="/paginas/ues/BotonesTop.xhtml">
                                 <ui:param name="section" value="nuevo"/>
-                                <ui:param name="bean" value="#{unidadMedidaFrm}"/>
+                                <ui:param name="bean" value="#{tipoUnidadMedidaFrm}"/>
                             </ui:include>
                         </h:form>
 
@@ -77,76 +71,63 @@
 
                 <!-- PANEL DETALLE -->
                 <h:panelGroup id="pnlDetalle">
-                    <h:form id="frmCrear" rendered="#{unidadMedidaFrm.estado != 'NADA'}">
+                    <h:form id="frmCrear" rendered="#{tipoUnidadMedidaFrm.estado != 'NADA'}">
                         <h:panelGrid columns="2" cellpadding="5">
 
-                            <!-- ID (igual que en tu código) -->
+                            <!-- ID -->
                             <h:outputLabel for="txtIdPanel" value="ID:"/>
                             <h:panelGroup id="txtIdPanel">
-                                <h:outputText rendered="#{empty unidadMedidaFrm.registro.id}"
+                                <h:outputText rendered="#{empty tipoUnidadMedidaFrm.registro.id}"
                                               value="(Generado automáticamente)"/>
                                 <h:inputText id="txtId"
-                                             value="#{unidadMedidaFrm.registro.id}"
-                                             rendered="#{not empty unidadMedidaFrm.registro.id}"
+                                             value="#{tipoUnidadMedidaFrm.registro.id}"
+                                             rendered="#{not empty tipoUnidadMedidaFrm.registro.id}"
                                              disabled="true"/>
                             </h:panelGroup>
 
-                            <!-- CAMPOS ESPECÍFICOS DE UNIDAD MEDIDA (del primer código) -->
-                            <h:outputLabel for="cbTipoUnidad" value="Tipo Unidad Medida:*"/>
-                            <p:selectOneMenu id="cbTipoUnidad"
-                                             value="#{unidadMedidaFrm.registro.idTipoUnidadMedida}"
-                                             converter="tipoUnidadMedidaConverter"
-                                             style="width: 100%;"
-                                             required="true"
-                                             requiredMessage="Debe seleccionar un tipo de unidad de medida">
-                                <f:selectItem itemLabel="-- Seleccione un tipo --" itemValue="#{null}"/>
-                                <f:selectItems value="#{unidadMedidaFrm.tiposUnidadMedida}"
-                                               var="tipo"
-                                               itemLabel="#{tipo.nombre}"
-                                               itemValue="#{tipo}"/>
-                            </p:selectOneMenu>
+                            <!-- Nombre -->
+                            <h:outputLabel for="txtNombre" value="Nombre:*"/>
+                            <p:inputText id="txtNombre"
+                                         value="#{tipoUnidadMedidaFrm.registro.nombre}"
+                                         style="width: 100%;"
+                                         required="true"
+                                         requiredMessage="El nombre es requerido"
+                                         maxlength="155"/>
 
-                            <h:outputLabel for="txtEquivalencia" value="Equivalencia:*"/>
-                            <p:inputNumber id="txtEquivalencia"
-                                           value="#{unidadMedidaFrm.registro.equivalencia}"
-                                           decimalPlaces="2"
-                                           minFractionDigits="2"
-                                           decimalSeparator="."
-                                           thousandSeparator=","
-                                           style="width: 100%;"
-                                           required="true"
-                                           requiredMessage="La equivalencia es requerida"/>
+                            <!-- Unidad Base -->
+                            <h:outputLabel for="txtUnidadBase" value="Unidad Base:"/>
+                            <p:inputText id="txtUnidadBase"
+                                         value="#{tipoUnidadMedidaFrm.registro.unidadBase}"
+                                         style="width: 100%;"
+                                         maxlength="155"/>
 
-                            <h:outputLabel for="txtExpresionRegular" value="Expresión Regular:"/>
-                            <p:inputText id="txtExpresionRegular"
-                                         value="#{unidadMedidaFrm.registro.expresionRegular}"
-                                         style="width: 100%;"/>
-
+                            <!-- Comentarios -->
                             <h:outputLabel for="txtComentarios" value="Comentarios:"/>
                             <p:inputTextarea id="txtComentarios"
-                                             value="#{unidadMedidaFrm.registro.comentarios}"
+                                             value="#{tipoUnidadMedidaFrm.registro.comentarios}"
                                              rows="4"
                                              style="width: 100%;"/>
 
+                            <!-- Activo -->
                             <h:outputLabel for="chkActivo" value="Activo:"/>
                             <p:selectBooleanCheckbox id="chkActivo"
-                                                     value="#{unidadMedidaFrm.registro.activo}"/>
+                                                     value="#{tipoUnidadMedidaFrm.registro.activo}"/>
                         </h:panelGrid>
 
-                        <!-- Botones Crear/Modificar/Eliminar (igual que en tu código) -->
+                        <!-- Botones Crear/Modificar/Eliminar -->
                         <h:panelGrid columns="3">
                             <ui:include src="/paginas/ues/BotonesTop.xhtml">
                                 <ui:param name="section" value="crud"/>
-                                <ui:param name="bean" value="#{unidadMedidaFrm}"/>
+                                <ui:param name="bean" value="#{tipoUnidadMedidaFrm}"/>
                             </ui:include>
                         </h:panelGrid>
                     </h:form>
 
-                    <!-- Botón Cancelar (igual que en tu código) -->
+                    <!-- Botón Cancelar -->
                     <h:form id="frmCancelar">
                         <ui:include src="/paginas/ues/BotonesTop.xhtml">
                             <ui:param name="section" value="cancelar"/>
-                            <ui:param name="bean" value="#{unidadMedidaFrm}"/>
+                            <ui:param name="bean" value="#{tipoUnidadMedidaFrm}"/>
                         </ui:include>
                     </h:form>
                 </h:panelGroup>
