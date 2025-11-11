@@ -16,20 +16,17 @@ public class Compra implements Serializable {
     @Column(name = "id_compra", nullable = false)
     private Long id;
 
-
-    // 2. CLAVE FORÁNEA PRIMITIVA (Integer)
-    // El ID del proveedor en la DB es INTEGER. Lo mapeamos como Integer.
     @Column(name = "id_proveedor")
     private Integer idProveedor;
 
-    // 3. RELACIÓN DE ENTIDAD
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_proveedor", referencedColumnName = "id_proveedor", insertable = false, updatable = false)
 
     private Proveedor proveedor;
 
 
-    // 4. OTROS CAMPOS DE COMPRA
+
     @Convert(converter = OffsetDateTimeJpaConverter.class)
     @Column(name = "fecha")
     private OffsetDateTime fecha;
@@ -41,10 +38,6 @@ public class Compra implements Serializable {
     @Lob
     @Column(name = "observaciones")
     private String observaciones;
-
-    // --- CONSTRUCTORES, GETTERS Y SETTERS ---
-
-    // ... (El resto de getters, setters y constructores) ...
 
     public Long getId() {
         return id;
