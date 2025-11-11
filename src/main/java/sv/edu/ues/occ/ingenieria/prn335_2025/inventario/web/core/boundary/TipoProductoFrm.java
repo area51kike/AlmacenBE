@@ -107,7 +107,7 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> implements Seriali
                     tiposProductoHierarchy.add(new SelectItem(tp.getId(), tp.getNombre()));
                     System.out.println("✅ Tipo raíz agregado: " + tp.getNombre() + " (ID: " + tp.getId() + ")");
                 } else {
-                    System.out.println("⏭️  Ignorado (tiene padre): " + tp.getNombre()
+                    System.out.println("  Ignorado (tiene padre): " + tp.getNombre()
                             + " -> Padre ID: " + tp.getIdTipoProductoPadre().getId());
                 }
             }

@@ -1,19 +1,186 @@
-<!DOCTYPE html>
-<html lang="es"
-      xmlns="http://www.w3.org/1999/xhtml"
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
-      xmlns:ui="http://java.sun.com/jsf/facelets">
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
 <h:head>
     <meta charset="UTF-8"/>
-    <title>#{msg['inicio.inicio']}</title>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['bienvenida.titulo']} - #{msg['bienvenida.sistema.nombre']}</title>
 </h:head>
 <h:body>
     <div class="page-container">
         <ui:include src="/paginas/ues/Sidebar.xhtml"/>
-
         <div class="container">
-            <h1>#{msg['inicio.bienvenida']}</h1>
+            <div class="header">
+                <h1>#{msg['bienvenida.titulo']}</h1>
+            </div>
+            <div class="content">
+                <div class="welcome-container">
+                    <div class="welcome-card">
+                        <h2>#{msg['bienvenida.sistema.nombre']}</h2>
+                        <p class="welcome-intro">
+                            #{msg['bienvenida.intro']}
+                        </p>
+
+                        <div class="features-section">
+                            <h3>#{msg['bienvenida.modulos.titulo']}</h3>
+
+                            <div class="feature-grid">
+                                <!-- Almacenes -->
+                                <div class="feature-item">
+                                    <div class="feature-icon">🏢</div>
+                                    <h4>#{msg['bienvenida.modulo.almacenes.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.almacenes.desc']}</p>
+                                </div>
+
+                                <div class="feature-item">
+                                    <div class="feature-icon">🏪</div>
+                                    <h4>#{msg['bienvenida.modulo.tiposAlmacen.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.tiposAlmacen.desc']}</p>
+                                </div>
+
+                                <!-- Productos -->
+                                <div class="feature-item">
+                                    <div class="feature-icon">📦</div>
+                                    <h4>#{msg['bienvenida.modulo.productos.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.productos.desc']}</p>
+                                </div>
+
+                                <div class="feature-item">
+                                    <div class="feature-icon">🏷️</div>
+                                    <h4>#{msg['bienvenida.modulo.tiposProducto.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.tiposProducto.desc']}</p>
+                                </div>
+
+                                <div class="feature-item">
+                                    <div class="feature-icon">🔖</div>
+                                    <h4>#{msg['bienvenida.modulo.productoTipoProducto.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.productoTipoProducto.desc']}</p>
+                                </div>
+
+                                <!-- Características -->
+                                <div class="feature-item">
+                                    <div class="feature-icon">⚙️</div>
+                                    <h4>#{msg['bienvenida.modulo.caracteristicas.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.caracteristicas.desc']}</p>
+                                </div>
+
+                                <div class="feature-item">
+                                    <div class="feature-icon">🏗️</div>
+                                    <h4>#{msg['bienvenida.modulo.caracteristicasTipoProducto.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.caracteristicasTipoProducto.desc']}</p>
+                                </div>
+
+                                <div class="feature-item">
+                                    <div class="feature-icon">🔧</div>
+                                    <h4>#{msg['bienvenida.modulo.caracteristicaProducto.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.caracteristicaProducto.desc']}</p>
+                                </div>
+
+                                <!-- Unidades de Medida -->
+                                <div class="feature-item">
+                                    <div class="feature-icon">📏</div>
+                                    <h4>#{msg['bienvenida.modulo.tiposUnidadMedida.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.tiposUnidadMedida.desc']}</p>
+                                </div>
+
+                                <div class="feature-item">
+                                    <div class="feature-icon">📐</div>
+                                    <h4>#{msg['bienvenida.modulo.unidadesMedida.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.unidadesMedida.desc']}</p>
+                                </div>
+
+                                <!-- Clientes y Proveedores -->
+                                <div class="feature-item">
+                                    <div class="feature-icon">👥</div>
+                                    <h4>#{msg['bienvenida.modulo.clientes.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.clientes.desc']}</p>
+                                </div>
+
+                                <div class="feature-item">
+                                    <div class="feature-icon">🚚</div>
+                                    <h4>#{msg['bienvenida.modulo.proveedores.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.proveedores.desc']}</p>
+                                </div>
+
+                                <!-- Compras -->
+                                <div class="feature-item">
+                                    <div class="feature-icon">🛒</div>
+                                    <h4>#{msg['bienvenida.modulo.compras.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.compras.desc']}</p>
+                                </div>
+
+                                <div class="feature-item">
+                                    <div class="feature-icon">📋</div>
+                                    <h4>#{msg['bienvenida.modulo.detallesCompra.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.detallesCompra.desc']}</p>
+                                </div>
+
+                                <!-- Ventas -->
+                                <div class="feature-item">
+                                    <div class="feature-icon">💰</div>
+                                    <h4>#{msg['bienvenida.modulo.ventas.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.ventas.desc']}</p>
+                                </div>
+
+                                <div class="feature-item">
+                                    <div class="feature-icon">🧾</div>
+                                    <h4>#{msg['bienvenida.modulo.detallesVenta.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.detallesVenta.desc']}</p>
+                                </div>
+
+                                <!-- Kardex -->
+                                <div class="feature-item">
+                                    <div class="feature-icon">📊</div>
+                                    <h4>#{msg['bienvenida.modulo.kardex.titulo']}</h4>
+                                    <p>#{msg['bienvenida.modulo.kardex.desc']}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="instructions-section">
+                            <h3>#{msg['bienvenida.instrucciones.titulo']}</h3>
+                            <ol class="instructions-list">
+                                <li>#{msg['bienvenida.instrucciones.paso1']}</li>
+                                <li>#{msg['bienvenida.instrucciones.paso2']}</li>
+                                <li>#{msg['bienvenida.instrucciones.paso3']}</li>
+                                <li>#{msg['bienvenida.instrucciones.paso4']}</li>
+                                <li>#{msg['bienvenida.instrucciones.paso5']}</li>
+                                <li>#{msg['bienvenida.instrucciones.paso6']}</li>
+                            </ol>
+                        </div>
+
+                        <div class="statistics-section">
+                            <h3>#{msg['bienvenida.ventajas.titulo']}</h3>
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-number">✓</div>
+                                    <p>#{msg['bienvenida.ventajas.control']}</p>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">✓</div>
+                                    <p>#{msg['bienvenida.ventajas.trazabilidad']}</p>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">✓</div>
+                                    <p>#{msg['bienvenida.ventajas.gestion']}</p>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">✓</div>
+                                    <p>#{msg['bienvenida.ventajas.reportes']}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <p class="help-text">
+                                <strong>#{msg['bienvenida.ayuda.nota']}</strong> #{msg['bienvenida.ayuda.texto']}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </h:body>
