@@ -73,8 +73,6 @@
                 <h:panelGroup id="pnlDetalle">
                     <h:form id="frmCrear" rendered="#{tipoUnidadMedidaFrm.estado != 'NADA'}">
                         <h:panelGrid columns="2" cellpadding="5">
-
-                            <!-- ID -->
                             <h:outputLabel for="txtIdPanel" value="ID:"/>
                             <h:panelGroup id="txtIdPanel">
                                 <h:outputText rendered="#{empty tipoUnidadMedidaFrm.registro.id}"
@@ -85,37 +83,29 @@
                                              disabled="true"/>
                             </h:panelGroup>
 
-                            <!-- Nombre -->
                             <h:outputLabel for="txtNombre" value="Nombre:*"/>
-                            <p:inputText id="txtNombre"
+                            <h:inputText id="txtNombre"
                                          value="#{tipoUnidadMedidaFrm.registro.nombre}"
-                                         style="width: 100%;"
                                          required="true"
-                                         requiredMessage="El nombre es requerido"
-                                         maxlength="155"/>
+                                         requiredMessage="El nombre es requerido"/>
 
-                            <!-- Unidad Base -->
                             <h:outputLabel for="txtUnidadBase" value="Unidad Base:"/>
-                            <p:inputText id="txtUnidadBase"
-                                         value="#{tipoUnidadMedidaFrm.registro.unidadBase}"
-                                         style="width: 100%;"
-                                         maxlength="155"/>
+                            <h:inputText id="txtUnidadBase"
+                                         value="#{tipoUnidadMedidaFrm.registro.unidadBase}"/>
 
-                            <!-- Comentarios -->
                             <h:outputLabel for="txtComentarios" value="Comentarios:"/>
-                            <p:inputTextarea id="txtComentarios"
+                            <h:inputTextarea id="txtComentarios"
                                              value="#{tipoUnidadMedidaFrm.registro.comentarios}"
                                              rows="4"
-                                             style="width: 100%;"/>
+                                             cols="50"/>
 
-                            <!-- Activo -->
                             <h:outputLabel for="chkActivo" value="Activo:"/>
-                            <p:selectBooleanCheckbox id="chkActivo"
-                                                     value="#{tipoUnidadMedidaFrm.registro.activo}"/>
+                            <h:selectBooleanCheckbox id="chkActivo"
+                                                     value="#{tipoUnidadMedidaFrm.registro.activo}"
+                                                     styleClass="checkbox-grande"/>
                         </h:panelGrid>
-
-                        <!-- Botones Crear/Modificar/Eliminar -->
-                        <h:panelGrid columns="3">
+                        <!-- Botones Crear / Modificar / Eliminar -->
+                        <h:panelGrid columns="3" style="margin-top: 15px;">
                             <ui:include src="/paginas/ues/BotonesTop.xhtml">
                                 <ui:param name="section" value="crud"/>
                                 <ui:param name="bean" value="#{tipoUnidadMedidaFrm}"/>

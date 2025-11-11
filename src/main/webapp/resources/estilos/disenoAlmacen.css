@@ -631,3 +631,20 @@ h1 {
 #pnlDetalle .ui-panelgrid-cell {
     padding: 15px;
 }
+
+/* Checkbox grande */
+.checkbox-grande {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    /* primero bajamos, luego escalamos (para que la bajada sea “real”) */
+    transform: translateY(3px) scale(1.5);
+    transform-origin: left center;
+}
+
+/* Baja sutil a la etiqueta y al contenedor del checkbox */
+.label-activo,
+.campo-activo {
+    display: inline-block;
+    margin-top: 6px;    /* ajusta a 4–10px a tu gusto */
+}

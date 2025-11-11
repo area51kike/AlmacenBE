@@ -120,36 +120,21 @@
                                                      value="#{caracteristicaFrm.registro.activo}"/>
                         </h:panelGrid>
 
-                        <!-- BOTONES CRUD -->
-                        <div class="form-buttons">
-                            <h:commandButton value="GUARDAR"
-                                             action="#{caracteristicaFrm.guardar}"
-                                             styleClass="btn-submit"/>
+                        <!-- Botones Crear / Modificar / Eliminar -->
+                        <h:panelGrid columns="3" style="margin-top: 15px;">
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="crud"/>
+                                <ui:param name="bean" value="#{caracteristicaFrm}"/>
+                            </ui:include>
+                        </h:panelGrid>
+                    </h:form>
 
-                            <h:commandButton value="CANCELAR"
-                                             action="#{caracteristicaFrm.cancelar}"
-                                             styleClass="btn-cancelar"
-                                             style="margin-right: 10px;"
-                                             immediate="true"
-                                             rendered="#{caracteristicaFrm.estado == 'CREAR'}">
-                                <f:ajax execute="@this" render=":pnlTabla :pnlDetalle :messages" resetValues="true"/>
-                            </h:commandButton>
-
-                            <h:commandButton value="MODIFICAR"
-                                             action="#{caracteristicaFrm.guardar}"
-                                             styleClass="btn-modificar"
-                                             style="margin-right: 10px;"
-                                             rendered="#{caracteristicaFrm.estado == 'MODIFICAR'}">
-                                <f:ajax execute="@form" render=":frmTop :pnlTabla :pnlDetalle :messages"/>
-                            </h:commandButton>
-
-                            <h:commandButton value="ELIMINAR"
-                                             action="#{caracteristicaFrm.eliminar}"
-                                             styleClass="btn-eliminar"
-                                             rendered="#{caracteristicaFrm.estado == 'MODIFICAR'}">
-                                <f:ajax execute="@this" render=":frmTop :pnlTabla :pnlDetalle :messages"/>
-                            </h:commandButton>
-                        </div>
+                    <!-- Botón Cancelar: su propio form  -->
+                    <h:form id="frmCancelar">
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="cancelar"/>
+                            <ui:param name="bean" value="#{caracteristicaFrm}"/>
+                        </ui:include>
                     </h:form>
                 </h:panelGroup>
             </div>
