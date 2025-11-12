@@ -47,7 +47,7 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
     @Override
     protected Compra nuevoRegistro() {
         Compra nuevaCompra = new Compra();
-        nuevaCompra.setFecha(OffsetDateTime.now()); // Establece la fecha actual
+        nuevaCompra.setFecha(OffsetDateTime.now());
         return nuevaCompra;
     }
 
@@ -55,7 +55,7 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
     protected Compra buscarRegistroPorId(Object id) {
         if (id instanceof Long) {
             try {
-                return compraDao.findById((Long) id); // Busca la compra por ID
+                return compraDao.findById((Long) id);
             } catch (Exception e) {
                 Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error buscando Compra por ID", e);
             }
@@ -83,43 +83,42 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
             throw new Exception("El proveedor seleccionado no existe.");
         }
 
-        // El ID será generado por el DAO automáticamente
+        // El DAO se encargará de asignar el proveedor y generar el ID
         compraDao.crear(entidad);
     }
 
     @Override
     protected String getIdAsText(Compra r) {
-        return (r != null && r.getId() != null) ? r.getId().toString() : null; // Convierte el ID a texto
+        return (r != null && r.getId() != null) ? r.getId().toString() : null;
     }
 
     @Override
     protected Compra getIdByText(String id) {
         try {
-            return buscarRegistroPorId(Long.parseLong(id)); // Busca por el ID recibido como texto
+            return buscarRegistroPorId(Long.parseLong(id));
         } catch (NumberFormatException e) {
-            return null; // Retorna null si el formato no es válido
+            return null;
         }
     }
 
     @Override
     protected boolean esNombreVacio(Compra registro) {
-        return registro == null || registro.getIdProveedor() == null; // Verifica si el registro es vacío
+        return registro == null || registro.getIdProveedor() == null;
     }
 
     @PostConstruct
     public void init() {
         super.inicializar();
-        // Inicializa las listas de proveedores y estados disponibles
         this.estadosDisponibles = Arrays.asList(EstadoCompra.values());
         this.proveedoresDisponibles = proveedorDao.findAll();
     }
 
     public List<Proveedor> getProveedoresDisponibles() {
-        return proveedoresDisponibles; // Obtiene los proveedores disponibles
+        return proveedoresDisponibles;
     }
 
     public List<EstadoCompra> getEstadosDisponibles() {
-        return estadosDisponibles; // Obtiene los estados disponibles
+        return estadosDisponibles;
     }
 
     @Override
@@ -158,19 +157,16 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
 
             // Ejecuta la operación según el estado
             if (this.estado == ESTADO_CRUD.CREAR) {
-                crearEntidad(this.registro); // Llama al método de creación
+                crearEntidad(this.registro);
             } else if (this.estado == ESTADO_CRUD.MODIFICAR) {
-                // Para modificación, validamos que el proveedor exista
-                if (this.registro.getIdProveedor() != null) {
-                    Proveedor proveedorEntity = proveedorDao.findById(this.registro.getIdProveedor());
-                    if (proveedorEntity == null) {
-                        getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        "Error", "El proveedor seleccionado no existe."));
-                        return;
-                    }
-                }
-                getDao().modificar(this.registro); // Modifica el registro
+                // Validar que el proveedor exista antes de modificar
+                compraDao.validarProveedor(this.registro.getIdProveedor());
+
+                // Cargar el proveedor completo
+                Proveedor proveedor = proveedorDao.findById(this.registro.getIdProveedor());
+                this.registro.setProveedor(proveedor);
+
+                getDao().modificar(this.registro);
             }
 
             // Limpiar y recargar después de guardar

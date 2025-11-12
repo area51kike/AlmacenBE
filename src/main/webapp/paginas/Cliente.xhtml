@@ -84,20 +84,16 @@
                                                  value="#{clienteFrm.registro.dui}"
                                                  required="true"
                                                  requiredMessage="#{msg['cliente.dui.requerido']}"
-                                                 style="width: 150px;">
-                                        <f:validateLength minimum="9" maximum="9"
-                                                          message="#{msg['cliente.dui.longitud']}"/>
-                                    </h:inputText>
+                                                 maxlength="9"
+                                                 style="width: 150px;"/>
 
                                     <h:outputLabel for="txtNIT" value="#{msg['cliente.form.nit']}"/>
                                     <h:inputText id="txtNIT"
                                                  value="#{clienteFrm.registro.nit}"
                                                  required="true"
                                                  requiredMessage="#{msg['cliente.nit.requerido']}"
-                                                 style="width: 200px;">
-                                        <f:validateLength minimum="14" maximum="14"
-                                                          message="#{msg['cliente.nit.longitud']}"/>
-                                    </h:inputText>
+                                                 maxlength="14"
+                                                 style="width: 200px;"/>
 
                                     <h:outputLabel for="chkActivo" value="#{msg['cliente.form.activo']}"/>
                                     <h:selectBooleanCheckbox id="chkActivo"
@@ -146,12 +142,12 @@
                         </p:tabView>
 
                         <!-- Botones Crear / Modificar / Eliminar -->
-                        <h:panelGrid columns="3" style="margin-top: 15px;">
+                        <div style="margin-top: 15px;">
                             <ui:include src="/paginas/ues/BotonesTop.xhtml">
                                 <ui:param name="section" value="crud"/>
                                 <ui:param name="bean" value="#{clienteFrm}"/>
                             </ui:include>
-                        </h:panelGrid>
+                        </div>
                     </h:form>
 
                     <!-- Botón Cancelar: su propio form  -->

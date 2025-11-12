@@ -4,11 +4,10 @@ import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Compra;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Proveedor;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,76 +34,42 @@ public class CompraDao extends InventarioDefaultDataAccess<Compra> implements Se
         LOGGER.log(Level.INFO, "Creando nueva compra...");
 
         try {
-            // Si el ID no está asignado, generamos uno basado en el proveedor.
-            if (entidad.getId() == null) {
-                if (entidad.getIdProveedor() == null) {
-                    throw new IllegalArgumentException("El ID del proveedor es obligatorio");
-                }
-
-                // Usamos el ID del proveedor como ID de la compra
-                Long idCompra = entidad.getIdProveedor().longValue();
-                Compra existente = em.find(Compra.class, idCompra);
-
-                // Si ya existe, buscamos un ID alternativo
-                if (existente != null) {
-                    LOGGER.log(Level.INFO, "ID de compra ya existe, buscando uno alternativo");
-                    idCompra = buscarIdProveedorDisponible();
-                }
-
-                entidad.setId(idCompra);
-                LOGGER.log(Level.INFO, "ID de compra asignado: {0}", idCompra);
-            } else {
-                LOGGER.log(Level.INFO, "Usando ID proporcionado: {0}", entidad.getId());
+            // Validar que el proveedor esté asignado
+            if (entidad.getIdProveedor() == null) {
+                throw new IllegalArgumentException("El ID del proveedor es obligatorio");
             }
 
-            // Mostramos los detalles de la compra
-            LOGGER.log(Level.INFO, "Detalles de la compra: {0}", entidad);
+            // Buscar el proveedor en la base de datos
+            Proveedor proveedor = em.find(Proveedor.class, entidad.getIdProveedor());
+            if (proveedor == null) {
+                throw new IllegalArgumentException("El proveedor con ID " + entidad.getIdProveedor() + " no existe");
+            }
 
-            // Guardamos la compra
+            // Asignar la entidad completa del proveedor
+            entidad.setProveedor(proveedor);
+
+            // Asegurarse de que el ID sea null para que la secuencia lo genere
+            entidad.setId(null);
+
+            LOGGER.log(Level.INFO, "Guardando compra: {0}", entidad);
+
+            // Persistir usando el método de la clase base
             super.crear(entidad);
-            LOGGER.log(Level.INFO, "Compra creada exitosamente");
+
+            LOGGER.log(Level.INFO, "Compra creada exitosamente con ID: {0}", entidad.getId());
 
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al crear compra", e);
 
-            // Mostramos la causa del error
+            // Obtener la causa raíz
             Throwable causa = e;
             while (causa.getCause() != null) {
                 causa = causa.getCause();
             }
-            LOGGER.log(Level.SEVERE, "Causa raíz: {0} - {1}", new Object[]{causa.getClass().getName(), causa.getMessage()});
+            LOGGER.log(Level.SEVERE, "Causa raíz: {0} - {1}",
+                    new Object[]{causa.getClass().getName(), causa.getMessage()});
 
-            throw e;
-        }
-    }
-
-    /**
-     * Busca un proveedor disponible para asignarle un ID de compra.
-     *
-     * @return Un ID válido de proveedor.
-     * @throws RuntimeException si no hay proveedores disponibles.
-     */
-    private Long buscarIdProveedorDisponible() {
-        try {
-            TypedQuery<Integer> query = em.createQuery(
-                    "SELECT p.id FROM Proveedor p " +
-                            "WHERE p.id NOT IN (SELECT c.id FROM Compra c) " +
-                            "ORDER BY p.id",
-                    Integer.class
-            );
-            query.setMaxResults(1);
-
-            List<Integer> resultado = query.getResultList();
-
-            if (resultado.isEmpty()) {
-                throw new RuntimeException("No hay IDs de proveedor disponibles.");
-            }
-
-            return resultado.get(0).longValue();
-
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error buscando ID de proveedor disponible", e);
-            throw new RuntimeException("No se pudo encontrar un ID válido para la compra", e);
+            throw new RuntimeException("Error al crear la compra: " + causa.getMessage(), e);
         }
     }
 
@@ -112,12 +77,11 @@ public class CompraDao extends InventarioDefaultDataAccess<Compra> implements Se
     public void eliminar(Compra registro) {
         LOGGER.log(Level.INFO, "Eliminando compra con ID: {0}", registro.getId());
         try {
-            // Elimina la compra usando el método de la clase base.
             super.eliminar(registro);
             LOGGER.log(Level.INFO, "Compra eliminada exitosamente");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al eliminar compra", e);
-            throw e;
+            throw new RuntimeException("Error al eliminar la compra: " + e.getMessage(), e);
         }
     }
 
@@ -125,5 +89,15 @@ public class CompraDao extends InventarioDefaultDataAccess<Compra> implements Se
     public Compra findById(Object id) {
         LOGGER.log(Level.FINE, "Buscando compra por ID: {0}", id);
         return super.findById(id);
+    }
+
+    // Método auxiliar para validar el proveedor antes de modificar
+    public void validarProveedor(Integer idProveedor) {
+        if (idProveedor != null) {
+            Proveedor proveedor = em.find(Proveedor.class, idProveedor);
+            if (proveedor == null) {
+                throw new IllegalArgumentException("El proveedor con ID " + idProveedor + " no existe");
+            }
+        }
     }
 }

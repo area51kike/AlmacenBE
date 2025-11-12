@@ -2,32 +2,23 @@ package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import java.io.Serializable;
+
 import java.time.OffsetDateTime;
 
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.conversores.OffsetDateTimeJpaConverter;
-
 @Entity
-@Access(AccessType.FIELD)
-@Table(name = "compra", schema = "public")
-public class Compra implements Serializable {
-
+@Table(name = "compra")
+public class Compra {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "compra_seq")
+    @SequenceGenerator(name = "compra_seq", sequenceName = "compra_id_seq", allocationSize = 1)
     @Column(name = "id_compra", nullable = false)
     private Long id;
 
-    @Column(name = "id_proveedor")
-    private Integer idProveedor;
-
-
+    // Relación ManyToOne con Proveedor
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_proveedor", referencedColumnName = "id_proveedor", insertable = false, updatable = false)
-
+    @JoinColumn(name = "id_proveedor", referencedColumnName = "id_proveedor")
     private Proveedor proveedor;
 
-
-
-    @Convert(converter = OffsetDateTimeJpaConverter.class)
     @Column(name = "fecha")
     private OffsetDateTime fecha;
 
@@ -39,6 +30,7 @@ public class Compra implements Serializable {
     @Column(name = "observaciones")
     private String observaciones;
 
+    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -47,25 +39,29 @@ public class Compra implements Serializable {
         this.id = id;
     }
 
-    public Integer getIdProveedor() {
-        return idProveedor;
-    }
-
-    public void setIdProveedor(Integer idProveedor) {
-        this.idProveedor = idProveedor;
-    }
-
     public Proveedor getProveedor() {
         return proveedor;
     }
 
     public void setProveedor(Proveedor proveedor) {
         this.proveedor = proveedor;
-        // Al establecer la entidad, actualizamos el ID primitivo para consistencia.
-        this.idProveedor = (proveedor != null) ? proveedor.getId() : null;
     }
 
+    // Métodos de conveniencia para trabajar con idProveedor
+    public Integer getIdProveedor() {
+        return proveedor != null ? proveedor.getId() : null;
+    }
 
+    public void setIdProveedor(Integer idProveedor) {
+        if (idProveedor != null) {
+            if (this.proveedor == null) {
+                this.proveedor = new Proveedor();
+            }
+            this.proveedor.setId(idProveedor);
+        } else {
+            this.proveedor = null;
+        }
+    }
 
     public OffsetDateTime getFecha() {
         return fecha;
@@ -74,8 +70,6 @@ public class Compra implements Serializable {
     public void setFecha(OffsetDateTime fecha) {
         this.fecha = fecha;
     }
-
-
 
     public String getEstado() {
         return estado;
@@ -93,4 +87,14 @@ public class Compra implements Serializable {
         this.observaciones = observaciones;
     }
 
+    @Override
+    public String toString() {
+        return "Compra{" +
+                "id=" + id +
+                ", idProveedor=" + getIdProveedor() +
+                ", fecha=" + fecha +
+                ", estado='" + estado + '\'' +
+                ", observaciones='" + observaciones + '\'' +
+                '}';
+    }
 }
