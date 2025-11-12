@@ -54,15 +54,11 @@
                                 </p:column>
                             </p:dataTable>
 
-                            <!-- BOTÓN NUEVO -->
-                            <div style="margin-top: 20px; padding: 10px;">
-                                <h:commandButton value="NUEVO"
-                                                 action="#{almacenFrm.prepararNuevo}"
-                                                 styleClass="btn-nuevo"
-                                                 style="margin-right: 10px;">
-                                    <f:ajax execute="@this" render=":pnlTabla :pnlDetalle :messages"/>
-                                </h:commandButton>
-                            </div>
+                            <!-- Botón Nuevo (incluimos BotonesTop pasando el bean correcto) -->
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="nuevo"/>
+                                <ui:param name="bean" value="#{almacenFrm}"/>
+                            </ui:include>
                         </h:form>
 
                         <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
