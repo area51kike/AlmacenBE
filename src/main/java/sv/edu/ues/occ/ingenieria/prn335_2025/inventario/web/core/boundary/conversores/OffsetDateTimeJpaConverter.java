@@ -4,13 +4,13 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
-import java.time.ZoneId; // Asegúrate de importar el ZoneId
+import java.time.ZoneId;
 
 @Converter(autoApply = true) // Aplica automáticamente a todos los OffsetDateTime
 public class OffsetDateTimeJpaConverter implements AttributeConverter<OffsetDateTime, Timestamp> {
 
-    // Define la zona horaria que usarás para guardar/recuperar el Offset
-    private static final ZoneId DEFAULT_ZONE = ZoneId.systemDefault();
+    // ✅ Define la zona horaria de El Salvador
+    private static final ZoneId DEFAULT_ZONE = ZoneId.of("America/El_Salvador");
 
     // Convierte de OffsetDateTime (Entidad Java) a Timestamp (Columna de BD)
     @Override
@@ -28,7 +28,7 @@ public class OffsetDateTimeJpaConverter implements AttributeConverter<OffsetDate
         if (databaseValue == null) {
             return null;
         }
-        // CRÍTICO: Usa toInstant y atZone para crear el OffsetDateTime requerido.
+        // ✅ Usa toInstant y atZone para crear el OffsetDateTime con zona de El Salvador
         return databaseValue.toInstant().atZone(DEFAULT_ZONE).toOffsetDateTime();
     }
 }

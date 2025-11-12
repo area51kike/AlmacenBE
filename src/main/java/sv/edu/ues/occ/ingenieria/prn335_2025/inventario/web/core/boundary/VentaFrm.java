@@ -2,7 +2,7 @@ package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary;
 
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.event.ActionEvent; // Necesario para btnGuardarHandler
+import jakarta.faces.event.ActionEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
@@ -15,9 +15,8 @@ import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.Cliente
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Venta;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Cliente;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.VentaDetalle;
 
-@Named("ventaFrm") // Nombre para usar en Venta.xhtml
+@Named("ventaFrm")
 @ViewScoped
 public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
 
@@ -25,25 +24,32 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
     private VentaDao ventaDao;
 
     @Inject
-    private ClienteDAO clienteDao; // DAO para cargar la lista de clientes
+    private ClienteDAO clienteDao;
 
     private List<Cliente> clientesDisponibles;
 
-    // Lista de estados disponibles para el SelectOneMenu
     private final List<String> estadosDisponibles = List.of("CREADA", "PROCESO", "FINALIZADA", "ANULADA");
 
+    // ✅ CORRECCIÓN: Sobrescribir inicializar() sin @PostConstruct
+    // El @PostConstruct de DefaultFrm lo llamará automáticamente
     @Override
     public void inicializar() {
+        System.out.println("🔵 Iniciando VentaFrm...");
         super.inicializar(); // Inicializa el LazyDataModel
         cargarClientes();
         this.nombreBean = "Gestión de Ventas";
-        System.out.println("🧠 Bean VentaFrm creado");
-
+        System.out.println("✅ Bean VentaFrm creado - Modelo: " + (modelo != null ? "OK" : "NULL"));
     }
 
     private void cargarClientes() {
-        this.clientesDisponibles = clienteDao.findAll();
-        System.out.println("🧠 Clientes cargados: " + clientesDisponibles.size());
+        try {
+            this.clientesDisponibles = clienteDao.findAll();
+            System.out.println("✅ Clientes cargados: " + clientesDisponibles.size());
+        } catch (Exception e) {
+            System.err.println("❌ Error al cargar clientes: " + e.getMessage());
+            e.printStackTrace();
+            this.clientesDisponibles = List.of();
+        }
     }
 
     // --- Implementación de Métodos Abstractos ---
@@ -58,29 +64,29 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         return ventaDao;
     }
 
+    @Override
     protected Venta nuevoRegistro() {
+        System.out.println("🆕 Creando nuevo registro Venta");
         Venta v = new Venta();
         v.setId(UUID.randomUUID());
-
-        // ✅ Inicializar cliente para evitar errores en el selectOneMenu
         v.setIdCliente(new Cliente());
-
-        // ✅ Inicializar estado si usás un enum o lista de estados
-        v.setEstado(null); // o EstadoVenta.PENDIENTE si tenés un valor por defecto
-
-        // ✅ Inicializar fecha para evitar errores en el calendario
-        v.setFecha(OffsetDateTime.now()); // o LocalDateTime si usás eso
-
-        // ✅ Inicializar observaciones para evitar null en el textarea
+        v.setEstado(null);
+        v.setFecha(OffsetDateTime.now());
         v.setObservaciones("");
-
         return v;
     }
 
-
     @Override
     protected Venta buscarRegistroPorId(Object id) {
-        return null; // El LazyDataModel lo maneja.
+        try {
+            if (id != null) {
+                UUID uuid = UUID.fromString(id.toString());
+                return ventaDao.findById(uuid);
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error en buscarRegistroPorId: " + e.getMessage());
+        }
+        return null;
     }
 
     @Override
@@ -95,21 +101,28 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         }
         try {
             UUID uuid = UUID.fromString(id);
-            return ventaDao.findById(uuid); // ✅ Retorna el objeto real desde la base
+            return ventaDao.findById(uuid);
         } catch (IllegalArgumentException e) {
-            System.err.println("Error al parsear UUID: " + e.getMessage());
+            System.err.println("❌ Error al parsear UUID: " + e.getMessage());
             return null;
         }
     }
 
-
     @Override
     protected boolean esNombreVacio(Venta registro) {
-        // 🛑 CORRECCIÓN CLAVE 2: Tu validación
-        // Ahora funciona porque nuevoRegistro() inicializó la entidad Cliente
         if (registro == null || registro.getIdCliente() == null || registro.getIdCliente().getId() == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "Debe seleccionar un cliente."));
+            return true;
+        }
+        if (registro.getEstado() == null || registro.getEstado().isEmpty()) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "Debe seleccionar un estado."));
+            return true;
+        }
+        if (registro.getFecha() == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "Debe seleccionar una fecha."));
             return true;
         }
         return false;
@@ -119,33 +132,42 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
 
     @Override
     public void btnGuardarHandler(ActionEvent actionEvent) {
+        System.out.println("💾 Intentando guardar venta...");
         if (this.registro != null) {
             try {
                 // 1. Validar
                 if (esNombreVacio(this.registro)) {
+                    System.out.println("⚠️ Validación fallida");
                     return;
                 }
 
-                // 🛑 CORRECCIÓN CLAVE 3: Sincronizar la Entidad COMPLETA
-                // Obtener el ID que JSF seteo en la entidad Cliente vacía
+                // 2. Sincronizar Cliente completo
                 UUID idClienteSeleccionado = this.registro.getIdCliente().getId();
-
-                // Buscar la entidad Cliente completa
                 Cliente clienteEntidad = clienteDao.findById(idClienteSeleccionado);
 
-                // Asignar la entidad completa al registro de Venta antes de guardar.
+                if (clienteEntidad == null) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Cliente no encontrado"));
+                    return;
+                }
+
                 this.registro.setIdCliente(clienteEntidad);
+                System.out.println("✅ Cliente sincronizado: " + clienteEntidad.getNombre());
 
-                // 2. Persistir
+                // 3. Persistir
                 getDao().crear(this.registro);
+                System.out.println("✅ Venta guardada con ID: " + this.registro.getId());
 
-                // 3. Limpieza y Notificación
+                // 4. Limpieza y Notificación
                 this.registro = null;
                 this.estado = ESTADO_CRUD.NADA;
+                this.modelo = null; // ✅ Forzar recreación del modelo
                 inicializarRegistros();
+
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Registro guardado correctamente"));
             } catch (Exception e) {
+                System.err.println("❌ Error al guardar: " + e.getMessage());
                 e.printStackTrace();
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al guardar", e.getMessage()));
@@ -156,21 +178,16 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         }
     }
 
-    // El resto de manejadores de botones (btnEliminarHandler, btnModificarHandler, etc.)
-    // se heredan correctamente de DefaultFrm.
-
     // --- Getters para JSF ---
 
     public List<Cliente> getClientesDisponibles() {
         if (clientesDisponibles == null || clientesDisponibles.isEmpty()) {
-            cargarClientes(); // respaldo por si no se cargó en inicializar()
+            cargarClientes();
         }
         return clientesDisponibles;
     }
 
-
     public List<String> getEstadosDisponibles() {
         return estadosDisponibles;
     }
-
 }

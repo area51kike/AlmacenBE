@@ -15,7 +15,10 @@ import java.time.format.DateTimeParseException;
 @ApplicationScoped
 public class OffsetDateTimeConverter implements Converter<OffsetDateTime> {
 
-    // Formatos de fecha con y sin offset
+    // ✅ CORRECCIÓN: Formato que usa PrimeFaces Calendar
+    private static final DateTimeFormatter UI_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    // Formatos de fecha con y sin offset (para compatibilidad)
     private static final DateTimeFormatter FMT_WITH_OFFSET = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mmXXX");
     private static final DateTimeFormatter FMT_NO_OFFSET = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -29,24 +32,34 @@ public class OffsetDateTimeConverter implements Converter<OffsetDateTime> {
         String v = value.trim();
 
         try {
+            // ✅ PRIORIDAD 1: Intentar con formato UI (dd/MM/yyyy HH:mm)
+            try {
+                LocalDateTime ldt = LocalDateTime.parse(v, UI_FORMATTER);
+                return ldt.atZone(DEFAULT_ZONE).toOffsetDateTime();
+            } catch (DateTimeParseException e1) {
+                // Continuar con otros formatos
+            }
+
             // Si tiene offset, usa el formato correspondiente
             if (v.matches(".*[+-]\\d{2}:\\d{2}$")) {
                 return OffsetDateTime.parse(v, FMT_WITH_OFFSET);
             }
-            // Si no tiene offset, asume la zona por defecto
+
+            // Si no tiene offset, asume formato yyyy-MM-dd HH:mm
             LocalDateTime ldt = LocalDateTime.parse(v, FMT_NO_OFFSET);
             return ldt.atZone(DEFAULT_ZONE).toOffsetDateTime();
+
         } catch (DateTimeParseException e) {
             throw new ConverterException(
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fecha inválida",
-                            "Usa yyyy-MM-dd HH:mm o con offset: yyyy-MM-dd HH:mm-06:00"));
+                            "Usa dd/MM/yyyy HH:mm"));
         }
     }
 
     @Override
     public String getAsString(FacesContext ctx, UIComponent comp, OffsetDateTime value) {
         if (value == null) return "";
-        // Devuelve la fecha en el formato sin offset
-        return value.atZoneSameInstant(DEFAULT_ZONE).toLocalDateTime().format(FMT_NO_OFFSET);
+        // ✅ CORRECCIÓN: Devuelve en formato UI (dd/MM/yyyy HH:mm)
+        return value.atZoneSameInstant(DEFAULT_ZONE).toLocalDateTime().format(UI_FORMATTER);
     }
 }
