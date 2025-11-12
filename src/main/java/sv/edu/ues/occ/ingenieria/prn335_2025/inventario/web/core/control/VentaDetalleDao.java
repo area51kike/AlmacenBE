@@ -40,5 +40,7 @@ public class VentaDetalleDao extends InventarioDefaultDataAccess<VentaDetalle> i
      * @param id El UUID del registro a buscar.
      * @return La entidad VentaDetalle encontrada o null.
      */
-
+    public VentaDetalle findById(UUID id) {
+        return getEntityManager().find(VentaDetalle.class, id);
+    }
 }

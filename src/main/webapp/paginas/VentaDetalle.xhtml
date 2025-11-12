@@ -21,10 +21,9 @@
 
             <div class="content">
 
-                <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
-
+                <!-- PANEL TABLA -->
                 <h:panelGroup id="pnlTabla" layout="block"
-                              style="display:#{ventaDetalleFrm.estado eq 'NADA' ? 'block' : 'none'}; width: 100%;">
+                              style="display:#{ventaDetalleFrm.estado eq 'NADA' ? 'block' : 'none'}">
                     <div class="content-tabla">
                         <h:form id="frmTabla">
                             <p:dataTable id="tblVentaDetalle"
@@ -39,63 +38,102 @@
                                          selection="#{ventaDetalleFrm.registro}"
                                          rowKey="#{item.id}">
 
-                                <p:ajax event="rowSelect" listener="#{ventaDetalleFrm.selectionHandler}"
-                                        update=":pnlTabla :pnlDetalle, :messages"/>
-                                <p:ajax event="rowUnselect" listener="#{ventaDetalleFrm.btnCancelarHandler}"
-                                        update=":pnlTabla :pnlDetalle, :messages"/>
+                                <p:ajax event="rowSelect"
+                                        listener="#{ventaDetalleFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle :messages"/>
 
-                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.id']}" width="150" sortBy="#{item.id}"><h:outputText value="#{item.id}"/></p:column>
-                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.venta']}" sortBy="#{item.idVenta.id}"><h:outputText value="#{item.idVenta.id}"/></p:column>
-                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.producto']}" sortBy="#{item.idProducto.nombreProducto}"><h:outputText value="#{item.idProducto.nombreProducto}"/></p:column>
-                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.cantidad']}" sortBy="#{item.cantidad}"><h:outputText value="#{item.cantidad}"/></p:column>
-                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.precio']}" sortBy="#{item.precio}"><h:outputText value="#{item.precio}"><f:convertNumber type="currency" currencySymbol="$"/></h:outputText></p:column>
-                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.estado']}" sortBy="#{item.estado}"><h:outputText value="#{item.estado}"/></p:column>
+                                <p:ajax event="rowUnselect"
+                                        listener="#{ventaDetalleFrm.btnCancelarHandler}"
+                                        update=":pnlTabla :pnlDetalle :messages"/>
+
+                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.id']}" width="150">
+                                    <h:outputText value="#{item.id}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.venta']}">
+                                    <h:outputText value="#{item.idVenta.id}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.producto']}">
+                                    <h:outputText value="#{item.idProducto.nombreProducto}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.cantidad']}">
+                                    <h:outputText value="#{item.cantidad}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.precio']}">
+                                    <h:outputText value="#{item.precio}">
+                                        <f:convertNumber type="currency" currencySymbol="$"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.ventaDetalle.columna.estado']}">
+                                    <h:outputText value="#{item.estado}"/>
+                                </p:column>
                             </p:dataTable>
 
+                            <!-- Botón Nuevo -->
                             <ui:include src="/paginas/ues/BotonesTop.xhtml">
                                 <ui:param name="section" value="nuevo"/>
                                 <ui:param name="bean" value="#{ventaDetalleFrm}"/>
                             </ui:include>
                         </h:form>
+
+                        <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
                     </div>
                 </h:panelGroup>
 
-                <h:panelGroup id="pnlDetalle" layout="block"
-                              style="display:#{ventaDetalleFrm.estado ne 'NADA' ? 'block' : 'none'}; width: 100%;">
+                <!-- PANEL DETALLE -->
+                <h:panelGroup id="pnlDetalle">
                     <h:form id="frmCrear" rendered="#{ventaDetalleFrm.estado != 'NADA'}">
 
-                        <h:panelGrid columns="2" cellpadding="5" style="margin-top: 10px; width: 60%;">
+                        <h:panelGrid columns="2" cellpadding="5" style="margin-top: 10px; width: 50%;">
 
                             <h:outputLabel for="txtIdPanel" value="#{msg['ventaDetalle.campo.id']}"/>
                             <h:panelGroup id="txtIdPanel">
-                                <h:outputText rendered="#{empty ventaDetalleFrm.registro.id}" value="(#{msg['ventaDetalle.id.autogenerado']})"/>
-                                <h:inputText id="txtId" value="#{ventaDetalleFrm.registro.id}" rendered="#{not empty ventaDetalleFrm.registro.id}" disabled="true"/>
+                                <h:outputText rendered="#{empty ventaDetalleFrm.registro.id}"
+                                              value="(#{msg['ventaDetalle.id.autogenerado']})"/>
+                                <h:inputText id="txtId"
+                                             value="#{ventaDetalleFrm.registro.id}"
+                                             rendered="#{not empty ventaDetalleFrm.registro.id}"
+                                             disabled="true"/>
                             </h:panelGroup>
 
                             <h:outputLabel for="selVenta" value="#{msg['ventaDetalle.campo.venta']}"/>
                             <p:selectOneMenu id="selVenta"
                                              value="#{ventaDetalleFrm.registro.idVenta.id}"
+                                             converter="uuidConverter"
                                              required="true"
                                              requiredMessage="#{msg['mensaje.validacion.venta.requerida']}"
                                              filter="true"
                                              filterMatchMode="contains"
-                                             style="width: 280px;">
-                                <f:selectItem itemLabel="Seleccione Venta" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{ventaDetalleFrm.ventasDisponibles}" var="venta"
-                                               itemLabel="ID: #{venta.id} | Estado: #{venta.estado} | Obs: #{venta.observaciones}" itemValue="#{venta.id}" />
+                                             style="width: 100%;">
+                                <f:selectItem itemLabel="-- Seleccione Venta --"
+                                              itemValue="#{null}"
+                                              noSelectionOption="true" />
+                                <f:selectItems value="#{ventaDetalleFrm.ventasDisponibles}"
+                                               var="venta"
+                                               itemLabel="ID: #{venta.id} | Estado: #{venta.estado}"
+                                               itemValue="#{venta.id}" />
                             </p:selectOneMenu>
 
                             <h:outputLabel for="selProducto" value="#{msg['ventaDetalle.campo.producto']}"/>
                             <p:selectOneMenu id="selProducto"
                                              value="#{ventaDetalleFrm.registro.idProducto.id}"
+                                             converter="uuidConverter"
                                              required="true"
                                              requiredMessage="#{msg['mensaje.validacion.producto.requerido']}"
                                              filter="true"
                                              filterMatchMode="contains"
-                                             style="width: 280px;">
-                                <f:selectItem itemLabel="Seleccione Producto" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{ventaDetalleFrm.productosDisponibles}" var="prod"
-                                               itemLabel="#{prod.nombreProducto} (Ref: #{prod.referenciaExterna})" itemValue="#{prod.id}" />
+                                             style="width: 100%;">
+                                <f:selectItem itemLabel="-- Seleccione Producto --"
+                                              itemValue="#{null}"
+                                              noSelectionOption="true" />
+                                <f:selectItems value="#{ventaDetalleFrm.productosDisponibles}"
+                                               var="prod"
+                                               itemLabel="#{prod.nombreProducto}"
+                                               itemValue="#{prod.id}" />
                             </p:selectOneMenu>
 
                             <h:outputLabel for="txtCantidad" value="#{msg['ventaDetalle.campo.cantidad']}"/>
@@ -103,46 +141,58 @@
                                            value="#{ventaDetalleFrm.registro.cantidad}"
                                            required="true"
                                            requiredMessage="#{msg['mensaje.validacion.cantidad.requerida']}"
-                                           minValue="0.1" decimalPlaces="1"/>
+                                           minValue="0.1"
+                                           decimalPlaces="2"/>
 
                             <h:outputLabel for="txtPrecio" value="#{msg['ventaDetalle.campo.precio']}"/>
                             <p:inputNumber id="txtPrecio"
                                            value="#{ventaDetalleFrm.registro.precio}"
                                            required="true"
                                            requiredMessage="#{msg['mensaje.validacion.precio.requerida']}"
-                                           symbol="$" symbolPosition="p"
-                                           minValue="0.00" decimalPlaces="2"/>
+                                           symbol="$"
+                                           symbolPosition="p"
+                                           minValue="0.00"
+                                           decimalPlaces="2"/>
 
                             <h:outputLabel for="selEstado" value="#{msg['ventaDetalle.campo.estado']}"/>
                             <p:selectOneMenu id="selEstado"
                                              value="#{ventaDetalleFrm.registro.estado}"
                                              required="true"
                                              requiredMessage="#{msg['mensaje.validacion.estado.requerida']}"
-                                             style="width: 150px;">
-                                <f:selectItem itemLabel="Seleccione Estado" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{ventaDetalleFrm.estadosDisponibles}" var="e"
-                                               itemLabel="#{e}" itemValue="#{e}" />
+                                             style="width: 100%;">
+                                <f:selectItem itemLabel="-- Seleccione Estado --"
+                                              itemValue="#{null}"
+                                              noSelectionOption="true" />
+                                <f:selectItems value="#{ventaDetalleFrm.estadosDisponibles}"
+                                               var="e"
+                                               itemLabel="#{e}"
+                                               itemValue="#{e}" />
                             </p:selectOneMenu>
 
                             <h:outputLabel for="txtObs" value="#{msg['ventaDetalle.campo.observaciones']}"/>
                             <p:inputTextarea id="txtObs"
                                              value="#{ventaDetalleFrm.registro.observaciones}"
-                                             rows="3" cols="40"
+                                             rows="3"
+                                             cols="40"
                                              style="width: 100%;"/>
 
                         </h:panelGrid>
 
-                        <h:panelGroup layout="block" style="margin-top: 15px;">
+                        <!-- Botones Crear / Modificar / Eliminar -->
+                        <h:panelGrid columns="3">
                             <ui:include src="/paginas/ues/BotonesTop.xhtml">
                                 <ui:param name="section" value="crud"/>
                                 <ui:param name="bean" value="#{ventaDetalleFrm}"/>
                             </ui:include>
+                        </h:panelGrid>
+                    </h:form>
 
-                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
-                                <ui:param name="section" value="cancelar"/>
-                                <ui:param name="bean" value="#{ventaDetalleFrm}"/>
-                            </ui:include>
-                        </h:panelGroup>
+                    <!-- Botón Cancelar: su propio form -->
+                    <h:form id="frmCancelar">
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="cancelar"/>
+                            <ui:param name="bean" value="#{ventaDetalleFrm}"/>
+                        </ui:include>
                     </h:form>
                 </h:panelGroup>
             </div>

@@ -6,10 +6,6 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-
-
-
-
 @Entity
 @Table(name = "compra_detalle", schema = "public")
 public class CompraDetalle {

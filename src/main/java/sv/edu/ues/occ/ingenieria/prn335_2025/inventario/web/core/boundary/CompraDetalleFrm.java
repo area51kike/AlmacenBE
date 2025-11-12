@@ -8,16 +8,17 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-// Importaciones de Control/DAO (Asume que existen)
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDetalleDao;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDao; // Necesario para la lista de compras
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProductoDAO; // Necesario para la lista de productos
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
 
-// Importaciones de Entidad
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.CompraDetalle;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto;
@@ -27,14 +28,16 @@ import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto
 @ViewScoped
 public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Serializable {
 
+    private static final Logger LOGGER = Logger.getLogger(CompraDetalleFrm.class.getName());
+
     @Inject
     private CompraDetalleDao compraDetalleDao;
 
     @Inject
-    private CompraDao compraDao; // Para obtener la entidad Compra y la lista de Compras
+    private CompraDao compraDao;
 
     @Inject
-    private ProductoDAO productoDao; // Para obtener la entidad Producto y la lista de Productos
+    private ProductoDAO productoDao;
 
     // Listas para los selectOneMenu
     private List<Compra> comprasDisponibles;
@@ -48,16 +51,24 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
     @Override
     public void inicializar() {
         super.inicializar();
-        cargarDatosFiltros(); // Carga las listas de FK
+        cargarDatosFiltros();
         this.nombreBean = "Gestión de Detalle de Compra";
+        LOGGER.log(Level.INFO, "CompraDetalleFrm inicializado correctamente");
     }
 
     private void cargarDatosFiltros() {
-        // Asume que CompraDao.findAll() devuelve List<Compra>
-        this.comprasDisponibles = compraDao.findAll();
+        try {
+            // Inicializar listas vacías para evitar NullPointerException
+            this.comprasDisponibles = compraDao != null ? compraDao.findAll() : new ArrayList<>();
+            this.productosDisponibles = productoDao != null ? productoDao.findAll() : new ArrayList<>();
 
-        // Asume que ProductoDao.findAll() devuelve List<Producto>
-        this.productosDisponibles = productoDao.findAll();
+            LOGGER.log(Level.INFO, "Cargadas {0} compras y {1} productos",
+                    new Object[]{comprasDisponibles.size(), productosDisponibles.size()});
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al cargar datos de filtros", e);
+            this.comprasDisponibles = new ArrayList<>();
+            this.productosDisponibles = new ArrayList<>();
+        }
     }
 
 
@@ -79,17 +90,22 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
         cd.setId(UUID.randomUUID());
         cd.setCantidad(BigDecimal.ZERO);
         cd.setPrecio(BigDecimal.ZERO);
+        cd.setEstado("PENDIENTE"); // Estado por defecto
 
-        // 🛑 Inicialización de entidades FK (CRÍTICO para evitar NullPointer en XHTML)
+        // Inicialización de entidades FK para evitar NullPointer en XHTML
         cd.setIdCompra(new Compra());
         cd.setIdProducto(new Producto());
 
+        LOGGER.log(Level.INFO, "Nuevo registro creado con ID: {0}", cd.getId());
         return cd;
     }
 
     @Override
     protected CompraDetalle buscarRegistroPorId(Object id) {
-        return null; // Manejado por LazyDataModel
+        if (id instanceof UUID) {
+            return compraDetalleDao.findById((UUID) id);
+        }
+        return null;
     }
 
     @Override
@@ -99,11 +115,14 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
 
     @Override
     protected CompraDetalle getIdByText(String id) {
-        if (id == null || id.isEmpty()) { return null; }
+        if (id == null || id.isEmpty()) {
+            return null;
+        }
         try {
             UUID uuid = UUID.fromString(id);
-            return null; // En un caso real, implementarías la búsqueda por UUID aquí.
+            return compraDetalleDao.findById(uuid);
         } catch (IllegalArgumentException e) {
+            LOGGER.log(Level.WARNING, "ID inválido: {0}", id);
             return null;
         }
     }
@@ -112,14 +131,14 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
     protected boolean esNombreVacio(CompraDetalle registro) {
         boolean fallo = false;
 
-        // 1. Validar que se seleccionó Compra (ID Long)
+        // 1. Validar que se seleccionó Compra
         if (registro.getIdCompra() == null || registro.getIdCompra().getId() == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "Debe seleccionar una Compra."));
             fallo = true;
         }
 
-        // 2. Validar que se seleccionó Producto (ID UUID)
+        // 2. Validar que se seleccionó Producto
         if (registro.getIdProducto() == null || registro.getIdProducto().getId() == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "Debe seleccionar un Producto."));
@@ -133,10 +152,17 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
             fallo = true;
         }
 
-        // 4. Validar Precio (podría ser cero si es un item de cortesía, pero lo validamos como requerido)
-        if (registro.getPrecio() == null) {
+        // 4. Validar Precio
+        if (registro.getPrecio() == null || registro.getPrecio().compareTo(BigDecimal.ZERO) < 0) {
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "Debe ingresar un precio."));
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "Debe ingresar un precio válido."));
+            fallo = true;
+        }
+
+        // 5. Validar Estado
+        if (registro.getEstado() == null || registro.getEstado().trim().isEmpty()) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "Debe seleccionar un estado."));
             fallo = true;
         }
 
@@ -145,61 +171,122 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
 
     // ---------------------- Manejo de Guardado y Sincronización de FK ----------------------
 
-    /**
-     * Busca la entidad Compra completa (incluyendo sus campos LAZY) a partir de su ID.
-     * @param id El ID Long de la Compra.
-     * @return La entidad Compra. Asume que CompraDao tiene findById(Long id).
-     */
     private Compra obtenerCompraCompleta(Long id) {
-        // Necesitas que CompraDao implemente: public Compra findById(Long id)
-        return compraDao.findById(id);
+        if (id == null) return null;
+        try {
+            return compraDao.findById(id);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener Compra con ID: " + id, e);
+            return null;
+        }
     }
 
-    /**
-     * Busca la entidad Producto completa a partir de su ID.
-     * @param id El ID UUID del Producto.
-     * @return La entidad Producto. Asume que ProductoDao tiene findById(UUID id).
-     */
     private Producto obtenerProductoCompleto(UUID id) {
-        // Necesitas que ProductoDao implemente: public Producto findById(UUID id)
-        return productoDao.findById(id);
+        if (id == null) return null;
+        try {
+            return productoDao.findById(id);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener Producto con ID: " + id, e);
+            return null;
+        }
     }
 
     @Override
     public void btnGuardarHandler(jakarta.faces.event.ActionEvent actionEvent) {
-        if (this.registro != null) {
-            try {
-                if (esNombreVacio(this.registro)) {
-                    return;
-                }
-
-                // 🛑 1. Sincronizar Entidades FK:
-                // Obtiene los IDs que JSF estableció en las entidades vacías:
-                Long idCompraSeleccionada = this.registro.getIdCompra().getId();
-                UUID idProductoSeleccionado = this.registro.getIdProducto().getId();
-
-                // Busca las entidades completas y las asigna al registro antes de guardar:
-                this.registro.setIdCompra(obtenerCompraCompleta(idCompraSeleccionada));
-                this.registro.setIdProducto(obtenerProductoCompleto(idProductoSeleccionado));
-
-
-                // 2. Persistir
-                getDao().crear(this.registro); // Asume que el método crear(T) es correcto.
-
-                // 3. Limpieza y Notificación
-                this.registro = null;
-                this.estado = ESTADO_CRUD.NADA;
-                inicializarRegistros(); // Para refrescar la tabla
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Detalle de compra guardado correctamente"));
-            } catch (Exception e) {
-                e.printStackTrace();
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al guardar", "Ocurrió un error de persistencia."));
-            }
-        } else {
+        if (this.registro == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "No hay registro para guardar"));
+            return;
+        }
+
+        try {
+            // Validar campos
+            if (esNombreVacio(this.registro)) {
+                return;
+            }
+
+            // Sincronizar Entidades FK
+            Long idCompraSeleccionada = this.registro.getIdCompra().getId();
+            UUID idProductoSeleccionado = this.registro.getIdProducto().getId();
+
+            Compra compraCompleta = obtenerCompraCompleta(idCompraSeleccionada);
+            Producto productoCompleto = obtenerProductoCompleto(idProductoSeleccionado);
+
+            if (compraCompleta == null) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontró la Compra seleccionada."));
+                return;
+            }
+
+            if (productoCompleto == null) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontró el Producto seleccionado."));
+                return;
+            }
+
+            this.registro.setIdCompra(compraCompleta);
+            this.registro.setIdProducto(productoCompleto);
+
+            // Persistir
+            getDao().crear(this.registro);
+
+            // Limpieza y Notificación
+            LOGGER.log(Level.INFO, "Detalle de compra guardado: {0}", this.registro.getId());
+            this.registro = null;
+            this.estado = ESTADO_CRUD.NADA;
+            inicializarRegistros();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Detalle de compra guardado correctamente"));
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al guardar detalle de compra", e);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al guardar",
+                            "Ocurrió un error de persistencia: " + e.getMessage()));
+        }
+    }
+
+    @Override
+    public void btnModificarHandler(jakarta.faces.event.ActionEvent actionEvent) {
+        if (this.registro == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "No hay registro para modificar"));
+            return;
+        }
+
+        try {
+            if (esNombreVacio(this.registro)) {
+                return;
+            }
+
+            // Sincronizar Entidades FK (igual que en guardar)
+            Long idCompraSeleccionada = this.registro.getIdCompra().getId();
+            UUID idProductoSeleccionado = this.registro.getIdProducto().getId();
+
+            Compra compraCompleta = obtenerCompraCompleta(idCompraSeleccionada);
+            Producto productoCompleto = obtenerProductoCompleto(idProductoSeleccionado);
+
+            if (compraCompleta == null || productoCompleto == null) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontraron las entidades relacionadas."));
+                return;
+            }
+
+            this.registro.setIdCompra(compraCompleta);
+            this.registro.setIdProducto(productoCompleto);
+
+            getDao().modificar(this.registro);
+
+            LOGGER.log(Level.INFO, "Detalle de compra modificado: {0}", this.registro.getId());
+            this.registro = null;
+            this.estado = ESTADO_CRUD.NADA;
+            inicializarRegistros();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Detalle de compra modificado correctamente"));
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al modificar detalle de compra", e);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al modificar",
+                            "Ocurrió un error: " + e.getMessage()));
         }
     }
 
@@ -207,10 +294,16 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
     // ---------------------- Getters para JSF ----------------------
 
     public List<Compra> getComprasDisponibles() {
+        if (comprasDisponibles == null) {
+            cargarDatosFiltros();
+        }
         return comprasDisponibles;
     }
 
     public List<Producto> getProductosDisponibles() {
+        if (productosDisponibles == null) {
+            cargarDatosFiltros();
+        }
         return productosDisponibles;
     }
 
