@@ -2,9 +2,12 @@ package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
+import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.ActionEvent;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
+import org.primefaces.event.SelectEvent;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProductoTipoProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDao;
@@ -35,6 +38,29 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
 
     private List<Producto> listaProductos;
     private List<TipoProducto> listaTipoProductos;
+
+
+    public UUID getIdProductoSeleccionado() {
+        return idProductoSeleccionado;
+    }
+
+    public void setIdProductoSeleccionado(UUID idProductoSeleccionado) {
+        this.idProductoSeleccionado = idProductoSeleccionado;
+    }
+
+    public Long getIdTipoProductoSeleccionado() {
+        return idTipoProductoSeleccionado;
+    }
+
+    public void setIdTipoProductoSeleccionado(Long idTipoProductoSeleccionado) {
+        this.idTipoProductoSeleccionado = idTipoProductoSeleccionado;
+    }
+
+    private UUID idProductoSeleccionado;
+
+
+
+    private Long idTipoProductoSeleccionado;
 
     @PostConstruct
     @Override
@@ -130,6 +156,100 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
             );
         }
     }
+
+    @Override
+    public void btnGuardarHandler(ActionEvent actionEvent) {
+        if (this.registro != null) {
+            try {
+                if (idProductoSeleccionado == null || idTipoProductoSeleccionado == null) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "Debe seleccionar Producto y Tipo de Producto"));
+                    return;
+                }
+
+                // Buscar objetos por ID
+                Producto producto = productoDAO.findById(idProductoSeleccionado);
+                TipoProducto tipo = tipoProductoDAO.findById(idTipoProductoSeleccionado);
+
+                registro.setIdProducto(producto);
+                registro.setIdTipoProducto(tipo);
+
+                if (estado == ESTADO_CRUD.CREAR) {
+                    getDao().crear(registro);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Registro creado correctamente"));
+                } else if (estado == ESTADO_CRUD.MODIFICAR) {
+                    getDao().modificar(registro);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Registro modificado correctamente"));
+                }
+
+                registro = null;
+                estado = ESTADO_CRUD.NADA;
+                inicializarRegistros();
+
+            } catch (Exception e) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al guardar", e.getMessage()));
+            }
+        }
+    }
+    @Override
+    public void btnModificarHandler(ActionEvent actionEvent) {
+        if (this.registro != null) {
+            try {
+                // Validación específica: asegurarse que producto y tipo producto estén seleccionados
+                if (idProductoSeleccionado == null || idTipoProductoSeleccionado == null) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "Debe seleccionar Producto y Tipo de Producto"));
+                    return;
+                }
+
+                // Buscar objetos por ID
+                Producto producto = productoDAO.findById(idProductoSeleccionado);
+                TipoProducto tipo = tipoProductoDAO.findById(idTipoProductoSeleccionado);
+
+                registro.setIdProducto(producto);
+                registro.setIdTipoProducto(tipo);
+
+                // Llamar al DAO para modificar
+                getDao().modificar(this.registro);
+
+                // Resetear estado y refrescar modelo
+                this.registro = null;
+                this.estado = ESTADO_CRUD.NADA;
+                inicializarRegistros();
+                this.idProductoSeleccionado = null;
+                this.idTipoProductoSeleccionado = null;
+
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Registro modificado correctamente"));
+
+            } catch (Exception e) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al modificar", e.getMessage()));
+                e.printStackTrace();
+            }
+        }
+
+    }
+    @Override
+    public void selectionHandler(SelectEvent<ProductoTipoProducto> r) {
+        if (r != null && r.getObject() != null) {
+            this.registro = r.getObject();
+            this.estado = ESTADO_CRUD.MODIFICAR;
+
+            // Sincronizar los auxiliares para que los combos muestren el valor actual
+            if (registro.getIdProducto() != null) {
+                this.idProductoSeleccionado = registro.getIdProducto().getId(); // UUID
+            }
+
+            if (registro.getIdTipoProducto() != null) {
+                this.idTipoProductoSeleccionado = registro.getIdTipoProducto().getId(); // Long
+            }
+        }
+    }
+
 
     // Getters y Setters
     public List<Producto> getListaProductos() {

@@ -11,7 +11,6 @@ import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto
 
 import java.util.UUID;
 
-@Named
 @FacesConverter(value = "productoConverter", managed = true)
 public class ProductoConverter implements Converter<Producto> {
 

@@ -51,6 +51,9 @@
                                     <h:outputText value="#{reg.activo ? 'Activo' : 'Inactivo'}"
                                                   styleClass="#{reg.activo?'estado-activo':'estado-inactivo'}"/>
                                 </p:column>
+                                <p:column headerText="Observaciones">
+                                    <h:outputText value="#{reg.observaciones}"/>
+                                </p:column>
                             </p:dataTable>
 
                             <!-- Botón Nuevo -->
@@ -84,31 +87,28 @@
                                                      disabled="true"/>
                                     </h:panelGroup>
 
-                                    <h:outputLabel for="cmbProducto" value="Producto:"/>
+                                    <h:outputLabel for="cmbProducto" value="Producto:" styleClass="etiqueta-formulario"/>
                                     <p:selectOneMenu id="cmbProducto"
-                                                     value="#{productoTipoProductoFrm.registro.idProducto}"
+                                                     value="#{productoTipoProductoFrm.idProductoSeleccionado}"
+                                                     converter="uuidConverter"
                                                      required="true"
-                                                     requiredMessage="El producto es requerido"
                                                      style="width: 300px;">
                                         <f:selectItem itemLabel="-- Seleccione Producto --" itemValue="#{null}"/>
-                                        <f:selectItems value="#{productoTipoProductoFrm.listaProductos}"
-                                                       var="prod"
-                                                       itemLabel="#{prod.nombreProducto}"
-                                                       itemValue="#{prod}"/>
+                                        <f:selectItems value="#{productoTipoProductoFrm.listaProductos}" var="prod"
+                                                       itemLabel="#{prod.nombreProducto}" itemValue="#{prod.id}"/>
                                     </p:selectOneMenu>
 
-                                    <h:outputLabel for="cmbTipoProducto" value="Tipo Producto:"/>
+                                    <h:outputLabel for="cmbTipoProducto" value="Tipo de Producto:" styleClass="etiqueta-formulario"/>
                                     <p:selectOneMenu id="cmbTipoProducto"
-                                                     value="#{productoTipoProductoFrm.registro.idTipoProducto}"
+                                                     value="#{productoTipoProductoFrm.idTipoProductoSeleccionado}"
                                                      required="true"
-                                                     requiredMessage="El tipo de producto es requerido"
                                                      style="width: 300px;">
                                         <f:selectItem itemLabel="-- Seleccione Tipo Producto --" itemValue="#{null}"/>
-                                        <f:selectItems value="#{productoTipoProductoFrm.listaTipoProductos}"
-                                                       var="tipo"
-                                                       itemLabel="#{tipo.nombre}"
-                                                       itemValue="#{tipo}"/>
+                                        <f:selectItems value="#{productoTipoProductoFrm.listaTipoProductos}" var="tipo"
+                                                       itemLabel="#{tipo.nombre}" itemValue="#{tipo.id}"/>
                                     </p:selectOneMenu>
+
+
 
                                     <h:outputLabel for="calFechaCreacion" value="Fecha Creación:"/>
                                     <p:calendar id="calFechaCreacion"
