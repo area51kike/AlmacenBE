@@ -11,6 +11,7 @@
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/TipoProductoCaracteristica.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/TipoUnidadMedida.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/manejartodo.xhtml.jsp" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/ues/BotonesTop.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas/ues" />
       </map>
     </option>
   </component>

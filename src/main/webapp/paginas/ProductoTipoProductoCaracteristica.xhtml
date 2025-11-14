@@ -35,8 +35,8 @@
                                          rowKey="#{reg.id}">
                                 <p:ajax event="rowSelect"
                                         listener="#{productoTipoProductoCaracteristicaFrm.selectionHandler}"
-                                        update=":pnlDetalle"
-                                        process="@this"/>
+                                        update=":pnlTabla :pnlDetalle :messages"/>
+
                                 <p:column headerText="#{msg['productoTipoProductoCaracteristica.tabla.id']}">
                                     <h:outputText value="#{reg.id}"/>
                                 </p:column>
@@ -84,11 +84,12 @@
                                                      style="width: 300px;"/>
                                     </h:panelGroup>
 
+                                    <!-- Usa converter personalizado para UUID -->
                                     <h:outputLabel for="cboProductoTipoProducto"
                                                    value="#{msg['productoTipoProductoCaracteristica.form.productoTipoProducto']}"/>
                                     <p:selectOneMenu id="cboProductoTipoProducto"
-                                                     value="#{productoTipoProductoCaracteristicaFrm.registro.idProductoTipoProducto}"
-                                                     converter="productoTipoProductoConverter"
+                                                     value="#{productoTipoProductoCaracteristicaFrm.idProductoTipoProductoSeleccionado}"
+                                                     converter="uuidConverter"
                                                      required="true"
                                                      requiredMessage="#{msg['productoTipoProductoCaracteristica.productoTipoProducto.requerido']}"
                                                      style="width: 300px;">
@@ -98,14 +99,14 @@
                                         <f:selectItems value="#{productoTipoProductoCaracteristicaFrm.listaProductoTipoProducto}"
                                                        var="ptp"
                                                        itemLabel="#{ptp.id}"
-                                                       itemValue="#{ptp}"/>
+                                                       itemValue="#{ptp.id}"/>
                                     </p:selectOneMenu>
 
+                                    <!-- Sin converter, JSF maneja Long automáticamente -->
                                     <h:outputLabel for="cboTipoProductoCaracteristica"
                                                    value="#{msg['productoTipoProductoCaracteristica.form.tipoProductoCaracteristica']}"/>
                                     <p:selectOneMenu id="cboTipoProductoCaracteristica"
-                                                     value="#{productoTipoProductoCaracteristicaFrm.registro.idTipoProductoCaracteristica}"
-                                                     converter="tipoProductoCaracteristicaConverter"
+                                                     value="#{productoTipoProductoCaracteristicaFrm.idTipoProductoCaracteristicaSeleccionado}"
                                                      required="true"
                                                      requiredMessage="#{msg['productoTipoProductoCaracteristica.tipoProductoCaracteristica.requerido']}"
                                                      style="width: 300px;">
@@ -115,7 +116,7 @@
                                         <f:selectItems value="#{productoTipoProductoCaracteristicaFrm.listaTipoProductoCaracteristica}"
                                                        var="tpc"
                                                        itemLabel="#{tpc.caracteristica != null ? tpc.caracteristica.nombre : tpc.id}"
-                                                       itemValue="#{tpc}"/>
+                                                       itemValue="#{tpc.id}"/>
                                     </p:selectOneMenu>
 
                                     <h:outputLabel for="txtValor"
@@ -151,13 +152,13 @@
                                     <h:outputText value="#{msg['productoTipoProductoCaracteristica.form.productoTipoProducto']}:"
                                                   styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
-                                        <h:outputText value="#{empty productoTipoProductoCaracteristicaFrm.registro.idProductoTipoProducto ? '-' : productoTipoProductoCaracteristicaFrm.registro.idProductoTipoProducto.id}"/>
+                                        <h:outputText value="#{empty productoTipoProductoCaracteristicaFrm.idProductoTipoProductoSeleccionado ? '-' : productoTipoProductoCaracteristicaFrm.idProductoTipoProductoSeleccionado}"/>
                                     </p:outputPanel>
 
                                     <h:outputText value="#{msg['productoTipoProductoCaracteristica.form.tipoProductoCaracteristica']}:"
                                                   styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
-                                        <h:outputText value="#{empty productoTipoProductoCaracteristicaFrm.registro.idTipoProductoCaracteristica ? '-' : (productoTipoProductoCaracteristicaFrm.registro.idTipoProductoCaracteristica.caracteristica != null ? productoTipoProductoCaracteristicaFrm.registro.idTipoProductoCaracteristica.caracteristica.nombre : productoTipoProductoCaracteristicaFrm.registro.idTipoProductoCaracteristica.id)}"/>
+                                        <h:outputText value="#{empty productoTipoProductoCaracteristicaFrm.idTipoProductoCaracteristicaSeleccionado ? '-' : productoTipoProductoCaracteristicaFrm.idTipoProductoCaracteristicaSeleccionado}"/>
                                     </p:outputPanel>
 
                                     <h:outputText value="#{msg['productoTipoProductoCaracteristica.form.valor']}:"

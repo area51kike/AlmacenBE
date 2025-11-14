@@ -2,9 +2,12 @@ package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
+import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.ActionEvent;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
@@ -32,7 +35,7 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
     private ProductoTipoProductoCaracteristicaDAO productoTipoProductoCaracteristicaDAO;
 
     @EJB
-    private ProductoTipoProductoDAO ProductoTipoProductoDAO;
+    private ProductoTipoProductoDAO productoTipoProductoDAO;
 
     @EJB
     private TipoProductoCaracteristicaDAO tipoProductoCaracteristicaDAO;
@@ -41,6 +44,10 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
     private List<ProductoTipoProducto> listaProductoTipoProducto;
     private List<TipoProductoCaracteristica> listaTipoProductoCaracteristica;
 
+    // ⭐ IDs para los selectores (sin converters)
+    private UUID idProductoTipoProductoSeleccionado;  // ProductoTipoProducto usa UUID
+    private Long idTipoProductoCaracteristicaSeleccionado;  // TipoProductoCaracteristica usa Long
+
     /**
      * Inicialización del formulario
      * Carga las listas necesarias y configura el modelo lazy
@@ -48,25 +55,20 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
     @PostConstruct
     @Override
     public void inicializar() {
-        super.inicializar(); // Llama al init del padre
+        super.inicializar();
         cargarListas();
-        inicializarModelo(); // Sobrescribe el modelo con configuración específica
+        inicializarModelo();
     }
 
     /**
      * Configura el LazyDataModel específico para ProductoTipoProductoCaracteristica
-     * Sobrescribe el modelo genérico del padre para agregar lógica personalizada
      */
     private void inicializarModelo() {
         this.modelo = new LazyDataModel<ProductoTipoProductoCaracteristica>() {
 
-            /**
-             * ⭐ MEJORADO: Ahora maneja Long retornado por count()
-             */
             @Override
             public int count(Map<String, FilterMeta> map) {
                 try {
-                    // ⭐ MEJORA: count() ahora retorna Long
                     Long total = productoTipoProductoCaracteristicaDAO.count();
                     int count = total.intValue();
                     System.out.println("📊 Count de registros: " + count);
@@ -78,10 +80,6 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
                 }
             }
 
-            /**
-             * Carga un rango de registros con información detallada de debug
-             * ⭐ MEJORA: Ahora se beneficia del ordenamiento automático por ID
-             */
             @Override
             public List<ProductoTipoProductoCaracteristica> load(int first, int pageSize,
                                                                  Map<String, SortMeta> sortBy,
@@ -89,13 +87,11 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
                 try {
                     System.out.println("🔄 load() llamado con first=" + first + ", pageSize=" + pageSize);
 
-                    // ⭐ MEJORA: findRange ahora incluye ordenamiento automático por ID
                     List<ProductoTipoProductoCaracteristica> registros =
                             productoTipoProductoCaracteristicaDAO.findRange(first, pageSize);
 
                     System.out.println("✅ Registros cargados: " + registros.size());
 
-                    // Debug detallado de los registros cargados
                     registros.forEach(r -> {
                         String nombreCaracteristica = (r.getIdTipoProductoCaracteristica() != null &&
                                 r.getIdTipoProductoCaracteristica().getCaracteristica() != null) ?
@@ -115,9 +111,6 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
                 }
             }
 
-            /**
-             * Obtiene la clave única de la fila basada en el UUID
-             */
             @Override
             public String getRowKey(ProductoTipoProductoCaracteristica object) {
                 if (object != null && object.getId() != null) {
@@ -128,9 +121,6 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
                 return null;
             }
 
-            /**
-             * Recupera una entidad específica por su clave de fila
-             */
             @Override
             public ProductoTipoProductoCaracteristica getRowData(String rowKey) {
                 if (rowKey != null && !rowKey.isEmpty()) {
@@ -152,11 +142,10 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
 
     /**
      * Carga las listas de ProductoTipoProducto y TipoProductoCaracteristica
-     * para poblar los selectores del formulario
      */
     private void cargarListas() {
         try {
-            this.listaProductoTipoProducto = ProductoTipoProductoDAO.findAll();
+            this.listaProductoTipoProducto = productoTipoProductoDAO.findAll();
             this.listaTipoProductoCaracteristica = tipoProductoCaracteristicaDAO.findAll();
 
             System.out.println("📋 ProductoTipoProducto cargados: " +
@@ -164,13 +153,11 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
             System.out.println("📋 TipoProductoCaracteristica cargados: " +
                     (listaTipoProductoCaracteristica != null ? listaTipoProductoCaracteristica.size() : 0));
 
-            // Debug: mostrar los ProductoTipoProducto cargados
             if (listaProductoTipoProducto != null && !listaProductoTipoProducto.isEmpty()) {
                 listaProductoTipoProducto.forEach(ptp ->
                         System.out.println("  ▪ ProductoTipoProducto ID: " + ptp.getId()));
             }
 
-            // Debug: mostrar las TipoProductoCaracteristica cargadas
             if (listaTipoProductoCaracteristica != null && !listaTipoProductoCaracteristica.isEmpty()) {
                 listaTipoProductoCaracteristica.forEach(tpc -> {
                     String nombreCaracteristica = (tpc.getCaracteristica() != null) ?
@@ -182,6 +169,93 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
         } catch (Exception e) {
             System.err.println("❌ Error al cargar listas: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * ⭐ Sincroniza los IDs seleccionados con las entidades del registro
+     * ProductoTipoProducto usa UUID, TipoProductoCaracteristica usa Long
+     */
+    private void sincronizarSelecciones() {
+        if (registro != null) {
+            // Sincronizar ProductoTipoProducto (UUID)
+            if (registro.getIdProductoTipoProducto() != null) {
+                idProductoTipoProductoSeleccionado = registro.getIdProductoTipoProducto().getId(); // UUID
+            } else {
+                idProductoTipoProductoSeleccionado = null;
+            }
+
+            // Sincronizar TipoProductoCaracteristica (Long)
+            if (registro.getIdTipoProductoCaracteristica() != null) {
+                idTipoProductoCaracteristicaSeleccionado = registro.getIdTipoProductoCaracteristica().getId(); // Long
+            } else {
+                idTipoProductoCaracteristicaSeleccionado = null;
+            }
+        }
+    }
+
+    /**
+     * ⭐ OVERRIDE CORREGIDO: Maneja la selección de fila con la firma correcta
+     */
+    @Override
+    public void selectionHandler(SelectEvent<ProductoTipoProductoCaracteristica> event) {
+        super.selectionHandler(event);
+        sincronizarSelecciones();
+    }
+
+    /**
+     * ⭐ OVERRIDE CORREGIDO: Maneja el botón Nuevo con la firma correcta
+     */
+    @Override
+    public void btnNuevoHandler(ActionEvent event) {
+        super.btnNuevoHandler(event);
+        idProductoTipoProductoSeleccionado = null;
+        idTipoProductoCaracteristicaSeleccionado = null;
+    }
+
+    /**
+     * ⭐ OVERRIDE CORREGIDO: Maneja el botón Guardar con la firma correcta
+     * Convierte los UUIDs seleccionados a entidades antes de guardar
+     */
+    @Override
+    public void btnGuardarHandler(ActionEvent event) {
+        try {
+            // Convertir UUIDs a entidades antes de guardar
+            if (idProductoTipoProductoSeleccionado != null) {
+                ProductoTipoProducto ptp = productoTipoProductoDAO.findById(idProductoTipoProductoSeleccionado);
+                if (ptp != null) {
+                    registro.setIdProductoTipoProducto(ptp);
+                    System.out.println("✅ ProductoTipoProducto asignado: " + ptp.getId());
+                } else {
+                    System.err.println("⚠️ ProductoTipoProducto no encontrado para UUID: " + idProductoTipoProductoSeleccionado);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "ProductoTipoProducto no encontrado"));
+                    return;
+                }
+            }
+
+            if (idTipoProductoCaracteristicaSeleccionado != null) {
+                TipoProductoCaracteristica tpc = tipoProductoCaracteristicaDAO.findById(idTipoProductoCaracteristicaSeleccionado);
+                if (tpc != null) {
+                    registro.setIdTipoProductoCaracteristica(tpc);
+                    String nombreCaracteristica = (tpc.getCaracteristica() != null) ?
+                            tpc.getCaracteristica().getNombre() : "Sin nombre";
+                    System.out.println("✅ TipoProductoCaracteristica asignado: " + tpc.getId() + " - " + nombreCaracteristica);
+                } else {
+                    System.err.println("⚠️ TipoProductoCaracteristica no encontrado para UUID: " + idTipoProductoCaracteristicaSeleccionado);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "TipoProductoCaracteristica no encontrado"));
+                    return;
+                }
+            }
+
+            // Llamar al método padre para continuar con el guardado
+            super.btnGuardarHandler(event);
+        } catch (Exception e) {
+            System.err.println("❌ Error al guardar: " + e.getMessage());
+            e.printStackTrace();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al guardar el registro: " + e.getMessage()));
         }
     }
 
@@ -276,5 +350,21 @@ public class ProductoTipoProductoCaracteristicaFrm extends DefaultFrm<ProductoTi
 
     public void setListaTipoProductoCaracteristica(List<TipoProductoCaracteristica> listaTipoProductoCaracteristica) {
         this.listaTipoProductoCaracteristica = listaTipoProductoCaracteristica;
+    }
+
+    public UUID getIdProductoTipoProductoSeleccionado() {
+        return idProductoTipoProductoSeleccionado;
+    }
+
+    public void setIdProductoTipoProductoSeleccionado(UUID idProductoTipoProductoSeleccionado) {
+        this.idProductoTipoProductoSeleccionado = idProductoTipoProductoSeleccionado;
+    }
+
+    public Long getIdTipoProductoCaracteristicaSeleccionado() {
+        return idTipoProductoCaracteristicaSeleccionado;
+    }
+
+    public void setIdTipoProductoCaracteristicaSeleccionado(Long idTipoProductoCaracteristicaSeleccionado) {
+        this.idTipoProductoCaracteristicaSeleccionado = idTipoProductoCaracteristicaSeleccionado;
     }
 }

@@ -8,10 +8,15 @@ import jakarta.faces.convert.FacesConverter;
 
 import java.util.UUID;
 
-
+/**
+ * Converter JSF para convertir entre String y UUID
+ */
 @FacesConverter(value = "uuidConverter")
 public class UUIDConverter implements Converter<UUID> {
 
+    /**
+     * Convierte de String a UUID
+     */
     @Override
     public UUID getAsObject(FacesContext context, UIComponent component, String value) {
         if (value == null || value.trim().isEmpty()) {
@@ -21,10 +26,15 @@ public class UUIDConverter implements Converter<UUID> {
         try {
             return UUID.fromString(value.trim());
         } catch (IllegalArgumentException e) {
-            throw new ConverterException("No se pudo convertir '" + value + "' a UUID: " + e.getMessage(), e);
+            System.err.println("❌ Error al convertir String a UUID: " + value);
+            e.printStackTrace();
+            return null;
         }
     }
 
+    /**
+     * Convierte de UUID a String
+     */
     @Override
     public String getAsString(FacesContext context, UIComponent component, UUID value) {
         if (value == null) {

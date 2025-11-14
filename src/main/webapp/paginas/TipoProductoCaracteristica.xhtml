@@ -3,7 +3,8 @@
       xmlns:h="jakarta.faces.html"
       xmlns:p="http://primefaces.org/ui"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:f="jakarta.faces.core">
+      xmlns:f="jakarta.faces.core"
+      xmlns:c="jakarta.tags.core">
 <h:head>
     <meta charset="UTF-8"/>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
@@ -20,118 +21,130 @@
                 <h:form id="frmPrincipal">
                     <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
 
-                    <!-- PANEL TABLA -->
-                    <h:panelGroup id="pnlTabla" layout="block"
-                                  rendered="#{tipoProductoCaracteristicaFrm.estado eq 'NADA'}">
-                        <div class="content-tabla">
-                            <p:dataTable id="tabla-top"
-                                         lazy="true"
-                                         rows="10"
-                                         paginator="true"
-                                         paginatorPosition="bottom"
-                                         value="#{tipoProductoCaracteristicaFrm.modelo}"
-                                         var="reg"
-                                         selectionMode="single"
-                                         selection="#{tipoProductoCaracteristicaFrm.registro}"
-                                         rowKey="#{reg.id}">
-                                <p:ajax event="rowSelect"
-                                        listener="#{tipoProductoCaracteristicaFrm.selectionHandler}"
-                                        update="pnlTabla pnlDetalle messages"
-                                        process="@this"/>
+                    <!-- ⭐ CONTENEDOR SIEMPRE PRESENTE PARA LA TABLA -->
+                    <h:panelGroup id="pnlTabla" layout="block">
+                        <!-- Usa ESTADO_CRUD.NADA porque el DefaultFrm usa enum ESTADO_CRUD -->
+                        <c:if test="#{tipoProductoCaracteristicaFrm.estado eq 'NADA'}">
+                            <div class="content-tabla">
+                                <p:dataTable id="tabla-top"
+                                             lazy="true"
+                                             rows="10"
+                                             paginator="true"
+                                             paginatorPosition="bottom"
+                                             value="#{tipoProductoCaracteristicaFrm.modelo}"
+                                             var="reg"
+                                             selectionMode="single"
+                                             selection="#{tipoProductoCaracteristicaFrm.registro}"
+                                             rowKey="#{reg.id}">
 
-                                <p:column headerText="ID">
-                                    <h:outputText value="#{reg.id}"/>
-                                </p:column>
-                                <p:column headerText="Tipo Producto">
-                                    <h:outputText value="#{reg.tipoProducto.nombre}"/>
-                                </p:column>
-                                <p:column headerText="Característica">
-                                    <h:outputText value="#{reg.caracteristica.nombre}"/>
-                                </p:column>
-                                <p:column headerText="Fecha Creación">
-                                    <h:outputText value="#{reg.fechaCreacion}">
-                                        <f:converter converterId="offsetDateTimeConverter"/>
-                                    </h:outputText>
-                                </p:column>
-                            </p:dataTable>
+                                    <!-- ✅ AJAX CORREGIDO: update con IDs completos -->
+                                    <p:ajax event="rowSelect"
+                                            listener="#{tipoProductoCaracteristicaFrm.selectionHandler}"
+                                            update="frmPrincipal:pnlTabla frmPrincipal:pnlDetalle frmPrincipal:messages"
+                                            process="@this"/>
 
-                            <!-- Botón Nuevo -->
-                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
-                                <ui:param name="section" value="nuevo"/>
-                                <ui:param name="bean" value="#{tipoProductoCaracteristicaFrm}"/>
-                            </ui:include>
-                        </div>
+                                    <p:column headerText="ID">
+                                        <h:outputText value="#{reg.id}"/>
+                                    </p:column>
+                                    <p:column headerText="Tipo Producto">
+                                        <h:outputText value="#{reg.tipoProducto.nombre}"/>
+                                    </p:column>
+                                    <p:column headerText="Característica">
+                                        <h:outputText value="#{reg.caracteristica.nombre}"/>
+                                    </p:column>
+                                    <p:column headerText="Obligatorio">
+                                        <h:outputText value="#{reg.obligatorio ? 'Sí' : 'No'}"/>
+                                    </p:column>
+                                    <p:column headerText="Fecha Creación">
+                                        <h:outputText value="#{reg.fechaCreacion}">
+                                            <f:converter converterId="offsetDateTimeConverter"/>
+                                        </h:outputText>
+                                    </p:column>
+                                </p:dataTable>
+
+                                <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                    <ui:param name="section" value="nuevo"/>
+                                    <ui:param name="bean" value="#{tipoProductoCaracteristicaFrm}"/>
+                                </ui:include>
+                            </div>
+                        </c:if>
                     </h:panelGroup>
 
-                    <!-- PANEL DETALLE -->
-                    <h:panelGroup id="pnlDetalle" layout="block"
-                                  rendered="#{tipoProductoCaracteristicaFrm.estado != 'NADA'}">
-                        <p:tabView>
-                            <p:tab title="Generalidades">
-                                <h:panelGrid columns="2" cellpadding="5">
+                    <!-- ⭐ CONTENEDOR SIEMPRE PRESENTE PARA EL DETALLE -->
+                    <h:panelGroup id="pnlDetalle" layout="block">
+                        <!-- Mostrar cuando NO está en estado NADA -->
+                        <c:if test="#{tipoProductoCaracteristicaFrm.estado != 'NADA'}">
+                            <p:tabView>
+                                <p:tab title="Generalidades">
+                                    <h:panelGrid columns="2" cellpadding="5">
 
-                                    <h:outputLabel for="txtIdPanel" value="ID:"/>
-                                    <h:panelGroup id="txtIdPanel">
-                                        <h:outputText rendered="#{empty tipoProductoCaracteristicaFrm.registro.id}"
-                                                      value="(Autogenerado)"/>
-                                        <h:inputText id="txtId"
-                                                     value="#{tipoProductoCaracteristicaFrm.registro.id}"
-                                                     rendered="#{not empty tipoProductoCaracteristicaFrm.registro.id}"
-                                                     disabled="true"/>
-                                    </h:panelGroup>
+                                        <h:outputLabel for="txtIdPanel" value="ID:"/>
+                                        <h:panelGroup id="txtIdPanel">
+                                            <h:outputText rendered="#{empty tipoProductoCaracteristicaFrm.registro.id}"
+                                                          value="(Autogenerado)"/>
+                                            <h:inputText id="txtId"
+                                                         value="#{tipoProductoCaracteristicaFrm.registro.id}"
+                                                         rendered="#{not empty tipoProductoCaracteristicaFrm.registro.id}"
+                                                         disabled="true"/>
+                                        </h:panelGroup>
 
-                                    <h:outputLabel for="cmbTipoProducto" value="Tipo Producto:"/>
-                                    <p:selectOneMenu id="cmbTipoProducto"
-                                                     value="#{tipoProductoCaracteristicaFrm.registro.tipoProducto}"
-                                                     required="true"
-                                                     requiredMessage="El tipo de producto es requerido"
-                                                     converter="tipoProductoConverter">
-                                        <f:selectItem itemLabel="-- Seleccione Tipo Producto --"
-                                                      itemValue="#{null}"
-                                                      noSelectionOption="true"/>
-                                        <f:selectItems value="#{tipoProductoCaracteristicaFrm.listaTipoProductos}"
-                                                       var="tipo"
-                                                       itemLabel="#{tipo.nombre}"
-                                                       itemValue="#{tipo}"/>
-                                    </p:selectOneMenu>
+                                        <h:outputLabel for="cmbTipoProducto" value="Tipo Producto: *"/>
+                                        <p:selectOneMenu id="cmbTipoProducto"
+                                                         value="#{tipoProductoCaracteristicaFrm.registro.tipoProducto}"
+                                                         required="true"
+                                                         requiredMessage="El tipo de producto es requerido"
+                                                         converter="tipoProductoConverter">
+                                            <f:selectItem itemLabel="-- Seleccione Tipo Producto --"
+                                                          itemValue="#{null}"
+                                                          noSelectionOption="true"/>
+                                            <f:selectItems value="#{tipoProductoCaracteristicaFrm.listaTipoProductos}"
+                                                           var="tipo"
+                                                           itemLabel="#{tipo.nombre}"
+                                                           itemValue="#{tipo}"/>
+                                        </p:selectOneMenu>
 
-                                    <h:outputLabel for="cmbCaracteristica" value="Característica:"/>
-                                    <p:selectOneMenu id="cmbCaracteristica"
-                                                     value="#{tipoProductoCaracteristicaFrm.registro.caracteristica}"
-                                                     required="true"
-                                                     requiredMessage="La característica es requerida"
-                                                     converter="caracteristicaConverter">
-                                        <f:selectItem itemLabel="-- Seleccione Característica --"
-                                                      itemValue="#{null}"
-                                                      noSelectionOption="true"/>
-                                        <f:selectItems value="#{tipoProductoCaracteristicaFrm.listaCaracteristicas}"
-                                                       var="carac"
-                                                       itemLabel="#{carac.nombre}"
-                                                       itemValue="#{carac}"/>
-                                    </p:selectOneMenu>
+                                        <h:outputLabel for="cmbCaracteristica" value="Característica: *"/>
+                                        <p:selectOneMenu id="cmbCaracteristica"
+                                                         value="#{tipoProductoCaracteristicaFrm.registro.caracteristica}"
+                                                         required="true"
+                                                         requiredMessage="La característica es requerida"
+                                                         converter="caracteristicaConverter">
+                                            <f:selectItem itemLabel="-- Seleccione Característica --"
+                                                          itemValue="#{null}"
+                                                          noSelectionOption="true"/>
+                                            <f:selectItems value="#{tipoProductoCaracteristicaFrm.listaCaracteristicas}"
+                                                           var="carac"
+                                                           itemLabel="#{carac.nombre}"
+                                                           itemValue="#{carac}"/>
+                                        </p:selectOneMenu>
 
-                                    <h:outputLabel for="calFechaCreacion" value="Fecha Creación:"/>
-                                    <p:calendar id="calFechaCreacion"
-                                                value="#{tipoProductoCaracteristicaFrm.registro.fechaCreacion}"
-                                                pattern="dd/MM/yyyy HH:mm"
-                                                showTime="true"
-                                                disabled="true"
-                                                converter="offsetDateTimeConverter"/>
-                                </h:panelGrid>
-                            </p:tab>
-                        </p:tabView>
+                                        <h:outputLabel for="chkObligatorio" value="Obligatorio:"/>
+                                        <p:selectBooleanCheckbox id="chkObligatorio"
+                                                                 value="#{tipoProductoCaracteristicaFrm.registro.obligatorio}"/>
 
-                        <!-- Botones Crear / Modificar / Eliminar / Cancelar -->
-                        <h:panelGrid columns="4">
-                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
-                                <ui:param name="section" value="crud"/>
-                                <ui:param name="bean" value="#{tipoProductoCaracteristicaFrm}"/>
-                            </ui:include>
-                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
-                                <ui:param name="section" value="cancelar"/>
-                                <ui:param name="bean" value="#{tipoProductoCaracteristicaFrm}"/>
-                            </ui:include>
-                        </h:panelGrid>
+                                        <h:outputLabel for="calFechaCreacion" value="Fecha Creación:"/>
+                                        <p:calendar id="calFechaCreacion"
+                                                    value="#{tipoProductoCaracteristicaFrm.registro.fechaCreacion}"
+                                                    pattern="dd/MM/yyyy HH:mm"
+                                                    showTime="true"
+                                                    disabled="true"
+                                                    converter="offsetDateTimeConverter"/>
+                                    </h:panelGrid>
+                                </p:tab>
+                            </p:tabView>
+
+                            <!-- Botones CRUD -->
+                            <h:panelGrid columns="4" style="margin-top: 10px;">
+                                <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                    <ui:param name="section" value="crud"/>
+                                    <ui:param name="bean" value="#{tipoProductoCaracteristicaFrm}"/>
+                                </ui:include>
+                                <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                    <ui:param name="section" value="cancelar"/>
+                                    <ui:param name="bean" value="#{tipoProductoCaracteristicaFrm}"/>
+                                </ui:include>
+                            </h:panelGrid>
+                        </c:if>
                     </h:panelGroup>
                 </h:form>
             </div>
