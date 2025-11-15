@@ -43,6 +43,22 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
     // Listas para los selectores del formulario
     private List<TipoProducto> listaTipoProductos;
     private List<Caracteristica> listaCaracteristicas;
+    private Long idTipoProductoSeleccionado;
+    private Integer idCaracteristicaSeleccionada;
+    public Long getIdTipoProductoSeleccionado() {
+        return idTipoProductoSeleccionado;
+    }
+    public void setIdTipoProductoSeleccionado(Long idTipoProductoSeleccionado) {
+        this.idTipoProductoSeleccionado = idTipoProductoSeleccionado;
+    }
+
+    public Integer getIdCaracteristicaSeleccionada() {
+        return idCaracteristicaSeleccionada;
+    }
+    public void setIdCaracteristicaSeleccionada(Integer idCaracteristicaSeleccionada) {
+        this.idCaracteristicaSeleccionada = idCaracteristicaSeleccionada;
+    }
+
 
     /**
      * Inicialización del formulario
@@ -176,146 +192,110 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
      */
     @Override
     public void selectionHandler(SelectEvent<TipoProductoCaracteristica> event) {
-        System.out.println("🖱️ selectionHandler invocado");
-
         if (event != null && event.getObject() != null) {
-            TipoProductoCaracteristica seleccionado = event.getObject();
-            System.out.println("  ✅ Registro seleccionado: ID=" + seleccionado.getId());
+            this.registro = event.getObject();
+            this.estado = ESTADO_CRUD.MODIFICAR;
 
-            // Recargar desde la BD para asegurar que tenemos todas las relaciones
-            this.registro = tipoProductoCaracteristicaDAO.findById(seleccionado.getId());
-
-            if (this.registro != null) {
-                this.estado = ESTADO_CRUD.MODIFICAR;
-                System.out.println("  ✅ Estado cambiado a: " + this.estado);
-
-                // Verificar que las relaciones se cargaron
-                System.out.println("  📋 TipoProducto: " +
-                        (this.registro.getTipoProducto() != null ?
-                                this.registro.getTipoProducto().getNombre() : "null"));
-                System.out.println("  📋 Caracteristica: " +
-                        (this.registro.getCaracteristica() != null ?
-                                this.registro.getCaracteristica().getNombre() : "null"));
-            } else {
-                System.err.println("  ❌ Error: No se pudo cargar el registro completo");
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                                "No se pudo cargar el registro seleccionado"));
+            // Sincronizar auxiliares para que los combos muestren el valor actual
+            if (registro.getTipoProducto() != null) {
+                this.idTipoProductoSeleccionado = registro.getTipoProducto().getId();
             }
-        } else {
-            System.err.println("  ❌ Error: Event o registro es null");
+            if (registro.getCaracteristica() != null) {
+                this.idCaracteristicaSeleccionada = registro.getCaracteristica().getId();
+            }
         }
     }
 
-    /**
-     * Maneja el botón NUEVO
-     * Sobrescribe el método del padre para asegurar que las listas estén cargadas
-     */
-    @Override
-    public void btnNuevoHandler(ActionEvent actionEvent) {
-        System.out.println("🆕 Botón NUEVO presionado");
-
-        // Asegurar que las listas estén cargadas
-        if (listaTipoProductos == null || listaTipoProductos.isEmpty() ||
-                listaCaracteristicas == null || listaCaracteristicas.isEmpty()) {
-            System.out.println("⚠️ Recargando listas...");
-            cargarListas();
-        }
-
-        // Llamar al método del padre
-        super.btnNuevoHandler(actionEvent);
-
-        System.out.println("✅ Estado después de nuevo: " + this.estado);
-        System.out.println("✅ Registro después de nuevo: " +
-                (this.registro != null ? "Creado (ID: " + this.registro.getId() + ")" : "null"));
-    }
-
-    /**
-     * Maneja el botón GUARDAR
-     * Sobrescribe para agregar validaciones específicas
-     */
     @Override
     public void btnGuardarHandler(ActionEvent actionEvent) {
-        System.out.println("💾 Botón GUARDAR presionado");
+        if (this.registro != null) {
+            try {
+                // Validación: asegurarse que se seleccionó TipoProducto y Caracteristica
+                if (idTipoProductoSeleccionado == null || idCaracteristicaSeleccionada == null) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención",
+                                    "Debe seleccionar Tipo de Producto y Característica"));
+                    return;
+                }
 
-        if (this.registro == null) {
-            System.err.println("❌ Registro es null");
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                            "No hay registro para guardar"));
-            return;
+                // Resolver relaciones
+                TipoProducto tipo = tipoProductoDAO.findById(idTipoProductoSeleccionado);
+                Caracteristica caract = caracteristicaDAO.findById(idCaracteristicaSeleccionada);
+
+                registro.setTipoProducto(tipo);
+                registro.setCaracteristica(caract);
+
+                if (estado == ESTADO_CRUD.CREAR) {
+                    getDao().crear(registro);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito",
+                                    "Registro creado correctamente"));
+                } else if (estado == ESTADO_CRUD.MODIFICAR) {
+                    getDao().modificar(registro);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito",
+                                    "Registro modificado correctamente"));
+                }
+
+                // Resetear estado
+                registro = null;
+                estado = ESTADO_CRUD.NADA;
+                inicializarRegistros();
+                idTipoProductoSeleccionado = null;
+                idCaracteristicaSeleccionada = null;
+
+            } catch (Exception e) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al guardar", e.getMessage()));
+                e.printStackTrace();
+            }
         }
-
-        // Validar relaciones requeridas
-        if (this.registro.getTipoProducto() == null) {
-            System.err.println("❌ TipoProducto no seleccionado");
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención",
-                            "Debe seleccionar un Tipo de Producto"));
-            return;
-        }
-
-        if (this.registro.getCaracteristica() == null) {
-            System.err.println("❌ Caracteristica no seleccionada");
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención",
-                            "Debe seleccionar una Característica"));
-            return;
-        }
-
-        // Asegurar valor por defecto de obligatorio
-        if (this.registro.getObligatorio() == null) {
-            this.registro.setObligatorio(false);
-        }
-
-        System.out.println("  📋 Guardando: TipoProducto=" +
-                this.registro.getTipoProducto().getNombre() +
-                ", Caracteristica=" + this.registro.getCaracteristica().getNombre());
-
-        // Llamar al método del padre que hace la persistencia
-        super.btnGuardarHandler(actionEvent);
     }
 
-    /**
-     * Maneja el botón MODIFICAR
-     * Sobrescribe para agregar validaciones específicas
-     */
     @Override
     public void btnModificarHandler(ActionEvent actionEvent) {
-        System.out.println("✏️ Botón MODIFICAR presionado");
+        if (this.registro != null) {
+            try {
+                // Validación: asegurarse que se seleccionó TipoProducto y Caracteristica
+                if (idTipoProductoSeleccionado == null || idCaracteristicaSeleccionada == null) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención",
+                                    "Debe seleccionar Tipo de Producto y Característica"));
+                    return;
+                }
 
-        if (this.registro == null) {
-            System.err.println("❌ Registro es null");
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                            "No hay registro para modificar"));
-            return;
+                // Resolver relaciones
+                TipoProducto tipo = tipoProductoDAO.findById(idTipoProductoSeleccionado);
+                Caracteristica caract = caracteristicaDAO.findById(idCaracteristicaSeleccionada);
+
+                registro.setTipoProducto(tipo);
+                registro.setCaracteristica(caract);
+
+                // Llamar al DAO para modificar
+                getDao().modificar(this.registro);
+
+                // Resetear estado y refrescar modelo
+                this.registro = null;
+                this.estado = ESTADO_CRUD.NADA;
+                inicializarRegistros();
+                this.idTipoProductoSeleccionado = null;
+                this.idCaracteristicaSeleccionada = null;
+
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito",
+                                "Registro modificado correctamente"));
+
+            } catch (Exception e) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al modificar", e.getMessage()));
+                e.printStackTrace();
+            }
         }
-
-        // Validar relaciones requeridas
-        if (this.registro.getTipoProducto() == null) {
-            System.err.println("❌ TipoProducto no seleccionado");
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención",
-                            "Debe seleccionar un Tipo de Producto"));
-            return;
-        }
-
-        if (this.registro.getCaracteristica() == null) {
-            System.err.println("❌ Caracteristica no seleccionada");
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención",
-                            "Debe seleccionar una Característica"));
-            return;
-        }
-
-        System.out.println("  📋 Modificando: ID=" + this.registro.getId() +
-                ", TipoProducto=" + this.registro.getTipoProducto().getNombre() +
-                ", Caracteristica=" + this.registro.getCaracteristica().getNombre());
-
-        // Llamar al método del padre
-        super.btnModificarHandler(actionEvent);
     }
+
+
+
+
 
     // =================== IMPLEMENTACIÓN DE MÉTODOS ABSTRACTOS ===================
 
@@ -333,23 +313,38 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
     protected TipoProductoCaracteristica nuevoRegistro() {
         TipoProductoCaracteristica nuevo = new TipoProductoCaracteristica();
 
-        // Como tienes @GeneratedValue, no asignes ID manualmente
-        // Si NO tuvieras @GeneratedValue, descomenta estas líneas:
-        // Long maxId = tipoProductoCaracteristicaDAO.obtenerMaximoId();
-        // nuevo.setId(maxId != null ? maxId + 1 : 1L);
+        // Obtener el máximo ID actual y sumarle 1
+        Long maxId = tipoProductoCaracteristicaDAO.obtenerMaximoId();
+        nuevo.setId(maxId + 1);
 
         nuevo.setFechaCreacion(OffsetDateTime.now());
-        nuevo.setObligatorio(false); // Valor por defecto
+        nuevo.setObligatorio(false);
 
-        System.out.println("🆕 Nuevo registro TipoProductoCaracteristica creado");
-        if (nuevo.getId() != null) {
-            System.out.println("   ID asignado: " + nuevo.getId());
-        } else {
-            System.out.println("   ID será autogenerado por la BD");
-        }
-
+        System.out.println("🆕 Nuevo registro TipoProductoCaracteristica creado con ID: " + nuevo.getId());
         return nuevo;
     }
+
+
+    /**
+     * Método específico para crear un registro de TipoProductoCaracteristica
+     * Sobrescribe la lógica genérica del DefaultDAO.
+     */
+    public void crear(TipoProductoCaracteristica registro) {
+        if (registro == null) {
+            throw new IllegalArgumentException("El registro no puede ser nulo");
+        }
+        try {
+
+            // Usar el DAO específico
+            tipoProductoCaracteristicaDAO.crear(registro);
+
+            System.out.println("✅ Registro creado correctamente con ID autogenerado");
+        } catch (Exception e) {
+            System.err.println("❌ Error al crear registro: " + e.getMessage());
+            throw new RuntimeException("Error al crear TipoProductoCaracteristica", e);
+        }
+    }
+
 
     @Override
     protected TipoProductoCaracteristica buscarRegistroPorId(Object id) {
@@ -408,6 +403,12 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
         }
         return vacio;
     }
+    @Override
+    public void btnNuevoHandler(ActionEvent actionEvent) {
+        super.btnNuevoHandler(actionEvent);
+
+    }
+
 
     // =================== GETTERS Y SETTERS ===================
 

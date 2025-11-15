@@ -23,4 +23,14 @@ public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<T
     public TipoProductoCaracteristica findById(Long id) {
         return em.find(TipoProductoCaracteristica.class, id);
     }
+    public Long obtenerMaximoId() {
+        try {
+            return em.createQuery(
+                    "SELECT COALESCE(MAX(t.id), 0) FROM TipoProductoCaracteristica t", Long.class
+            ).getSingleResult();
+        } catch (Exception e) {
+            return 0L;
+        }
+    }
+
 }

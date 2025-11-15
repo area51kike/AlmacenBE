@@ -9,7 +9,6 @@ import jakarta.inject.Named;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDao;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto;
 
-@Named
 @FacesConverter(value = "tipoProductoConverter", managed = true)
 public class TipoProductoConverter implements Converter<TipoProducto> {
 

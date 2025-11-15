@@ -9,7 +9,6 @@ import java.time.OffsetDateTime;
 public class TipoProductoCaracteristica implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_tipo_producto_caracteristica", nullable = false)
     private Long id;
 
