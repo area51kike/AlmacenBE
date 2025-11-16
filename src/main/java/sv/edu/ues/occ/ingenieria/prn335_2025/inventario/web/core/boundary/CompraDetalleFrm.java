@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDetalleDao;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
 
@@ -34,7 +34,7 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
     private CompraDetalleDao compraDetalleDao;
 
     @Inject
-    private CompraDao compraDao;
+    private CompraDAO compraDao;
 
     @Inject
     private ProductoDAO productoDao;

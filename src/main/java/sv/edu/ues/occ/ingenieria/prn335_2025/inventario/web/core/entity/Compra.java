@@ -9,8 +9,7 @@ import java.time.OffsetDateTime;
 @Table(name = "compra")
 public class Compra {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "compra_seq")
-    @SequenceGenerator(name = "compra_seq", sequenceName = "compra_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_compra", nullable = false)
     private Long id;
 
@@ -54,9 +53,9 @@ public class Compra {
 
     public void setIdProveedor(Integer idProveedor) {
         if (idProveedor != null) {
-            if (this.proveedor == null) {
-                this.proveedor = new Proveedor();
-            }
+            // Crear una instancia de Proveedor solo con el ID
+            // JPA la tratará como una referencia (proxy)
+            this.proveedor = new Proveedor();
             this.proveedor.setId(idProveedor);
         } else {
             this.proveedor = null;

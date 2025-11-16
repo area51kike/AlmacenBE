@@ -14,19 +14,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProveedorDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Proveedor;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.EstadoCompra;
 
 @Named("compraFrm")
 @ViewScoped
 public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
 
     @Inject
-    private CompraDao compraDao;
+    private CompraDAO compraDao;
 
     @Inject
     private ProveedorDAO proveedorDao;

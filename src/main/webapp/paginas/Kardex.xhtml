@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <meta charset="UTF-8"/>
+    <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['kardex.titulo']}</title>
+</h:head>
+<h:body>
+    <div class="page-container">
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['kardex.titulo']}</h1>
+            </div>
+            <div class="content">
+                <!-- PANEL TABLA -->
+                <h:panelGroup id="pnlTabla" layout="block"
+                              rendered="#{kardexFrm.estado eq 'NADA' or kardexFrm.estado.name() eq 'NADA'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTop">
+                            <p:dataTable id="tabla-top"
+                                         lazy="true"
+                                         rendered="#{kardexFrm.estado == 'NADA'}"
+                                         rows="8"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{kardexFrm.modelo}"
+                                         var="reg"
+                                         selectionMode="single"
+                                         selection="#{kardexFrm.registro}"
+                                         rowKey="#{reg.id}">
+                                <p:ajax event="rowSelect" listener="#{kardexFrm.selectionHandler}"
+                                        update="@form :pnlDetalle"/>
+
+                                <p:column headerText="#{msg['kardex.tabla.fecha']}" sortBy="#{reg.fecha}">
+                                    <h:outputText value="#{reg.fecha}" converter="offsetDateTimeConverter"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['kardex.tabla.producto']}">
+                                    <h:outputText value="#{reg.idProducto.nombreProducto}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['kardex.tabla.almacen']}">
+                                    <h:outputText value="#{reg.idAlmacen.idTipoAlmacen.nombre}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['kardex.tabla.tipoMovimiento']}">
+                                    <h:outputText value="#{msg['kardex.tipo.'.concat(reg.tipoMovimiento)]}"
+                                                  styleClass="tipo-movimiento-#{reg.tipoMovimiento.contains('ENTRADA') or reg.tipoMovimiento.contains('DEVOLUCION_VENTA') ? 'entrada' : 'salida'}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['kardex.tabla.cantidad']}" styleClass="column-number">
+                                    <h:outputText value="#{reg.cantidad}">
+                                        <f:convertNumber pattern="#,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="#{msg['kardex.tabla.precio']}" styleClass="column-number">
+                                    <h:outputText value="#{reg.precio}">
+                                        <f:convertNumber type="currency" currencySymbol="$"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="#{msg['kardex.tabla.cantidadActual']}" styleClass="column-number">
+                                    <h:outputText value="#{reg.cantidadActual}">
+                                        <f:convertNumber pattern="#,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="#{msg['kardex.tabla.precioActual']}" styleClass="column-number">
+                                    <h:outputText value="#{reg.precioActual}">
+                                        <f:convertNumber type="currency" currencySymbol="$"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:dataTable>
+
+                            <!-- Botón Nuevo (incluimos BotonesTop pasando el bean correcto) -->
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="nuevo"/>
+                                <ui:param name="bean" value="#{kardexFrm}"/>
+                            </ui:include>
+                        </h:form>
+
+                        <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
+                    </div>
+                </h:panelGroup>
+
+                <!-- PANEL DETALLE -->
+                <h:panelGroup id="pnlDetalle" rendered="#{kardexFrm.estado ne 'NADA' and kardexFrm.estado.name() ne 'NADA'}">
+                    <h:form id="frmCrear">
+                        <h:panelGrid columns="2" cellpadding="5">
+
+                            <h:outputLabel for="txtIdPanel" value="#{msg['kardex.tabla.id']}:"/>
+                            <h:panelGroup id="txtIdPanel">
+                                <h:outputText rendered="#{empty kardexFrm.registro.id}"
+                                              value="(#{msg['kardex.id.autogenerado']})"/>
+                                <h:inputText id="txtId"
+                                             value="#{kardexFrm.registro.id}"
+                                             rendered="#{not empty kardexFrm.registro.id}"
+                                             disabled="true"/>
+                            </h:panelGroup>
+
+                            <h:outputLabel for="calFecha" value="#{msg['kardex.form.fecha']}"/>
+                            <p:calendar id="calFecha"
+                                        value="#{kardexFrm.registro.fecha}"
+                                        pattern="dd/MM/yyyy HH:mm"
+                                        showTime="true"
+                                        required="true"
+                                        requiredMessage="#{msg['kardex.fecha.requerido']}"
+                                        locale="es"
+                                        converter="offsetDateTimeConverter"
+                                        timeZone="America/El_Salvador"/>
+
+                            <h:outputLabel for="cmbProducto" value="#{msg['kardex.form.producto']}"/>
+                            <p:selectOneMenu id="cmbProducto"
+                                             value="#{kardexFrm.registro.idProducto}"
+                                             required="true"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             requiredMessage="#{msg['kardex.producto.requerido']}">
+                                <f:converter converterId="productoConverter"/>
+                                <f:selectItem itemLabel="#{msg['kardex.seleccione.producto']}"
+                                              itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{kardexFrm.productosDisponibles}"
+                                               var="prod"
+                                               itemValue="#{prod}"
+                                               itemLabel="#{prod.nombreProducto}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="cmbAlmacen" value="#{msg['kardex.form.almacen']}"/>
+                            <p:selectOneMenu id="cmbAlmacen"
+                                             value="#{kardexFrm.registro.idAlmacen}"
+                                             required="true"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             requiredMessage="#{msg['kardex.almacen.requerido']}">
+                                <f:converter converterId="almacenConverter"/>
+                                <f:selectItem itemLabel="#{msg['kardex.seleccione.almacen']}"
+                                              itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{kardexFrm.almacenesDisponibles}"
+                                               var="alm"
+                                               itemValue="#{alm}"
+                                               itemLabel="ID: #{alm.id} - #{alm.idTipoAlmacen.nombre}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="cmbTipoMovimiento" value="#{msg['kardex.form.tipoMovimiento']}"/>
+                            <p:selectOneMenu id="cmbTipoMovimiento"
+                                             value="#{kardexFrm.registro.tipoMovimiento}"
+                                             required="true"
+                                             requiredMessage="#{msg['kardex.tipoMovimiento.requerido']}">
+                                <f:selectItem itemLabel="#{msg['kardex.seleccione.tipoMovimiento']}"
+                                              itemValue=""
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{kardexFrm.tiposMovimiento}"
+                                               var="tipo"
+                                               itemValue="#{tipo}"
+                                               itemLabel="#{msg['kardex.tipo.'.concat(tipo)]}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="txtCantidad" value="#{msg['kardex.form.cantidad']}"/>
+                            <p:inputNumber id="txtCantidad"
+                                           value="#{kardexFrm.registro.cantidad}"
+                                           decimalPlaces="2"
+                                           minValue="0.01"
+                                           required="true"
+                                           requiredMessage="#{msg['kardex.cantidad.requerido']}">
+                            </p:inputNumber>
+
+                            <h:outputLabel for="txtPrecio" value="#{msg['kardex.form.precio']}"/>
+                            <p:inputNumber id="txtPrecio"
+                                           value="#{kardexFrm.registro.precio}"
+                                           decimalPlaces="2"
+                                           minValue="0"
+                                           symbol="$ "
+                                           required="true"
+                                           requiredMessage="#{msg['kardex.precio.requerido']}">
+                            </p:inputNumber>
+
+                            <h:outputLabel for="txtCantidadActual" value="#{msg['kardex.form.cantidadActual']}"/>
+                            <h:inputText id="txtCantidadActual"
+                                         value="#{kardexFrm.registro.cantidadActual}"
+                                         disabled="true">
+                                <f:convertNumber pattern="#,##0.00"/>
+                            </h:inputText>
+
+                            <h:outputLabel for="txtPrecioActual" value="#{msg['kardex.form.precioActual']}"/>
+                            <h:inputText id="txtPrecioActual"
+                                         value="#{kardexFrm.registro.precioActual}"
+                                         disabled="true">
+                                <f:convertNumber type="currency" currencySymbol="$"/>
+                            </h:inputText>
+
+                            <h:outputLabel for="cmbCompraDetalle" value="#{msg['kardex.form.compraDetalle']}"/>
+                            <p:selectOneMenu id="cmbCompraDetalle"
+                                             value="#{kardexFrm.registro.idCompraDetalle}"
+                                             filter="true"
+                                             filterMatchMode="contains">
+                                <f:converter converterId="compraDetalleConverter"/>
+                                <f:selectItem itemLabel="#{msg['kardex.seleccione.compraDetalle']}"
+                                              itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{kardexFrm.comprasDetalleDisponibles}"
+                                               var="compDet"
+                                               itemValue="#{compDet}"
+                                               itemLabel="#{compDet.id} - #{compDet.idProducto.nombreProducto}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="cmbVentaDetalle" value="#{msg['kardex.form.ventaDetalle']}"/>
+                            <p:selectOneMenu id="cmbVentaDetalle"
+                                             value="#{kardexFrm.registro.idVentaDetalle}"
+                                             filter="true"
+                                             filterMatchMode="contains">
+                                <f:converter converterId="ventaDetalleConverter"/>
+                                <f:selectItem itemLabel="#{msg['kardex.seleccione.ventaDetalle']}"
+                                              itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{kardexFrm.ventasDetalleDisponibles}"
+                                               var="ventDet"
+                                               itemValue="#{ventDet}"
+                                               itemLabel="#{ventDet.id} - #{ventDet.idProducto.nombreProducto}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="txtComentarios" value="#{msg['kardex.form.comentarios']}"/>
+                            <h:inputTextarea id="txtComentarios"
+                                             value="#{kardexFrm.registro.comentarios}"
+                                             rows="4"
+                                             cols="50"/>
+
+                        </h:panelGrid>
+
+                        <!-- Botones Crear / Modificar / Eliminar -->
+                        <h:panelGrid columns="3">
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="crud"/>
+                                <ui:param name="bean" value="#{kardexFrm}"/>
+                            </ui:include>
+                        </h:panelGrid>
+                    </h:form>
+
+                    <!-- Botón Cancelar: su propio form  -->
+                    <h:form id="frmCancelar">
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="cancelar"/>
+                            <ui:param name="bean" value="#{kardexFrm}"/>
+                        </ui:include>
+                    </h:form>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>

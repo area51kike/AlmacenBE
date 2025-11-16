@@ -13,14 +13,14 @@ import java.util.logging.Logger;
 
 @Stateless
 @LocalBean
-public class CompraDao extends InventarioDefaultDataAccess<Compra> implements Serializable {
+public class CompraDAO extends InventarioDefaultDataAccess<Compra> implements Serializable {
 
-    private static final Logger LOGGER = Logger.getLogger(CompraDao.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CompraDAO.class.getName());
 
     @PersistenceContext(unitName = "inventarioPU")
     private EntityManager em;
 
-    public CompraDao() {
+    public CompraDAO() {
         super(Compra.class);
     }
 

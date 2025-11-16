@@ -1,5 +1,6 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity;
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
@@ -13,6 +14,7 @@ public class TipoProducto {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_producto_padre")
+    @JsonbTransient  // ← CAMBIO: Usa JsonbTransient en lugar de JsonIgnore
     private TipoProducto idTipoProductoPadre;
 
     @Size(max = 155)

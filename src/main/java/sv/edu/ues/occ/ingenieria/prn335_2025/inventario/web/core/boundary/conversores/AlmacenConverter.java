@@ -1,6 +1,6 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.conversores;
 
-import jakarta.ejb.EJB;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
@@ -9,23 +9,22 @@ import jakarta.inject.Inject;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.AlmacenDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Almacen;
 
+@RequestScoped
 @FacesConverter(value = "almacenConverter", managed = true)
 public class AlmacenConverter implements Converter<Almacen> {
 
     @Inject
-    private AlmacenDAO almacenDAO;
+    AlmacenDAO almacenDao;
 
     @Override
     public Almacen getAsObject(FacesContext context, UIComponent component, String value) {
-        if (value == null || value.trim().isEmpty() || value.equals("null")) {
+        if (value == null || value.isEmpty()) {
             return null;
         }
         try {
-            Integer id = Integer.parseInt(value);
-            return almacenDAO.findById(id);
-        } catch (Exception e) {
-            System.err.println("Error en AlmacenConverter.getAsObject: " + e.getMessage());
-            e.printStackTrace();
+            Integer id = Integer.valueOf(value);
+            return almacenDao.findById(id);
+        } catch (NumberFormatException e) {
             return null;
         }
     }

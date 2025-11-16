@@ -24,11 +24,17 @@ public class ProductoConverter implements Converter<Producto> {
         }
         try {
             UUID id = UUID.fromString(value);
-            return productoDao.findById(id);
+            Producto producto = productoDao.findById(id);
+            if (producto == null) {
+                throw new IllegalArgumentException("Producto no encontrado");
+            }
+            return producto;
         } catch (IllegalArgumentException e) {
+            // Aquí puedes registrar el error o manejarlo como prefieras
             return null;
         }
     }
+
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Producto value) {
