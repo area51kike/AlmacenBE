@@ -1,19 +1,20 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control;
 
-import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.KardexDetalle;
-import java.io.Serializable;
-@Stateless
-@LocalBean
-public class KardexDetalleDAO extends InventarioDefaultDataAccess<KardexDetalle> implements Serializable {
-    @PersistenceContext(unitName = "inventarioPU")
-    EntityManager em;
 
-    public KardexDetalleDAO(Class<KardexDetalle> entityClass) {
-        super(entityClass);
+import java.util.UUID;
+
+@Stateless
+public class KardexDetalleDAO extends InventarioDefaultDataAccess<KardexDetalle> {
+
+    @PersistenceContext(unitName = "inventarioPU")
+    private EntityManager em;
+
+    public KardexDetalleDAO() {
+        super(KardexDetalle.class);
     }
 
     @Override
@@ -21,5 +22,14 @@ public class KardexDetalleDAO extends InventarioDefaultDataAccess<KardexDetalle>
         return em;
     }
 
-    public KardexDetalleDAO() { super(KardexDetalle.class); }
+    /**
+     * Buscar un registro de KardexDetalle por su UUID.
+     * @param id identificador único del KardexDetalle
+     * @return entidad KardexDetalle encontrada o null si no existe
+     */
+    public KardexDetalle findById(UUID id) {
+        return em.find(KardexDetalle.class, id);
+    }
 }
+
+

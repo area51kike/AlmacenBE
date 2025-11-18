@@ -1,10 +1,156 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
+<h:head>
     <meta charset="UTF-8"/>
-    <title>Title</title>
-</head>
-<body>
+    <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['kardexDetalle.titulo']}</title>
+</h:head>
+<h:body>
+    <div class="page-container">
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['kardexDetalle.titulo']}</h1>
+            </div>
+            <div class="content">
 
-</body>
+                <!-- PANEL TABLA -->
+                <h:panelGroup id="pnlTabla" layout="block"
+                              style="display:#{kardexDetalleFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTop">
+                            <p:dataTable id="tabla-kardexDetalle"
+                                         lazy="true"
+                                         rendered="#{kardexDetalleFrm.estado == 'NADA'}"
+                                         rows="8"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{kardexDetalleFrm.modelo}"
+                                         var="reg"
+                                         selectionMode="single"
+                                         selection="#{kardexDetalleFrm.registro}" rowKey="#{reg.id}">
+                                <p:ajax event="rowSelect" listener="#{kardexDetalleFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle"/>
+                                <p:column headerText="#{msg['kardexDetalle.tabla.id']}">
+                                    <h:outputText value="#{reg.id}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['kardexDetalle.tabla.kardex']}">
+                                    <h:outputText value="#{reg.idKardex.id}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['kardexDetalle.tabla.lote']}">
+                                    <h:outputText value="#{reg.lote}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['kardexDetalle.tabla.estado']}">
+                                    <h:outputText value="#{reg.activo ? msg['estado.activo'] : msg['estado.inactivo']}"
+                                                  styleClass="#{reg.activo ? 'estado-activo' : 'estado-inactivo'}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                            <!-- Botón Nuevo -->
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="nuevo"/>
+                                <ui:param name="bean" value="#{kardexDetalleFrm}"/>
+                            </ui:include>
+                        </h:form>
+
+                        <p:growl id="messages" showDetail="true" life="5000" sticky="false"/>
+                    </div>
+                </h:panelGroup>
+
+                <!-- PANEL DETALLE CON TABVIEW -->
+                <h:panelGroup id="pnlDetalle">
+                    <h:form id="frmCrear" rendered="#{kardexDetalleFrm.estado != 'NADA'}">
+                        <p:tabView id="tabViewKardexDetalle">
+
+                            <!-- Tab 1: Generalidades -->
+                            <p:tab title="#{msg['kardexDetalle.tab.generalidades']}">
+                                <h:panelGrid columns="2" cellpadding="5" style="margin-top: 10px;">
+
+                                    <h:outputLabel for="txtIdPanel" value="#{msg['kardexDetalle.form.id']}"/>
+                                    <h:panelGroup id="txtIdPanel">
+                                        <h:outputText rendered="#{empty kardexDetalleFrm.registro.id}"
+                                                      value="(#{msg['kardexDetalle.id.autogenerado']})"/>
+                                        <h:inputText id="txtId"
+                                                     value="#{kardexDetalleFrm.registro.id}"
+                                                     rendered="#{not empty kardexDetalleFrm.registro.id}"
+                                                     disabled="true"/>
+                                    </h:panelGroup>
+
+                                    <h:outputLabel for="selKardex" value="#{msg['kardexDetalle.form.kardex']}"/>
+                                    <h:panelGroup>
+                                        <p:selectOneMenu id="selKardex"
+                                                         value="#{kardexDetalleFrm.idKardexSeleccionado}"
+                                                         required="true"
+                                                         requiredMessage="#{msg['kardexDetalle.error.kardex']}"
+                                                         style="width: 300px;">
+                                            <f:selectItem itemLabel="#{msg['kardexDetalle.form.seleccioneKardex']}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{kardexDetalleFrm.listaKardex}" var="k"
+                                                           itemValue="#{k.id}" itemLabel="#{k.id}"/>
+                                        </p:selectOneMenu>
+                                        <p:message for="selKardex"/>
+                                    </h:panelGroup>
+
+                                    <h:outputLabel for="txtLote" value="#{msg['kardexDetalle.form.lote']}"/>
+                                    <h:panelGroup>
+                                        <h:inputText id="txtLote"
+                                                     value="#{kardexDetalleFrm.registro.lote}"
+                                                     required="true"
+                                                     requiredMessage="#{msg['kardexDetalle.error.lote']}"
+                                                     style="width: 300px;"/>
+                                        <p:message for="txtLote"/>
+                                    </h:panelGroup>
+
+                                    <h:outputLabel for="chkActivo" value="#{msg['kardexDetalle.form.activo']}"/>
+                                    <h:selectBooleanCheckbox id="chkActivo"
+                                                             value="#{kardexDetalleFrm.registro.activo}"/>
+                                </h:panelGrid>
+                            </p:tab>
+
+                            <!-- Tab 2: Resumen -->
+                            <p:tab title="#{msg['kardexDetalle.tab.resumen']}">
+                                <p:panelGrid columns="2" layout="grid" columnClasses="col-label col-value"
+                                             styleClass="resumen-grid" style="margin-top:10px">
+
+                                    <h:outputText value="#{msg['kardexDetalle.form.id']}"/>
+                                    <h:outputText value="#{empty kardexDetalleFrm.registro.id ? '(autogenerado)' : kardexDetalleFrm.registro.id}"/>
+
+                                    <h:outputText value="#{msg['kardexDetalle.form.kardex']}"/>
+                                    <h:outputText value="#{empty kardexDetalleFrm.registro.idKardex ? '-' : kardexDetalleFrm.registro.idKardex.id}"/>
+
+                                    <h:outputText value="#{msg['kardexDetalle.form.lote']}"/>
+                                    <h:outputText value="#{empty kardexDetalleFrm.registro.lote ? '-' : kardexDetalleFrm.registro.lote}"/>
+
+                                    <h:outputText value="#{msg['kardexDetalle.form.activo']}"/>
+                                    <h:outputText value="#{kardexDetalleFrm.registro.activo ? msg['estado.activo'] : msg['estado.inactivo']}"
+                                                  styleClass="#{kardexDetalleFrm.registro.activo ? 'estado-activo' : 'estado-inactivo'}"/>
+                                </p:panelGrid>
+                            </p:tab>
+
+                        </p:tabView>
+
+                        <!-- Botones Crear / Modificar / Eliminar -->
+                        <h:panelGrid columns="1" style="margin-top: 15px;">
+                            <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                <ui:param name="section" value="crud"/>
+                                <ui:param name="bean" value="#{kardexDetalleFrm}"/>
+                            </ui:include>
+                        </h:panelGrid>
+                    </h:form>
+
+                    <!-- Botón Cancelar -->
+                    <h:form id="frmCancelar">
+                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                            <ui:param name="section" value="cancelar"/>
+                            <ui:param name="bean" value="#{kardexDetalleFrm}"/>
+                        </ui:include>
+                    </h:form>
+                </h:panelGroup>
+
+            </div>
+        </div>
+    </div>
+</h:body>
 </html>

@@ -9,7 +9,7 @@
 <h:head>
     <meta charset="UTF-8"/>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
-    <title>Tipo Producto Característica</title>
+    <title>#{msg['tipoProductoCaracteristica.titulo']}</title>
 </h:head>
 
 <h:body>
@@ -17,7 +17,7 @@
         <ui:include src="/paginas/ues/Sidebar.xhtml"/>
         <div class="container">
             <div class="header">
-                <h1>Tipo Producto Característica</h1>
+                <h1>#{msg['tipoProductoCaracteristica.titulo']}</h1>
             </div>
             <div class="content">
 
@@ -42,19 +42,19 @@
                                         listener="#{tipoProductoCaracteristicaFrm.selectionHandler}"
                                         update=":pnlTabla :pnlDetalle :messages"/>
 
-                                <p:column headerText="ID">
+                                <p:column headerText="#{msg['tpc.tabla.id']}">
                                     <h:outputText value="#{reg.id}"/>
                                 </p:column>
-                                <p:column headerText="Tipo Producto">
+                                <p:column headerText="#{msg['tpc.tabla.tipoProducto']}">
                                     <h:outputText value="#{reg.tipoProducto.nombre}"/>
                                 </p:column>
-                                <p:column headerText="Característica">
+                                <p:column headerText="#{msg['tpc.tabla.caracteristica']}">
                                     <h:outputText value="#{reg.caracteristica.nombre}"/>
                                 </p:column>
-                                <p:column headerText="Obligatorio">
-                                    <h:outputText value="#{reg.obligatorio ? 'Sí' : 'No'}"/>
+                                <p:column headerText="#{msg['tpc.tabla.obligatorio']}">
+                                    <h:outputText value="#{reg.obligatorio ? msg['estado.si'] : msg['estado.no']}"/>
                                 </p:column>
-                                <p:column headerText="Fecha Creación">
+                                <p:column headerText="#{msg['tpc.tabla.fechaCreacion']}">
                                     <h:outputText value="#{reg.fechaCreacion}" converter="offsetDateTimeConverter"/>
                                 </p:column>
                             </p:dataTable>
@@ -77,54 +77,54 @@
                         <p:tabView id="tabViewTPC">
 
                             <!-- Tab 1: Generalidades -->
-                            <p:tab title="Generalidades">
+                            <p:tab title="#{msg['tpc.tab.generalidades']}">
                                 <h:panelGrid columns="2" cellpadding="5" style="margin-top: 10px;">
 
-                                    <h:outputLabel for="txtId" value="ID:"/>
+                                    <h:outputLabel for="txtId" value="#{msg['tpc.form.id']}"/>
                                     <h:outputText id="txtId"
-                                                  value="#{tipoProductoCaracteristicaFrm.estado eq 'CREAR' ? '(Autogenerado)' : tipoProductoCaracteristicaFrm.registro.id}"/>
+                                                  value="#{tipoProductoCaracteristicaFrm.estado eq 'CREAR' ? msg['tpc.form.autogenerado'] : tipoProductoCaracteristicaFrm.registro.id}"/>
 
-
-                                    <h:outputLabel for="cmbTipoProducto" value="Tipo Producto:"/>
+                                    <h:outputLabel for="cmbTipoProducto" value="#{msg['tpc.form.tipoProducto']}"/>
                                     <p:selectOneMenu id="cmbTipoProducto"
                                                      value="#{tipoProductoCaracteristicaFrm.idTipoProductoSeleccionado}"
                                                      required="true"
+                                                     requiredMessage="#{msg['tpc.error.tipoProducto']}"
                                                      style="width: 300px;">
-                                        <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItem itemLabel="#{msg['tpc.form.seleccione']}" itemValue="#{null}" noSelectionOption="true"/>
                                         <f:selectItems value="#{tipoProductoCaracteristicaFrm.listaTipoProductos}"
                                                        var="tp"
                                                        itemLabel="#{tp.nombre}"
                                                        itemValue="#{tp.id}"/>
                                     </p:selectOneMenu>
 
-                                    <h:outputLabel for="cmbCaracteristica" value="Característica:"/>
+                                    <h:outputLabel for="cmbCaracteristica" value="#{msg['tpc.form.caracteristica']}"/>
                                     <p:selectOneMenu id="cmbCaracteristica"
                                                      value="#{tipoProductoCaracteristicaFrm.idCaracteristicaSeleccionada}"
                                                      required="true"
+                                                     requiredMessage="#{msg['tpc.error.caracteristica']}"
                                                      style="width: 300px;">
-                                        <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItem itemLabel="#{msg['tpc.form.seleccione']}" itemValue="#{null}" noSelectionOption="true"/>
                                         <f:selectItems value="#{tipoProductoCaracteristicaFrm.listaCaracteristicas}"
                                                        var="car"
                                                        itemLabel="#{car.nombre}"
                                                        itemValue="#{car.id}"/>
                                     </p:selectOneMenu>
 
-                                    <h:outputLabel for="chkObligatorio" value="Obligatorio:"/>
+                                    <h:outputLabel for="chkObligatorio" value="#{msg['tpc.form.obligatorio']}"/>
                                     <p:selectBooleanCheckbox id="chkObligatorio"
                                                              value="#{tipoProductoCaracteristicaFrm.registro.obligatorio}"/>
 
-                                    <h:outputLabel for="calFechaCreacion" value="Fecha Creación:"/>
+                                    <h:outputLabel for="calFechaCreacion" value="#{msg['tpc.form.fechaCreacion']}"/>
                                     <p:calendar id="calFechaCreacion"
                                                 value="#{tipoProductoCaracteristicaFrm.registro.fechaCreacion}"
                                                 pattern="dd/MM/yyyy HH:mm"
                                                 showTime="true"
-
                                                 converter="offsetDateTimeConverter"/>
                                 </h:panelGrid>
                             </p:tab>
 
                             <!-- Tab 2: Resumen -->
-                            <p:tab title="Resumen">
+                            <p:tab title="#{msg['tpc.tab.resumen']}">
                                 <p:panelGrid id="gridResumen"
                                              columns="2"
                                              layout="grid"
@@ -132,34 +132,31 @@
                                              styleClass="resumen-grid"
                                              style="margin-top:10px">
 
-                                    <h:outputText value="ID:" styleClass="lbl"/>
+                                    <h:outputText value="#{msg['tpc.form.id']}" styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
-                                        <h:outputText value="#{empty tipoProductoCaracteristicaFrm.registro.id ? '(Autogenerado)' : tipoProductoCaracteristicaFrm.registro.id}"/>
+                                        <h:outputText value="#{empty tipoProductoCaracteristicaFrm.registro.id ? msg['tpc.form.autogenerado'] : tipoProductoCaracteristicaFrm.registro.id}"/>
                                     </p:outputPanel>
 
-                                    <h:outputText value="Tipo Producto:" styleClass="lbl"/>
+                                    <h:outputText value="#{msg['tpc.form.tipoProducto']}" styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
                                         <h:outputText value="#{empty tipoProductoCaracteristicaFrm.registro.tipoProducto ? '-' : tipoProductoCaracteristicaFrm.registro.tipoProducto.nombre}"/>
                                     </p:outputPanel>
 
-                                    <h:outputText value="Característica:" styleClass="lbl"/>
+                                    <h:outputText value="#{msg['tpc.form.caracteristica']}" styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
                                         <h:outputText value="#{empty tipoProductoCaracteristicaFrm.registro.caracteristica ? '-' : tipoProductoCaracteristicaFrm.registro.caracteristica.nombre}"/>
                                     </p:outputPanel>
 
-                                    <h:outputText value="Obligatorio:" styleClass="lbl"/>
+                                    <h:outputText value="#{msg['tpc.form.obligatorio']}" styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
-                                        <h:outputText value="#{tipoProductoCaracteristicaFrm.registro.obligatorio ? 'Sí' : 'No'}"/>
+                                        <h:outputText value="#{tipoProductoCaracteristicaFrm.registro.obligatorio ? msg['estado.si'] : msg['estado.no']}"/>
                                     </p:outputPanel>
 
-                                    <h:outputText value="Fecha Creación:" styleClass="lbl"/>
+                                    <h:outputText value="#{msg['tpc.form.fechaCreacion']}" styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
                                         <h:outputText value="#{tipoProductoCaracteristicaFrm.registro.fechaCreacion}"
                                                       converter="offsetDateTimeConverter"/>
                                     </p:outputPanel>
-
-
-
                                 </p:panelGrid>
                             </p:tab>
 

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:p="http://primefaces.org/ui"
@@ -7,16 +6,17 @@
 <h:head>
     <meta charset="UTF-8"/>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
-    <title>Producto Tipo Producto</title>
+    <title>#{msg['productoTipoProducto.titulo']}</title>
 </h:head>
 <h:body>
     <div class="page-container">
         <ui:include src="/paginas/ues/Sidebar.xhtml"/>
         <div class="container">
             <div class="header">
-                <h1>Producto Tipo Producto</h1>
+                <h1>#{msg['productoTipoProducto.titulo']}</h1>
             </div>
             <div class="content">
+
                 <!-- PANEL TABLA -->
                 <h:panelGroup id="pnlTabla" layout="block"
                               style="display:#{productoTipoProductoFrm.estado eq 'NADA' ? 'block' : 'none'}">
@@ -35,28 +35,28 @@
                                          rowKey="#{reg.id}">
                                 <p:ajax event="rowSelect" listener="#{productoTipoProductoFrm.selectionHandler}"
                                         update=":pnlTabla :pnlDetalle"/>
-                                <p:column headerText="ID">
+
+                                <p:column headerText="#{msg['ptp.tabla.id']}">
                                     <h:outputText value="#{reg.id}"/>
                                 </p:column>
-                                <p:column headerText="Producto">
+                                <p:column headerText="#{msg['ptp.tabla.producto']}">
                                     <h:outputText value="#{reg.idProducto.nombreProducto}"/>
                                 </p:column>
-                                <p:column headerText="Tipo Producto">
+                                <p:column headerText="#{msg['ptp.tabla.tipoProducto']}">
                                     <h:outputText value="#{reg.idTipoProducto.nombre}"/>
                                 </p:column>
-                                <p:column headerText="Fecha Creación">
+                                <p:column headerText="#{msg['ptp.tabla.fechaCreacion']}">
                                     <h:outputText value="#{reg.fechaCreacion}" converter="offsetDateTimeConverter"/>
                                 </p:column>
-                                <p:column headerText="Estado">
-                                    <h:outputText value="#{reg.activo ? 'Activo' : 'Inactivo'}"
+                                <p:column headerText="#{msg['ptp.tabla.estado']}">
+                                    <h:outputText value="#{reg.activo ? msg['estado.activo'] : msg['estado.inactivo']}"
                                                   styleClass="#{reg.activo?'estado-activo':'estado-inactivo'}"/>
                                 </p:column>
-                                <p:column headerText="Observaciones">
+                                <p:column headerText="#{msg['ptp.tabla.observaciones']}">
                                     <h:outputText value="#{reg.observaciones}"/>
                                 </p:column>
                             </p:dataTable>
 
-                            <!-- Botón Nuevo -->
                             <ui:include src="/paginas/ues/BotonesTop.xhtml">
                                 <ui:param name="section" value="nuevo"/>
                                 <ui:param name="bean" value="#{productoTipoProductoFrm}"/>
@@ -67,50 +67,48 @@
                     </div>
                 </h:panelGroup>
 
-                <!-- PANEL DETALLE CON TABVIEW -->
+                <!-- PANEL DETALLE -->
                 <h:panelGroup id="pnlDetalle">
                     <h:form id="frmCrear" rendered="#{productoTipoProductoFrm.estado != 'NADA'}">
-
-                        <!-- TabView con dos pestañas -->
                         <p:tabView id="tabViewProductoTipoProducto">
 
                             <!-- Tab 1: Generalidades -->
-                            <p:tab title="Generalidades">
+                            <p:tab title="#{msg['ptp.tab.generalidades']}">
                                 <h:panelGrid columns="2" cellpadding="5" style="margin-top: 10px;">
-                                    <h:outputLabel for="txtIdPanel" value="ID:"/>
+                                    <h:outputLabel for="txtIdPanel" value="#{msg['ptp.form.id']}"/>
                                     <h:panelGroup id="txtIdPanel">
                                         <h:outputText rendered="#{empty productoTipoProductoFrm.registro.id}"
-                                                      value="(Autogenerado)"/>
+                                                      value="#{msg['ptp.form.autogenerado']}"/>
                                         <h:inputText id="txtId"
                                                      value="#{productoTipoProductoFrm.registro.id}"
                                                      rendered="#{not empty productoTipoProductoFrm.registro.id}"
                                                      disabled="true"/>
                                     </h:panelGroup>
 
-                                    <h:outputLabel for="cmbProducto" value="Producto:" styleClass="etiqueta-formulario"/>
+                                    <h:outputLabel for="cmbProducto" value="#{msg['ptp.form.producto']}" styleClass="etiqueta-formulario"/>
                                     <p:selectOneMenu id="cmbProducto"
                                                      value="#{productoTipoProductoFrm.idProductoSeleccionado}"
                                                      converter="uuidConverter"
                                                      required="true"
+                                                     requiredMessage="#{msg['ptp.error.producto']}"
                                                      style="width: 300px;">
-                                        <f:selectItem itemLabel="-- Seleccione Producto --" itemValue="#{null}"/>
+                                        <f:selectItem itemLabel="#{msg['ptp.form.seleccioneProducto']}" itemValue="#{null}"/>
                                         <f:selectItems value="#{productoTipoProductoFrm.listaProductos}" var="prod"
                                                        itemLabel="#{prod.nombreProducto}" itemValue="#{prod.id}"/>
                                     </p:selectOneMenu>
 
-                                    <h:outputLabel for="cmbTipoProducto" value="Tipo de Producto:" styleClass="etiqueta-formulario"/>
+                                    <h:outputLabel for="cmbTipoProducto" value="#{msg['ptp.form.tipoProducto']}" styleClass="etiqueta-formulario"/>
                                     <p:selectOneMenu id="cmbTipoProducto"
                                                      value="#{productoTipoProductoFrm.idTipoProductoSeleccionado}"
                                                      required="true"
+                                                     requiredMessage="#{msg['ptp.error.tipoProducto']}"
                                                      style="width: 300px;">
-                                        <f:selectItem itemLabel="-- Seleccione Tipo Producto --" itemValue="#{null}"/>
+                                        <f:selectItem itemLabel="#{msg['ptp.form.seleccioneTipoProducto']}" itemValue="#{null}"/>
                                         <f:selectItems value="#{productoTipoProductoFrm.listaTipoProductos}" var="tipo"
                                                        itemLabel="#{tipo.nombre}" itemValue="#{tipo.id}"/>
                                     </p:selectOneMenu>
 
-
-
-                                    <h:outputLabel for="calFechaCreacion" value="Fecha Creación:"/>
+                                    <h:outputLabel for="calFechaCreacion" value="#{msg['ptp.form.fechaCreacion']}"/>
                                     <p:calendar id="calFechaCreacion"
                                                 value="#{productoTipoProductoFrm.fechaCreacionDate}"
                                                 pattern="dd/MM/yyyy HH:mm"
@@ -120,16 +118,16 @@
                                                 showButtonBar="true"
                                                 showIcon="true"
                                                 required="true"
-                                                requiredMessage="La fecha de creación es requerida"
+                                                requiredMessage="#{msg['ptp.error.fechaCreacion']}"
                                                 style="width: 300px;">
                                         <p:ajax event="dateSelect" update="@this"/>
                                     </p:calendar>
 
-                                    <h:outputLabel for="chkActivo" value="Activo:"/>
+                                    <h:outputLabel for="chkActivo" value="#{msg['ptp.form.activo']}"/>
                                     <h:selectBooleanCheckbox id="chkActivo"
                                                              value="#{productoTipoProductoFrm.registro.activo}"/>
 
-                                    <h:outputLabel for="txtObservaciones" value="Observaciones:"/>
+                                    <h:outputLabel for="txtObservaciones" value="#{msg['ptp.form.observaciones']}"/>
                                     <h:inputTextarea id="txtObservaciones"
                                                      value="#{productoTipoProductoFrm.registro.observaciones}"
                                                      rows="4"
@@ -139,7 +137,7 @@
                             </p:tab>
 
                             <!-- Tab 2: Resumen -->
-                            <p:tab title="Resumen">
+                            <p:tab title="#{msg['ptp.tab.resumen']}">
                                 <p:panelGrid id="gridResumen"
                                              columns="2"
                                              layout="grid"
@@ -147,40 +145,41 @@
                                              styleClass="resumen-grid"
                                              style="margin-top:10px">
 
-                                    <h:outputText value="ID:" styleClass="lbl"/>
+                                    <h:outputText value="#{msg['ptp.form.id']}" styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
-                                        <h:outputText value="#{empty productoTipoProductoFrm.registro.id ? '(Autogenerado)' : productoTipoProductoFrm.registro.id}"/>
+                                        <h:outputText value="#{empty productoTipoProductoFrm.registro.id ? msg['ptp.form.autogenerado'] : productoTipoProductoFrm.registro.id}"/>
                                     </p:outputPanel>
 
-                                    <h:outputText value="Producto:" styleClass="lbl"/>
+                                    <h:outputText value="#{msg['ptp.form.producto']}" styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
                                         <h:outputText value="#{empty productoTipoProductoFrm.registro.idProducto ? '-' : productoTipoProductoFrm.registro.idProducto.nombreProducto}"/>
                                     </p:outputPanel>
 
-                                    <h:outputText value="Tipo Producto:" styleClass="lbl"/>
+                                    <h:outputText value="#{msg['ptp.form.tipoProducto']}" styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
                                         <h:outputText value="#{empty productoTipoProductoFrm.registro.idTipoProducto ? '-' : productoTipoProductoFrm.registro.idTipoProducto.nombre}"/>
                                     </p:outputPanel>
 
-                                    <h:outputText value="Fecha Creación:" styleClass="lbl"/>
+                                    <h:outputText value="#{msg['ptp.form.fechaCreacion']}" styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
                                         <h:outputText value="#{productoTipoProductoFrm.registro.fechaCreacion}"
                                                       converter="offsetDateTimeConverter"/>
                                     </p:outputPanel>
 
-                                    <h:outputText value="Estado:" styleClass="lbl"/>
+                                    <h:outputText value="#{msg['ptp.form.estado']}" styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
-                                        <h:outputText value="#{productoTipoProductoFrm.registro.activo ? 'Activo' : 'Inactivo'}"
+                                        <h:outputText value="#{productoTipoProductoFrm.registro.activo ? msg['estado.activo'] : msg['estado.inactivo']}"
                                                       styleClass="#{productoTipoProductoFrm.registro.activo ? 'estado-activo' : 'estado-inactivo'}"/>
                                     </p:outputPanel>
 
-                                    <h:outputText value="Observaciones:" styleClass="lbl"/>
+                                    <h:outputText value="#{msg['ptp.form.observaciones']}" styleClass="lbl"/>
                                     <p:outputPanel styleClass="cuadro">
                                         <h:outputText value="#{empty productoTipoProductoFrm.registro.observaciones ? '-' : productoTipoProductoFrm.registro.observaciones}"/>
                                     </p:outputPanel>
 
                                 </p:panelGrid>
                             </p:tab>
+
 
                         </p:tabView>
 
