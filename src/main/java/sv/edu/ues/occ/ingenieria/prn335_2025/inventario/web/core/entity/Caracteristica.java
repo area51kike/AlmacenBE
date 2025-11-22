@@ -1,5 +1,6 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity;
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,6 +16,7 @@ public class Caracteristica {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_unidad_medida")
+    @JsonbTransient  // Este de aca
     private TipoUnidadMedida idTipoUnidadMedida;
 
     @Column(name = "activo")

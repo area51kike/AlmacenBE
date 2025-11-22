@@ -15,8 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProductoDAO;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDetalleDao;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDetalleDAO;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
 
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Venta;
@@ -31,10 +31,10 @@ public class VentaDetalleFrm extends DefaultFrm<VentaDetalle> implements Seriali
     private static final Logger LOGGER = Logger.getLogger(VentaDetalleFrm.class.getName());
 
     @Inject
-    private VentaDetalleDao ventaDetalleDao;
+    private VentaDetalleDAO ventaDetalleDao;
 
     @Inject
-    private VentaDao ventaDao;
+    private VentaDAO ventaDao;
 
     @Inject
     private ProductoDAO productoDao;

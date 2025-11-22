@@ -10,8 +10,7 @@ import jakarta.inject.Named;
 import org.primefaces.event.SelectEvent;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProductoTipoProductoDAO;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDao;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.ProductoTipoProducto;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto;
@@ -34,7 +33,7 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
     ProductoDAO productoDAO;
 
     @EJB
-    TipoProductoDao tipoProductoDAO;
+    TipoProductoDAO tipoProductoDAO;
 
     private List<Producto> listaProductos;
     private List<TipoProducto> listaTipoProductos;

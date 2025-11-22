@@ -37,10 +37,10 @@ public class KardexFrm extends DefaultFrm<Kardex> implements Serializable {
     private AlmacenDAO almacenDAO;  // CORREGIDO: mayúscula
 
     @Inject
-    private CompraDetalleDao compraDetalleDAO;  // CORREGIDO: mayúscula
+    private CompraDetalleDAO compraDetalleDAO;  // CORREGIDO: mayúscula
 
     @Inject
-    private VentaDetalleDao ventaDetalleDAO;
+    private VentaDetalleDAO ventaDetalleDAO;
 
     // Listas para los selectOneMenu
     private List<Producto> productosDisponibles;

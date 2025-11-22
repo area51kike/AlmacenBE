@@ -28,13 +28,13 @@ class TipoProductoDaoTest {
     private TypedQuery<TipoProducto> typedQuery;
 
     @InjectMocks
-    private TipoProductoDao tipoProductoDao;
+    private TipoProductoDAO tipoProductoDao;
 
     private TipoProducto tipoProducto;
 
     @BeforeEach
     void setUp() {
-        tipoProductoDao = new TipoProductoDao();
+        tipoProductoDao = new TipoProductoDAO();
         tipoProductoDao.em = entityManager;
 
         tipoProducto = new TipoProducto();
@@ -53,7 +53,7 @@ class TipoProductoDaoTest {
 
     @Test
     void testConstructor() {
-        TipoProductoDao dao = new TipoProductoDao();
+        TipoProductoDAO dao = new TipoProductoDAO();
         assertNotNull(dao);
     }
 

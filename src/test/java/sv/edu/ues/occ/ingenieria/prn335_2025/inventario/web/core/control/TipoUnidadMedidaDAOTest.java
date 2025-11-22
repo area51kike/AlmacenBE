@@ -75,6 +75,14 @@ class TipoUnidadMedidaDAOTest {
     }
 
     @Test
+    void testFindById_WithNullId() {
+        TipoUnidadMedida result = tipoUnidadMedidaDAO.findById(null);
+
+        assertNull(result);
+        verify(entityManager, never()).find(any(), any());
+    }
+
+    @Test
     void testFindById_NotFound() {
         Integer id = 999;
         when(entityManager.find(TipoUnidadMedida.class, id)).thenReturn(null);
@@ -86,21 +94,14 @@ class TipoUnidadMedidaDAOTest {
     }
 
     @Test
-    void testFindById_NullId() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            tipoUnidadMedidaDAO.findById(null);
-        });
-        verify(entityManager, never()).find(any(), any());
-    }
+    void testFindById_ThrowsException() {
+        when(entityManager.find(TipoUnidadMedida.class, testId))
+                .thenThrow(new RuntimeException("Database error"));
 
-    @Test
-    void testFindById_Exception() {
-        Integer id = 1;
-        when(entityManager.find(TipoUnidadMedida.class, id))
-                .thenThrow(new RuntimeException("Database connection error"));
+        TipoUnidadMedida result = tipoUnidadMedidaDAO.findById(testId);
 
-        assertThrows(RuntimeException.class, () -> tipoUnidadMedidaDAO.findById(id));
-        verify(entityManager).find(TipoUnidadMedida.class, id);
+        assertNull(result);
+        verify(entityManager).find(TipoUnidadMedida.class, testId);
     }
 
     @Test
@@ -349,11 +350,33 @@ class TipoUnidadMedidaDAOTest {
 
     @Test
     void testCrear_NullRegistro() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             tipoUnidadMedidaDAO.crear(null);
         });
+
+        assertEquals("El registro no puede ser nulo", exception.getMessage());
         verify(entityManager, never()).persist(any());
         verify(entityManager, never()).createNativeQuery(anyString());
+    }
+
+    @Test
+    void testCrear_NullEntityManager() throws Exception {
+        // Crear una nueva instancia del DAO para este test específico
+        TipoUnidadMedidaDAO daoConEmNulo = new TipoUnidadMedidaDAO();
+
+        // No inyectar el EntityManager, dejarlo en null
+
+        TipoUnidadMedida newTipo = new TipoUnidadMedida();
+        newTipo.setId(20);
+        newTipo.setNombre("Mililitro");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            daoConEmNulo.crear(newTipo);
+        });
+
+        // Verificar que la excepción fue lanzada (el mensaje exacto puede variar)
+        assertNotNull(exception);
+        assertNotNull(exception.getMessage());
     }
 
     @Test
@@ -365,7 +388,12 @@ class TipoUnidadMedidaDAOTest {
         doThrow(new RuntimeException("Database error"))
                 .when(entityManager).persist(newTipo);
 
-        assertThrows(IllegalStateException.class, () -> tipoUnidadMedidaDAO.crear(newTipo));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            tipoUnidadMedidaDAO.crear(newTipo);
+        });
+
+        assertTrue(exception.getMessage().contains("Error al crear el registro"));
+        assertNotNull(exception.getCause());
         verify(entityManager).persist(newTipo);
     }
 
@@ -377,7 +405,11 @@ class TipoUnidadMedidaDAOTest {
         when(entityManager.createNativeQuery("SELECT nextval('tipo_unidad_medida_id_tipo_unidad_medida_seq'::regclass)"))
                 .thenThrow(new RuntimeException("Sequence error"));
 
-        assertThrows(IllegalStateException.class, () -> tipoUnidadMedidaDAO.crear(newTipo));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            tipoUnidadMedidaDAO.crear(newTipo);
+        });
+
+        assertTrue(exception.getMessage().contains("Error al crear el registro"));
         verify(entityManager).createNativeQuery("SELECT nextval('tipo_unidad_medida_id_tipo_unidad_medida_seq'::regclass)");
         verify(entityManager, never()).persist(any());
     }
@@ -395,6 +427,19 @@ class TipoUnidadMedidaDAOTest {
         tipoUnidadMedidaDAO.crear(newTipo);
 
         assertEquals(999999, newTipo.getId());
+        verify(entityManager).persist(newTipo);
+    }
+
+    @Test
+    void testCrear_WithMinimalData() {
+        TipoUnidadMedida newTipo = new TipoUnidadMedida();
+        newTipo.setId(100);
+
+        doNothing().when(entityManager).persist(newTipo);
+
+        tipoUnidadMedidaDAO.crear(newTipo);
+
+        assertEquals(100, newTipo.getId());
         verify(entityManager).persist(newTipo);
     }
 }

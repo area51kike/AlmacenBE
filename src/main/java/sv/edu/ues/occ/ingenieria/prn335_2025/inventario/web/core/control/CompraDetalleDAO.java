@@ -12,13 +12,13 @@ import java.util.UUID;
 
 @Stateless
 @LocalBean
-public class CompraDetalleDao extends InventarioDefaultDataAccess<CompraDetalle> implements Serializable {
+public class CompraDetalleDAO extends InventarioDefaultDataAccess<CompraDetalle> implements Serializable {
 
     // Nombre de la unidad de persistencia (asegúrate de que coincida con tu persistence.xml)
     @PersistenceContext(unitName = "inventarioPU")
     EntityManager em;
 
-    public CompraDetalleDao() {
+    public CompraDetalleDAO() {
         super(CompraDetalle.class);
     }
 

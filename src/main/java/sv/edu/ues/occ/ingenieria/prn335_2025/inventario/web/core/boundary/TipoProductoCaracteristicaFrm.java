@@ -12,7 +12,7 @@ import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoCaracteristicaDAO;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CaracteristicaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProductoCaracteristica;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto;
@@ -35,7 +35,7 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
     private TipoProductoCaracteristicaDAO tipoProductoCaracteristicaDAO;
 
     @EJB
-    private TipoProductoDao tipoProductoDAO;
+    private TipoProductoDAO tipoProductoDAO;
 
     @EJB
     private CaracteristicaDAO caracteristicaDAO;

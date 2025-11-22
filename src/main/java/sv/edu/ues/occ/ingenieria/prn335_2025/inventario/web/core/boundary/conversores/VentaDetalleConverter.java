@@ -6,7 +6,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.inject.Inject;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDetalleDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDetalleDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.VentaDetalle;
 
 import java.util.UUID;
@@ -16,7 +16,7 @@ import java.util.UUID;
 public class VentaDetalleConverter implements Converter<VentaDetalle> {
 
     @Inject
-    VentaDetalleDao ventaDetalleDao;
+    VentaDetalleDAO ventaDetalleDao;
 
     @Override
     public VentaDetalle getAsObject(FacesContext context, UIComponent component, String value) {
