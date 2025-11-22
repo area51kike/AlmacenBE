@@ -8,16 +8,14 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto;
-
-import java.util.List;
 
 @Path("tipo_producto")
 public class TipoProductoResource {
 
     @Inject
-    TipoProductoDao tipoProductoDao;
+    TipoProductoDAO tipoProductoDao;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

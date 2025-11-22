@@ -1,8 +1,6 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.rest.server;
 
 import jakarta.inject.Inject;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -13,7 +11,11 @@ import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoAlm
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Almacen;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoAlmacen;
 
-@Path("almacen")
+import java.util.List;
+
+@Path("tipo_almacen/{idTipoAlmacen}/almacen")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class AlmacenResource {
 
     @Inject
@@ -22,157 +24,232 @@ public class AlmacenResource {
     @Inject
     TipoAlmacenDAO tipoAlmacenDAO;
 
+    /**
+     * GET /tipo_almacen/{idTipoAlmacen}/almacen
+     * Obtiene todos los almacenes de un tipo específico
+     */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response findRange(@Min(0) @DefaultValue("0") @QueryParam("first") int first,
-                              @Max(100) @DefaultValue("50") @QueryParam("max") int max) {
-        if (first >= 0 && max <= 100) {
-            try {
-                Long total = almacenDAO.count();
-                return Response.ok(almacenDAO.findRange(first, max))
-                        .header("Total-records", total)
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+    public Response getAlmacenesPorTipo(@PathParam("idTipoAlmacen") Integer idTipoAlmacen) {
+        if (idTipoAlmacen == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("El ID del tipo de almacén no puede ser nulo")
+                    .build();
+        }
+
+        try {
+            // Verificar que existe el tipo de almacén
+            TipoAlmacen tipoAlmacen = tipoAlmacenDAO.findById(idTipoAlmacen);
+            if (tipoAlmacen == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("No existe el tipo de almacén con id: " + idTipoAlmacen)
                         .build();
             }
+
+            List<Almacen> almacenes = almacenDAO.findByTipoAlmacen(idTipoAlmacen);
+
+            if (almacenes.isEmpty()) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("No se encontraron almacenes para el tipo de almacén con id: " + idTipoAlmacen)
+                        .build();
+            }
+
+            return Response.ok(almacenes).build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al obtener almacenes: " + ex.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "first or max out of range")
-                .build();
     }
 
+    /**
+     * GET /tipo_almacen/{idTipoAlmacen}/almacen/{idAlmacen}
+     * Obtiene un almacén específico de un tipo de almacén
+     */
     @GET
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response findById(@PathParam("id") Integer id) {
-        if (id != null && id > 0) {
-            try {
-                Almacen resp = almacenDAO.findById(id);
-                if (resp != null) {
-                    return Response.ok(resp).build();
-                }
+    @Path("/{idAlmacen}")
+    public Response findById(@PathParam("idTipoAlmacen") Integer idTipoAlmacen,
+                             @PathParam("idAlmacen") Integer idAlmacen) {
+        if (idAlmacen == null || idTipoAlmacen == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Los IDs no pueden ser nulos")
+                    .build();
+        }
+
+        try {
+            Almacen almacen = almacenDAO.findById(idAlmacen);
+
+            if (almacen == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .header("Record-not-found", "Record with id " + id + " not found")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+                        .entity("Almacén con id " + idAlmacen + " no encontrado")
                         .build();
             }
-        }
-        return Response.status(422)
-                .header("Missing-parameter", "id must be greater than 0")
-                .build();
-    }
 
-    @DELETE
-    @Path("{id}")
-    public Response delete(@PathParam("id") Integer id) {
-        if (id != null && id > 0) {
-            try {
-                Almacen resp = almacenDAO.findById(id);
-                if (resp != null) {
-                    almacenDAO.eliminar(resp);
-                    return Response.noContent().build();
-                }
+            // Validar que el almacén pertenezca al tipo especificado
+            if (almacen.getIdTipoAlmacen() == null ||
+                    !almacen.getIdTipoAlmacen().getId().equals(idTipoAlmacen)) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .header("Record-not-found", "Record with id " + id + " not found")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+                        .entity("El almacén no pertenece al tipo de almacén especificado")
                         .build();
             }
+
+            return Response.ok(almacen).build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al buscar el almacén: " + ex.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "id must be greater than 0")
-                .build();
     }
 
+    /**
+     * POST /tipo_almacen/{idTipoAlmacen}/almacen
+     * Crea un nuevo almacén para un tipo específico
+     */
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(Almacen entity, @Context UriInfo uriInfo) {
-        if (entity != null && entity.getId() == null) {
-            try {
-                // Validar y asignar TipoAlmacen si existe
-                if (entity.getIdTipoAlmacen() != null &&
-                        entity.getIdTipoAlmacen().getId() != null) {
+    public Response create(@PathParam("idTipoAlmacen") Integer idTipoAlmacen,
+                           Almacen entity,
+                           @Context UriInfo uriInfo) {
+        if (idTipoAlmacen == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("El ID del tipo de almacén no puede ser nulo")
+                    .build();
+        }
 
-                    TipoAlmacen tipoAlmacen = tipoAlmacenDAO.findById(
-                            entity.getIdTipoAlmacen().getId()
-                    );
+        if (entity == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("La entidad no puede ser nula")
+                    .build();
+        }
 
-                    if (tipoAlmacen == null) {
-                        return Response.status(422)
-                                .header("Missing-parameter",
-                                        "TipoAlmacen does not exist in database")
-                                .build();
-                    }
-                    entity.setIdTipoAlmacen(tipoAlmacen);
-                }
-
-                almacenDAO.crear(entity);
-                return Response.created(
-                        uriInfo.getAbsolutePathBuilder()
-                                .path(String.valueOf(entity.getId()))
-                                .build()
-                ).build();
-
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+        try {
+            TipoAlmacen tipoAlmacen = tipoAlmacenDAO.findById(idTipoAlmacen);
+            if (tipoAlmacen == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("No existe el tipo de almacén con id: " + idTipoAlmacen)
                         .build();
             }
+
+            // Asignar el tipo de almacén
+            entity.setIdTipoAlmacen(tipoAlmacen);
+
+            almacenDAO.crear(entity);
+
+            return Response.created(
+                    uriInfo.getAbsolutePathBuilder()
+                            .path(entity.getId().toString())
+                            .build()
+            ).entity(entity).build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al crear el almacén: " + e.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "entity must not be null and id must be null")
-                .build();
     }
 
+    /**
+     * PUT /tipo_almacen/{idTipoAlmacen}/almacen/{idAlmacen}
+     * Actualiza un almacén existente
+     */
     @PUT
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response update(@PathParam("id") Integer id, Almacen entity) {
-        if (id != null && id > 0 && entity != null) {
-            try {
-                Almacen existing = almacenDAO.findById(id);
-                if (existing != null) {
-                    // Validar TipoAlmacen si se proporciona
-                    if (entity.getIdTipoAlmacen() != null &&
-                            entity.getIdTipoAlmacen().getId() != null) {
+    @Path("/{idAlmacen}")
+    public Response update(@PathParam("idTipoAlmacen") Integer idTipoAlmacen,
+                           @PathParam("idAlmacen") Integer idAlmacen,
+                           Almacen entity) {
+        if (idAlmacen == null || idTipoAlmacen == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Los IDs no pueden ser nulos")
+                    .build();
+        }
 
-                        TipoAlmacen tipoAlmacen = tipoAlmacenDAO.findById(
-                                entity.getIdTipoAlmacen().getId()
-                        );
+        if (entity == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("La entidad no puede ser nula")
+                    .build();
+        }
 
-                        if (tipoAlmacen == null) {
-                            return Response.status(422)
-                                    .header("Missing-parameter",
-                                            "TipoAlmacen does not exist in database")
-                                    .build();
-                        }
-                        entity.setIdTipoAlmacen(tipoAlmacen);
-                    }
+        try {
+            Almacen existente = almacenDAO.findById(idAlmacen);
 
-                    entity.setId(id);
-                    almacenDAO.modificar(entity);
-                    return Response.ok(entity).build();
-                }
+            if (existente == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .header("Record-not-found", "Record with id " + id + " not found")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+                        .entity("Almacén con id " + idAlmacen + " no encontrado")
                         .build();
             }
+
+            // Validar que el almacén pertenezca al tipo especificado
+            if (existente.getIdTipoAlmacen() == null ||
+                    !existente.getIdTipoAlmacen().getId().equals(idTipoAlmacen)) {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .entity("El almacén no pertenece al tipo de almacén especificado")
+                        .build();
+            }
+
+            // Actualizar campos
+            existente.setActivo(entity.getActivo());
+            existente.setObservaciones(entity.getObservaciones());
+
+            // Sí se envía un nuevo tipo de almacén en el body, actualizarlo
+            if (entity.getIdTipoAlmacen() != null && entity.getIdTipoAlmacen().getId() != null) {
+                TipoAlmacen nuevoTipo = tipoAlmacenDAO.findById(entity.getIdTipoAlmacen().getId());
+                if (nuevoTipo == null) {
+                    return Response.status(Response.Status.NOT_FOUND)
+                            .entity("No existe el tipo de almacén con id: " + entity.getIdTipoAlmacen().getId())
+                            .build();
+                }
+                existente.setIdTipoAlmacen(nuevoTipo);
+            }
+
+            almacenDAO.modificar(existente);
+
+            return Response.ok(existente).build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al actualizar el almacén: " + e.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "id and entity must be valid")
-                .build();
+    }
+
+    /**
+     * DELETE /tipo_almacen/{idTipoAlmacen}/almacen/{idAlmacen}
+     * Elimina un almacén
+     */
+    @DELETE
+    @Path("/{idAlmacen}")
+    public Response delete(@PathParam("idTipoAlmacen") Integer idTipoAlmacen,
+                           @PathParam("idAlmacen") Integer idAlmacen) {
+        if (idAlmacen == null || idTipoAlmacen == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Los IDs no pueden ser nulos")
+                    .build();
+        }
+
+        try {
+            Almacen existente = almacenDAO.findById(idAlmacen);
+
+            if (existente == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("Almacén con id " + idAlmacen + " no encontrado")
+                        .build();
+            }
+
+            // Validar que el almacén pertenezca al tipo especificado
+            if (existente.getIdTipoAlmacen() == null ||
+                    !existente.getIdTipoAlmacen().getId().equals(idTipoAlmacen)) {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .entity("El almacén no pertenece al tipo de almacén especificado")
+                        .build();
+            }
+
+            almacenDAO.eliminar(existente);
+            return Response.noContent().build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al eliminar el almacén: " + ex.getMessage())
+                    .build();
+        }
     }
 }

@@ -13,14 +13,14 @@ import java.util.logging.Logger;
 
 @Stateless
 @LocalBean
-public class VentaDao extends InventarioDefaultDataAccess<Venta> {
+public class VentaDAO extends InventarioDefaultDataAccess<Venta> {
 
-    private static final Logger LOGGER = Logger.getLogger(VentaDao.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(VentaDAO.class.getName());
 
     @PersistenceContext(unitName = "inventarioPU")
     private EntityManager em;
 
-    public VentaDao() {
+    public VentaDAO() {
         super(Venta.class);
     }
 

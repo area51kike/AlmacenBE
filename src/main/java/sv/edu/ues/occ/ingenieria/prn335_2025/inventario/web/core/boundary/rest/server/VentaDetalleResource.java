@@ -8,8 +8,8 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDetalleDao;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDetalleDAO;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.VentaDetalle;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Venta;
@@ -21,10 +21,10 @@ import java.util.UUID;
 public class VentaDetalleResource {
 
     @Inject
-    VentaDetalleDao ventaDetalleDao;
+    VentaDetalleDAO ventaDetalleDao;
 
     @Inject
-    VentaDao ventaDao;
+    VentaDAO ventaDao;
 
     @Inject
     ProductoDAO productoDAO;

@@ -12,7 +12,7 @@ import java.util.List;
 
 @Stateless
 @LocalBean
-public class TipoProductoDao extends InventarioDefaultDataAccess<TipoProducto> implements Serializable {
+public class TipoProductoDAO extends InventarioDefaultDataAccess<TipoProducto> implements Serializable {
 
     @PersistenceContext(unitName = "inventarioPU")
     EntityManager em;
@@ -23,7 +23,7 @@ public class TipoProductoDao extends InventarioDefaultDataAccess<TipoProducto> i
         return em;
     }
 
-    public TipoProductoDao() { super(TipoProducto.class); }
+    public TipoProductoDAO() { super(TipoProducto.class); }
 
 
     public List<TipoProducto> findAll() {

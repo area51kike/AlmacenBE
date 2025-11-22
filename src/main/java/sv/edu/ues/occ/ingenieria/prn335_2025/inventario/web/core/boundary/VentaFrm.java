@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ClienteDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Venta;
@@ -21,7 +21,7 @@ import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Cliente;
 public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
 
     @Inject
-    private VentaDao ventaDao;
+    private VentaDAO ventaDao;
 
     @Inject
     private ClienteDAO clienteDao;

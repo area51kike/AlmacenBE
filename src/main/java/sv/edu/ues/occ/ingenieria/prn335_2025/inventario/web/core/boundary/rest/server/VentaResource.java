@@ -8,7 +8,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ClienteDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Venta;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Cliente;
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class VentaResource {
 
     @Inject
-    VentaDao ventaDao;
+    VentaDAO ventaDao;
 
     @Inject
     ClienteDAO clienteDAO;

@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 @Stateless
 @LocalBean
-public class VentaDetalleDao extends InventarioDefaultDataAccess<VentaDetalle> implements Serializable {
+public class VentaDetalleDAO extends InventarioDefaultDataAccess<VentaDetalle> implements Serializable {
 
     @PersistenceContext(unitName = "inventarioPU")
     EntityManager em;
@@ -23,7 +23,7 @@ public class VentaDetalleDao extends InventarioDefaultDataAccess<VentaDetalle> i
     /**
      * Constructor requerido para inicializar la clase base con la entidad VentaDetalle.
      */
-    public VentaDetalleDao() {
+    public VentaDetalleDAO() {
         super(VentaDetalle.class);
     }
 

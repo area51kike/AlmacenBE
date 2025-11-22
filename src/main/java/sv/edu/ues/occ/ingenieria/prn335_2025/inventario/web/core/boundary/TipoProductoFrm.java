@@ -8,7 +8,7 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto;
 
 import java.io.Serializable;
@@ -23,7 +23,7 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> implements Seriali
     FacesContext facesContext;
 
     @Inject
-    TipoProductoDao tipoProductoDao;
+    TipoProductoDAO tipoProductoDao;
 
     private List<SelectItem> tiposProductoHierarchy;
     private Long tipoProductoPadreSeleccionado;

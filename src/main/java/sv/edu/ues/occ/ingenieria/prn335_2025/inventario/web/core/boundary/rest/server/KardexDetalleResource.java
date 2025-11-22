@@ -1,188 +1,438 @@
-package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.rest.server;
+package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.boundary.rest;
 
 import jakarta.inject.Inject;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.KardexDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.KardexDetalleDAO;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.KardexDetalle;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Kardex;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.KardexDetalle;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-@Path("kardex_detalle")
+/**
+ * Recurso REST para manejar detalles de lote de un movimiento de kardex específico.
+ * Patrón: /kardex/{idKardex}/detalles
+ */
+@Path("/kardex/{idKardex}/detalles")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class KardexDetalleResource {
 
+    private static final Logger LOGGER = Logger.getLogger(KardexDetalleResource.class.getName());
+
     @Inject
-    KardexDetalleDAO kardexDetalleDAO;
+    private KardexDetalleDAO kardexDetalleDAO;
 
+    @Inject
+    private KardexDAO kardexDAO;
+
+    /**
+     * GET /kardex/{idKardex}/detalles
+     * Obtiene todos los detalles de lote de un movimiento de kardex
+     */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response findRange(@Min(0) @DefaultValue("0") @QueryParam("first") int first,
-                              @Max(100) @DefaultValue("50") @QueryParam("max") int max) {
+    public Response getDetallesByKardex(@PathParam("idKardex") String idKardexStr) {
+        LOGGER.log(Level.INFO, "GET - Obteniendo detalles del kardex: {0}", idKardexStr);
 
-        if (first >= 0 && max <= 100) {
-            try {
-                Long total = kardexDetalleDAO.count();
-                return Response.ok(kardexDetalleDAO.findRange(first, max))
-                        .header("Total-records", total)
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+        try {
+            UUID idKardex = UUID.fromString(idKardexStr);
+
+            // Validar que el kardex existe
+            Kardex kardex = kardexDAO.findById(idKardex);
+            if (kardex == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Kardex no encontrado\"}")
                         .build();
             }
-        }
 
-        return Response.status(422)
-                .header("Missing.parameter", "first o max out of range")
-                .build();
+            // Obtener todos los detalles y filtrar por kardex
+            List<KardexDetalle> todosLosDetalles = kardexDetalleDAO.findAll();
+            List<KardexDetalle> detallesDelKardex = todosLosDetalles.stream()
+                    .filter(d -> d.getIdKardex() != null &&
+                            d.getIdKardex().getId().equals(idKardex))
+                    .collect(Collectors.toList());
+
+            LOGGER.log(Level.INFO, "Se encontraron {0} detalles para el kardex {1}",
+                    new Object[]{detallesDelKardex.size(), idKardex});
+
+            return Response.ok(detallesDelKardex).build();
+
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"ID de kardex inválido\"}")
+                    .build();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener detalles del kardex " + idKardexStr, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"Error al obtener detalles: " + e.getMessage() + "\"}")
+                    .build();
+        }
     }
 
+    /**
+     * GET /kardex/{idKardex}/detalles/{idDetalle}
+     * Obtiene un detalle específico de un kardex
+     */
     @GET
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response findById(@PathParam("id") String id) {
-        if (id != null && !id.isEmpty()) {
-            try {
-                UUID uuid = UUID.fromString(id);
-                KardexDetalle resp = kardexDetalleDAO.findById(uuid);
-                if (resp != null) {
-                    return Response.ok(resp).build();
-                }
+    @Path("/{idDetalle}")
+    public Response getDetalleById(
+            @PathParam("idKardex") String idKardexStr,
+            @PathParam("idDetalle") String idDetalleStr) {
+
+        LOGGER.log(Level.INFO, "GET - Obteniendo detalle {0} del kardex {1}",
+                new Object[]{idDetalleStr, idKardexStr});
+
+        try {
+            UUID idKardex = UUID.fromString(idKardexStr);
+            UUID idDetalle = UUID.fromString(idDetalleStr);
+
+            KardexDetalle detalle = kardexDetalleDAO.findById(idDetalle);
+
+            if (detalle == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .header("Record-not-found", "Record with id " + id + " not found")
-                        .build();
-            } catch (IllegalArgumentException ex) {
-                return Response.status(422)
-                        .header("Invalid.parameter", "Invalid UUID format")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+                        .entity("{\"error\": \"Detalle no encontrado\"}")
                         .build();
             }
-        }
-        return Response.status(422)
-                .header("Missing.parameter", "id must not be null or empty")
-                .build();
-    }
 
-    @DELETE
-    @Path("{id}")
-    public Response delete(@PathParam("id") String id) {
-        if (id != null && !id.isEmpty()) {
-            try {
-                UUID uuid = UUID.fromString(id);
-                KardexDetalle resp = kardexDetalleDAO.findById(uuid);
-                if (resp != null) {
-                    kardexDetalleDAO.eliminar(resp);
-                    return Response.noContent().build();
-                }
-                return Response.status(Response.Status.NOT_FOUND)
-                        .header("Record-not-found", "Record with id " + id + " not found")
-                        .build();
-            } catch (IllegalArgumentException ex) {
-                return Response.status(422)
-                        .header("Invalid.parameter", "Invalid UUID format")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+            // Validar que el detalle pertenece al kardex solicitado
+            if (detalle.getIdKardex() == null ||
+                    !detalle.getIdKardex().getId().equals(idKardex)) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"El detalle no pertenece al kardex especificado\"}")
                         .build();
             }
+
+            return Response.ok(detalle).build();
+
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"ID inválido\"}")
+                    .build();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener detalle " + idDetalleStr, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"Error al obtener detalle: " + e.getMessage() + "\"}")
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing.parameter", "id must not be null or empty")
-                .build();
     }
 
+    /**
+     * GET /kardex/{idKardex}/detalles/activos
+     * Obtiene solo los detalles activos de un kardex
+     */
+    @GET
+    @Path("/activos")
+    public Response getDetallesActivos(@PathParam("idKardex") String idKardexStr) {
+        LOGGER.log(Level.INFO, "GET - Obteniendo detalles activos del kardex: {0}", idKardexStr);
+
+        try {
+            UUID idKardex = UUID.fromString(idKardexStr);
+
+            // Validar que el kardex existe
+            Kardex kardex = kardexDAO.findById(idKardex);
+            if (kardex == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Kardex no encontrado\"}")
+                        .build();
+            }
+
+            // Obtener detalles activos
+            List<KardexDetalle> todosLosDetalles = kardexDetalleDAO.findAll();
+            List<KardexDetalle> detallesActivos = todosLosDetalles.stream()
+                    .filter(d -> d.getIdKardex() != null &&
+                            d.getIdKardex().getId().equals(idKardex) &&
+                            d.getActivo() != null && d.getActivo())
+                    .collect(Collectors.toList());
+
+            LOGGER.log(Level.INFO, "Se encontraron {0} detalles activos para el kardex {1}",
+                    new Object[]{detallesActivos.size(), idKardex});
+
+            return Response.ok(detallesActivos).build();
+
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"ID de kardex inválido\"}")
+                    .build();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener detalles activos", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"Error al obtener detalles activos: " + e.getMessage() + "\"}")
+                    .build();
+        }
+    }
+
+    /**
+     * POST /kardex/{idKardex}/detalles
+     * Crea un nuevo detalle de lote para un movimiento de kardex
+     */
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(KardexDetalle entity, @Context UriInfo uriInfo) {
-        if (entity != null && entity.getId() == null) {
-            try {
-                // Validar que el Kardex padre exista si está asignado
-                if (entity.getIdKardex() != null && entity.getIdKardex().getId() != null) {
-                    Kardex kardex = kardexDetalleDAO.getEntityManager()
-                            .find(Kardex.class, entity.getIdKardex().getId());
-                    if (kardex == null) {
-                        return Response.status(422)
-                                .header("Missing.parameter", "If kardex is assigned, it must exist in the db")
-                                .build();
-                    }
-                    entity.setIdKardex(kardex);
-                }
+    public Response createDetalle(
+            @PathParam("idKardex") String idKardexStr,
+            KardexDetalle detalle) {
 
-                // Generar UUID si no existe
-                entity.setId(UUID.randomUUID());
+        LOGGER.log(Level.INFO, "POST - Creando detalle para kardex: {0}", idKardexStr);
 
-                kardexDetalleDAO.crear(entity);
-                return Response.created(uriInfo.getAbsolutePathBuilder()
-                                .path(String.valueOf(entity.getId()))
-                                .build())
-                        .build();
+        try {
+            UUID idKardex = UUID.fromString(idKardexStr);
 
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+            // Validar que el kardex existe
+            Kardex kardex = kardexDAO.findById(idKardex);
+            if (kardex == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Kardex no encontrado\"}")
                         .build();
             }
+
+            // Validaciones básicas
+            if (detalle.getLote() == null || detalle.getLote().isBlank()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"El número de lote es obligatorio\"}")
+                        .build();
+            }
+
+            // Generar UUID y asignar kardex
+            detalle.setId(UUID.randomUUID());
+            detalle.setIdKardex(kardex);
+
+            // Si no se especifica, el detalle está activo por defecto
+            if (detalle.getActivo() == null) {
+                detalle.setActivo(true);
+            }
+
+            // Crear el detalle
+            kardexDetalleDAO.crear(detalle);
+
+            LOGGER.log(Level.INFO, "Detalle creado exitosamente con ID: {0}", detalle.getId());
+
+            return Response.status(Response.Status.CREATED)
+                    .entity(detalle)
+                    .build();
+
+        } catch (IllegalArgumentException e) {
+            LOGGER.log(Level.WARNING, "Error de validación al crear detalle", e);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                    .build();
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al crear detalle", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"Error al crear detalle: " + e.getMessage() + "\"}")
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing.parameter", "entity must not be null and id must be null")
-                .build();
     }
 
+    /**
+     * PUT /kardex/{idKardex}/detalles/{idDetalle}
+     * Actualiza un detalle existente
+     */
     @PUT
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response update(@PathParam("id") String id, KardexDetalle entity) {
-        if (id != null && !id.isEmpty() && entity != null) {
-            try {
-                UUID uuid = UUID.fromString(id);
-                KardexDetalle existing = kardexDetalleDAO.findById(uuid);
+    @Path("/{idDetalle}")
+    public Response updateDetalle(
+            @PathParam("idKardex") String idKardexStr,
+            @PathParam("idDetalle") String idDetalleStr,
+            KardexDetalle detalle) {
 
-                if (existing == null) {
-                    return Response.status(Response.Status.NOT_FOUND)
-                            .header("Record-not-found", "Record with id " + id + " not found")
-                            .build();
-                }
+        LOGGER.log(Level.INFO, "PUT - Actualizando detalle {0} del kardex {1}",
+                new Object[]{idDetalleStr, idKardexStr});
 
-                // Validar que el Kardex padre exista si está asignado
-                if (entity.getIdKardex() != null && entity.getIdKardex().getId() != null) {
-                    Kardex kardex = kardexDetalleDAO.getEntityManager()
-                            .find(Kardex.class, entity.getIdKardex().getId());
-                    if (kardex == null) {
-                        return Response.status(422)
-                                .header("Missing.parameter", "If kardex is assigned, it must exist in the db")
-                                .build();
-                    }
-                    entity.setIdKardex(kardex);
-                }
+        try {
+            UUID idKardex = UUID.fromString(idKardexStr);
+            UUID idDetalle = UUID.fromString(idDetalleStr);
 
-                entity.setId(uuid);
-                kardexDetalleDAO.modificar(entity);
-                return Response.ok(entity).build();
+            // Buscar el detalle existente
+            KardexDetalle detalleExistente = kardexDetalleDAO.findById(idDetalle);
 
-            } catch (IllegalArgumentException ex) {
-                return Response.status(422)
-                        .header("Invalid.parameter", "Invalid UUID format")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+            if (detalleExistente == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Detalle no encontrado\"}")
                         .build();
             }
+
+            // Validar que el detalle pertenece al kardex
+            if (detalleExistente.getIdKardex() == null ||
+                    !detalleExistente.getIdKardex().getId().equals(idKardex)) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"El detalle no pertenece al kardex especificado\"}")
+                        .build();
+            }
+
+            // Actualizar campos (NO se permite cambiar el kardex)
+            if (detalle.getLote() != null) {
+                detalleExistente.setLote(detalle.getLote());
+            }
+            if (detalle.getActivo() != null) {
+                detalleExistente.setActivo(detalle.getActivo());
+            }
+
+            // Modificar
+            KardexDetalle detalleActualizado = kardexDetalleDAO.modificar(detalleExistente);
+
+            LOGGER.log(Level.INFO, "Detalle actualizado exitosamente: {0}", idDetalle);
+
+            return Response.ok(detalleActualizado).build();
+
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"ID inválido\"}")
+                    .build();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar detalle " + idDetalleStr, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"Error al actualizar detalle: " + e.getMessage() + "\"}")
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing.parameter", "id and entity must not be null")
-                .build();
+    }
+
+    /**
+     * DELETE /kardex/{idKardex}/detalles/{idDetalle}
+     * Elimina (o desactiva) un detalle de kardex
+     */
+    @DELETE
+    @Path("/{idDetalle}")
+    public Response deleteDetalle(
+            @PathParam("idKardex") String idKardexStr,
+            @PathParam("idDetalle") String idDetalleStr,
+            @QueryParam("softDelete") @DefaultValue("false") boolean softDelete) {
+
+        LOGGER.log(Level.INFO, "DELETE - Eliminando detalle {0} del kardex {1}",
+                new Object[]{idDetalleStr, idKardexStr});
+
+        try {
+            UUID idKardex = UUID.fromString(idKardexStr);
+            UUID idDetalle = UUID.fromString(idDetalleStr);
+
+            KardexDetalle detalle = kardexDetalleDAO.findById(idDetalle);
+
+            if (detalle == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Detalle no encontrado\"}")
+                        .build();
+            }
+
+            // Validar que el detalle pertenece al kardex
+            if (detalle.getIdKardex() == null ||
+                    !detalle.getIdKardex().getId().equals(idKardex)) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"El detalle no pertenece al kardex especificado\"}")
+                        .build();
+            }
+
+            // Soft delete (desactivar) o hard delete (eliminar físicamente)
+            if (softDelete) {
+                detalle.setActivo(false);
+                kardexDetalleDAO.modificar(detalle);
+                LOGGER.log(Level.INFO, "Detalle desactivado exitosamente: {0}", idDetalle);
+                return Response.ok(detalle).build();
+            } else {
+                kardexDetalleDAO.eliminar(detalle);
+                LOGGER.log(Level.INFO, "Detalle eliminado exitosamente: {0}", idDetalle);
+                return Response.noContent().build();
+            }
+
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"ID inválido\"}")
+                    .build();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al eliminar detalle " + idDetalleStr, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"Error al eliminar detalle: " + e.getMessage() + "\"}")
+                    .build();
+        }
+    }
+
+    /**
+     * GET /kardex/{idKardex}/detalles/count
+     * Cuenta los detalles de un kardex
+     */
+    @GET
+    @Path("/count")
+    public Response countDetallesByKardex(
+            @PathParam("idKardex") String idKardexStr,
+            @QueryParam("soloActivos") @DefaultValue("false") boolean soloActivos) {
+
+        LOGGER.log(Level.INFO, "GET - Contando detalles del kardex: {0}", idKardexStr);
+
+        try {
+            UUID idKardex = UUID.fromString(idKardexStr);
+
+            // Validar que el kardex existe
+            Kardex kardex = kardexDAO.findById(idKardex);
+            if (kardex == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Kardex no encontrado\"}")
+                        .build();
+            }
+
+            List<KardexDetalle> todosLosDetalles = kardexDetalleDAO.findAll();
+            long count = todosLosDetalles.stream()
+                    .filter(d -> d.getIdKardex() != null &&
+                            d.getIdKardex().getId().equals(idKardex) &&
+                            (!soloActivos || (d.getActivo() != null && d.getActivo())))
+                    .count();
+
+            return Response.ok("{\"count\": " + count + "}").build();
+
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"ID de kardex inválido\"}")
+                    .build();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al contar detalles del kardex " + idKardexStr, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"Error al contar detalles: " + e.getMessage() + "\"}")
+                    .build();
+        }
+    }
+
+    /**
+     * GET /kardex/{idKardex}/detalles/lotes
+     * Obtiene la lista de números de lote únicos de un kardex
+     */
+    @GET
+    @Path("/lotes")
+    public Response getLotesByKardex(@PathParam("idKardex") String idKardexStr) {
+        LOGGER.log(Level.INFO, "GET - Obteniendo lotes del kardex: {0}", idKardexStr);
+
+        try {
+            UUID idKardex = UUID.fromString(idKardexStr);
+
+            // Validar que el kardex existe
+            Kardex kardex = kardexDAO.findById(idKardex);
+            if (kardex == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Kardex no encontrado\"}")
+                        .build();
+            }
+
+            List<KardexDetalle> todosLosDetalles = kardexDetalleDAO.findAll();
+            List<String> lotes = todosLosDetalles.stream()
+                    .filter(d -> d.getIdKardex() != null &&
+                            d.getIdKardex().getId().equals(idKardex) &&
+                            d.getLote() != null && !d.getLote().isBlank())
+                    .map(KardexDetalle::getLote)
+                    .distinct()
+                    .sorted()
+                    .collect(Collectors.toList());
+
+            return Response.ok(lotes).build();
+
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"ID de kardex inválido\"}")
+                    .build();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener lotes del kardex " + idKardexStr, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"Error al obtener lotes: " + e.getMessage() + "\"}")
+                    .build();
+        }
     }
 }

@@ -1,5 +1,6 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity;
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
@@ -13,9 +14,10 @@ public class Compra {
     @Column(name = "id_compra", nullable = false)
     private Long id;
 
-    // Relación ManyToOne con Proveedor
+    // ✅ @JsonbTransient excluye el objeto Proveedor completo del JSON
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_proveedor", referencedColumnName = "id_proveedor")
+    @JsonbTransient
     private Proveedor proveedor;
 
     @Column(name = "fecha")
@@ -46,11 +48,18 @@ public class Compra {
         this.proveedor = proveedor;
     }
 
-    // Métodos de conveniencia para trabajar con idProveedor
+    /**
+     * Método de conveniencia para obtener el ID del proveedor.
+     * Este campo SÍ se incluirá en el JSON porque no tiene @JsonbTransient.
+     */
     public Integer getIdProveedor() {
         return proveedor != null ? proveedor.getId() : null;
     }
 
+    /**
+     * Método de conveniencia para establecer el proveedor usando solo su ID.
+     * Útil para recibir JSON del cliente con {"idProveedor": 1}
+     */
     public void setIdProveedor(Integer idProveedor) {
         if (idProveedor != null) {
             // Crear una instancia de Proveedor solo con el ID

@@ -1,5 +1,6 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity;
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,6 +12,7 @@ public class Almacen {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_almacen")
+    @JsonbTransient  // Esta linea nueva xd
     private TipoAlmacen idTipoAlmacen;
 
     @Column(name = "activo")
@@ -51,5 +53,4 @@ public class Almacen {
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
     }
-
 }

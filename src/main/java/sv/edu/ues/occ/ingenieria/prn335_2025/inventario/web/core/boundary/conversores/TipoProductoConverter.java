@@ -5,15 +5,14 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDao;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto;
 
 @FacesConverter(value = "tipoProductoConverter", managed = true)
 public class TipoProductoConverter implements Converter<TipoProducto> {
 
     @Inject
-    TipoProductoDao tipoProductoDao;
+    TipoProductoDAO tipoProductoDao;
 
     @Override
     public TipoProducto getAsObject(FacesContext context, UIComponent component, String value) {
