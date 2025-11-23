@@ -22,27 +22,6 @@ public class ProductoDAO extends InventarioDefaultDataAccess<Producto> {
         return em;
     }
 
-    @Override
-    public void crear(Producto registro) throws IllegalArgumentException {
-        if (registro == null) {
-            throw new IllegalArgumentException("El registro no puede ser nulo");
-        }
-
-        try {
-            EntityManager em = getEntityManager();
-            if (em == null) {
-                throw new IllegalStateException("EntityManager no disponible");
-            }
-
-            if (registro.getId() == null) {
-                registro.setId(UUID.randomUUID());
-            }
-
-            em.persist(registro);
-        } catch (Exception ex) {
-            throw new IllegalStateException("Error al crear el registro", ex);
-        }
-    }
 
     public Producto findById(UUID id) {
         if (id == null) {

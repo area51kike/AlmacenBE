@@ -96,13 +96,15 @@
                             <h:selectOneMenu id="cbTipoUnidad"
                                              value="#{unidadMedidaFrm.idTipoSeleccionado}"
                                              required="true"
-                                             requiredMessage="Seleccione un tipo de unidad"
+                                             requiredMessage="Debe seleccionar un tipo de unidad de medida"
+                                             validatorMessage="Debe seleccionar un tipo de unidad válido"
                                              style="width: 100%;">
-                                <f:selectItem itemLabel=" Seleccione un tipo " itemValue="#{null}"/>
+                                <f:selectItem itemLabel="-- Seleccione un tipo --" itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{unidadMedidaFrm.tiposUnidadMedida}"
                                                var="tipo"
                                                itemLabel="#{tipo.nombre}"
                                                itemValue="#{tipo.id}"/>
+                                <f:ajax event="change" render="@form"/>
                             </h:selectOneMenu>
 
                             <h:outputLabel for="txtEquivalencia" value="Equivalencia:"/>
@@ -133,7 +135,7 @@
                         </h:panelGrid>
 
                         <!-- Botones Crear / Modificar / Eliminar -->
-                        <h:panelGrid columns="3" style="margin-top: 15px;">
+                        <h:panelGrid columns="1" style="margin-top: 15px;">
                             <ui:include src="/paginas/ues/BotonesTop.xhtml">
                                 <ui:param name="section" value="crud"/>
                                 <ui:param name="bean" value="#{unidadMedidaFrm}"/>

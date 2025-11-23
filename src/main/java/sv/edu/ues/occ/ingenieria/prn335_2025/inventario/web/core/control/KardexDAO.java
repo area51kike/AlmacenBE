@@ -50,11 +50,6 @@ public class KardexDAO extends InventarioDefaultDataAccess<Kardex> implements Se
                 throw new IllegalArgumentException("La cantidad es obligatoria");
             }
 
-            // Generar UUID si no existe
-            if (entidad.getId() == null) {
-                entidad.setId(UUID.randomUUID());
-            }
-
             // Establecer fecha actual si no tiene
             if (entidad.getFecha() == null) {
                 entidad.setFecha(OffsetDateTime.now());

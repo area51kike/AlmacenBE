@@ -5,6 +5,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProductoCaracteristica;
 
+import java.util.List;
+
 @Stateless
 public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<TipoProductoCaracteristica> {
 
@@ -20,9 +22,16 @@ public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<T
         return em;
     }
 
+    public List<TipoProductoCaracteristica> findByIdTipoProducto(Long idTipoProducto) {
+        return em.createQuery("SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.tipoProducto.id = :idTipoProducto", TipoProductoCaracteristica.class)
+                .setParameter("idTipoProducto", idTipoProducto)
+                .getResultList();
+    }
+
     public TipoProductoCaracteristica findById(Long id) {
         return em.find(TipoProductoCaracteristica.class, id);
     }
+
     public Long obtenerMaximoId() {
         try {
             return em.createQuery(
@@ -32,5 +41,4 @@ public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<T
             return 0L;
         }
     }
-
 }

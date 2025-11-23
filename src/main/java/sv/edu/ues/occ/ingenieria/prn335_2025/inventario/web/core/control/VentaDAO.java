@@ -61,6 +61,21 @@ public class VentaDAO extends InventarioDefaultDataAccess<Venta> {
             return List.of();
         }
     }
+    public List<Venta> buscarPorCliente(UUID idCliente) {
+        try {
+            return em.createQuery(
+                            "SELECT v FROM Venta v " +
+                                    "LEFT JOIN FETCH v.idCliente " +
+                                    "WHERE v.idCliente.id = :idCliente",
+                            Venta.class)
+                    .setParameter("idCliente", idCliente)
+                    .getResultList();
+        } catch (Exception e) {
+            System.err.println("Error buscando ventas por cliente: " + e.getMessage());
+            e.printStackTrace();
+            return List.of();
+        }
+    }
 
     @Override
     public Long count() {

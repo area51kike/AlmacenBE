@@ -80,6 +80,13 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
         return null;
     }
 
+    @Override
+    protected boolean esNombreVacio(UnidadMedida registro) {
+        // UnidadMedida no tiene campo "nombre", así que no validamos nombre
+        // En su lugar validamos que tenga un tipo de unidad asignado
+        return registro.getIdTipoUnidadMedida() == null;
+    }
+
     public List<TipoUnidadMedida> getTiposUnidadMedida() {
         if (tiposUnidadMedida == null) {
             try {
@@ -104,7 +111,6 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
         try {
             if (this.registro != null) {
 
-
                 if (this.idTipoSeleccionado == null) {
                     FacesContext.getCurrentInstance().addMessage("frmCrear:cbTipoUnidad",
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -112,10 +118,17 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
                     return null;
                 }
 
-                if (this.registro.getIdTipoUnidadMedida() == null) {
-                    TipoUnidadMedida tipo = tipoUnidadMedidaDAO.findById(idTipoSeleccionado);
-                    this.registro.setIdTipoUnidadMedida(tipo);
+                // Buscar el tipo sin validar el nombre aquí
+                TipoUnidadMedida tipo = tipoUnidadMedidaDAO.findById(idTipoSeleccionado);
+                if (tipo == null) {
+                    FacesContext.getCurrentInstance().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Error", "Tipo de unidad no encontrado"));
+                    return null;
                 }
+
+                // Asignar directamente
+                this.registro.setIdTipoUnidadMedida(tipo);
 
                 if (this.estado == ESTADO_CRUD.CREAR) {
                     unidadMedidaDAO.crear(this.registro);
@@ -130,7 +143,7 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
                 }
 
                 this.registro = null;
-                this.idTipoSeleccionado = null; // ✅ AGREGAR ESTA LÍNEA
+                this.idTipoSeleccionado = null;
                 this.estado = ESTADO_CRUD.NADA;
                 this.tiposUnidadMedida = null;
                 inicializarRegistros();
@@ -180,6 +193,5 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
             } catch (Exception e) {
             }
         }
-
     }
 }

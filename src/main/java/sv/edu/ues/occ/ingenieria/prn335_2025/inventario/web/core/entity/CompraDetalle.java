@@ -11,6 +11,7 @@ import java.util.UUID;
 @Table(name = "compra_detalle", schema = "public")
 public class CompraDetalle {
     @Id
+    @GeneratedValue(generator = "UUID")
     @Column(name = "id_compra_detalle", nullable = false)
     private UUID id;
 

@@ -1,191 +1,279 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.rest.server;
 
 import jakarta.inject.Inject;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ClienteDAO;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Venta;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Cliente;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Venta;
 
+import java.util.List;
 import java.util.UUID;
 
-@Path("venta")
+@Path("cliente/{idCliente}/venta")
+@Produces(MediaType.APPLICATION_JSON)
 public class VentaResource {
 
     @Inject
-    VentaDAO ventaDao;
+    VentaDAO ventaDAO;
 
     @Inject
     ClienteDAO clienteDAO;
 
+    /**
+     * GET /cliente/{idCliente}/venta
+     * Obtiene todas las ventas de un cliente
+     */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response findRange(@Min(0) @DefaultValue("0") @QueryParam("first") int first,
-                              @Max(100) @DefaultValue("50") @QueryParam("max") int max) {
-        if (first >= 0 && max <= 100) {
-            try {
-                Long total = ventaDao.count();
-                return Response.ok(ventaDao.findRange(first, max))
-                        .header("Total-records", total)
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+    public Response getVentasproCliente(@PathParam("idCliente") UUID idCliente) {
+        if (idCliente == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "idCliente no debe ser nulo")
+                    .build();
+        }
+
+        try {
+            // Verificar que el cliente existe
+            Cliente cliente = clienteDAO.findById(idCliente);
+            if (cliente == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "Cliente with id " + idCliente + " not found")
                         .build();
             }
+
+            // Obtener las asociadas
+            List<Venta> ventas = ventaDAO.buscarPorCliente(idCliente);
+
+            return Response.ok(ventas != null ? ventas : List.of()).build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Server-Exception", "Error: " + ex.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "first or max out of range")
-                .build();
     }
 
+    /**
+     * GET /cliente/{idCliente}/venta/{idVenta}
+     * Obtiene una venta específica
+     */
     @GET
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response findById(@PathParam("id") String id) {
-        if (id != null && !id.trim().isEmpty()) {
-            try {
-                UUID uuid = UUID.fromString(id);
-                Venta resp = ventaDao.findById(uuid);
-                if (resp != null) {
-                    return Response.ok(resp).build();
-                }
+    @Path("{idVenta}")
+    public Response findById(
+            @PathParam("idCliente") UUID idCliente,
+            @PathParam("idVenta") UUID idVenta) {
+
+        if (idVenta == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "idVenta no debe ser nulo")
+                    .build();
+        }
+
+        try {
+            Venta venta = ventaDAO.findById(idVenta);
+
+            if (venta == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .header("Record-not-found", "Record with id " + id + " not found")
-                        .build();
-            } catch (IllegalArgumentException ex) {
-                return Response.status(422)
-                        .header("Missing-parameter", "Invalid UUID format")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+                        .header("Not-Found", "Record with id " + idVenta + " not found")
                         .build();
             }
-        }
-        return Response.status(422)
-                .header("Missing-parameter", "id cannot be null or empty")
-                .build();
-    }
 
-    @DELETE
-    @Path("{id}")
-    public Response delete(@PathParam("id") String id) {
-        if (id != null && !id.trim().isEmpty()) {
-            try {
-                UUID uuid = UUID.fromString(id);
-                Venta resp = ventaDao.findById(uuid);
-                if (resp != null) {
-                    ventaDao.eliminar(resp);
-                    return Response.noContent().build();
-                }
+            // Verificar que pertenece al cliente correcto
+            if (!venta.getIdCliente().getId().equals(idCliente)) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .header("Record-not-found", "Record with id " + id + " not found")
-                        .build();
-            } catch (IllegalArgumentException ex) {
-                return Response.status(422)
-                        .header("Missing-parameter", "Invalid UUID format")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+                        .header("Not-Found", "Venta no pertenece a este cliente")
                         .build();
             }
+
+            return Response.ok(venta).build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Server-Exception", "Cannot access db: " + ex.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "id cannot be null or empty")
-                .build();
     }
 
+    /**
+     * POST /cliente/{idCliente}/venta
+     * Crea una nueva para un cliente
+     */
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(Venta entity, @Context UriInfo uriInfo) {
-        if (entity != null && entity.getId() == null) {
-            try {
-                // Validar y asignar Cliente si existe
-                if (entity.getIdCliente() != null && entity.getIdCliente().getId() != null) {
-                    Cliente cliente = clienteDAO.findById(entity.getIdCliente().getId());
-                    if (cliente == null) {
-                        return Response.status(422)
-                                .header("Missing-parameter",
-                                        "Cliente with id " + entity.getIdCliente().getId() + " does not exist in database")
-                                .build();
-                    }
-                    entity.setIdCliente(cliente);
-                }
+    public Response create(
+            @PathParam("idCliente") UUID idCliente,
+            Venta entity,
+            @Context UriInfo uriInfo) {
 
-                // Generar UUID si no existe
-                if (entity.getId() == null) {
-                    entity.setId(UUID.randomUUID());
-                }
+        if (idCliente == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "idCliente no debe ser nulo")
+                    .build();
+        }
 
-                ventaDao.crear(entity);
+        if (entity == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "Request body is required")
+                    .build();
+        }
 
-                return Response.created(
-                        uriInfo.getAbsolutePathBuilder()
-                                .path(entity.getId().toString())
-                                .build()
-                ).build();
+        // Si viene con ID, rechazar pq debe ser nuevo
+        if (entity.getId() != null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "idVenta must be null for new records")
+                    .build();
+        }
 
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+        try {
+            // Verificar que existe el cliente
+            Cliente cliente = clienteDAO.findById(idCliente);
+            if (cliente == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "Cliente with id " + idCliente + " not found")
                         .build();
             }
+
+            entity.setIdCliente(cliente);
+            entity.setId(UUID.randomUUID());
+            ventaDAO.crear(entity);
+
+            return Response.created(
+                    uriInfo.getAbsolutePathBuilder()
+                            .path(entity.getId().toString())
+                            .build()
+            ).entity(entity).build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Server-Exception", "Error creating: " + ex.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "entity must not be null and id must be null")
-                .build();
     }
 
+    /**
+     * PUT /cliente/{idCliente}/venta/{idVenta}
+     * Actualiza una venta
+     */
     @PUT
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Path("{idVenta}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response update(@PathParam("id") String id, Venta entity) {
-        if (id != null && !id.trim().isEmpty() && entity != null) {
-            try {
-                UUID uuid = UUID.fromString(id);
-                Venta existing = ventaDao.findById(uuid);
-                if (existing != null) {
-                    // Validar Cliente si se proporciona
-                    if (entity.getIdCliente() != null && entity.getIdCliente().getId() != null) {
-                        Cliente cliente = clienteDAO.findById(entity.getIdCliente().getId());
-                        if (cliente == null) {
-                            return Response.status(422)
-                                    .header("Missing-parameter",
-                                            "Cliente with id " + entity.getIdCliente().getId() + " does not exist in database")
-                                    .build();
-                        }
-                        entity.setIdCliente(cliente);
-                    }
+    public Response update(
+            @PathParam("idCliente") UUID idCliente,
+            @PathParam("idVenta") UUID idVenta,
+            Venta entity) {
 
-                    entity.setId(uuid);
-                    ventaDao.modificar(entity);
-                    return Response.ok(entity).build();
-                }
+        if (idCliente == null || idVenta == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "IDs cannot be null")
+                    .build();
+        }
+
+        if (entity == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "Request body is required")
+                    .build();
+        }
+
+        try {
+            // Buscar registro existente
+            Venta existente = ventaDAO.findById(idVenta);
+
+            if (existente == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .header("Record-not-found", "Record with id " + id + " not found")
-                        .build();
-            } catch (IllegalArgumentException ex) {
-                return Response.status(422)
-                        .header("Missing-parameter", "Invalid UUID format")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+                        .header("Not-Found", "Record with id " + idVenta + " not found")
                         .build();
             }
+
+            // Verificar que pertenece al cliente del path
+            if (!existente.getIdCliente().getId().equals(idCliente)) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "Venta no pertenece al cliente")
+                        .build();
+            }
+
+            // Manejar actualización de idCliente
+            if (entity.getIdCliente() != null) {
+                UUID idClienteBody = entity.getIdCliente().getId();
+                if (idClienteBody == null) {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .header("Error", "idCliente.id cannot be null")
+                            .build();
+                }
+
+                Cliente nuevoCliente = clienteDAO.findById(idClienteBody);
+                if (nuevoCliente == null) {
+                    return Response.status(Response.Status.NOT_FOUND)
+                            .header("Not-Found", "Cliente with id " + idClienteBody + " not found")
+                            .build();
+                }
+                existente.setIdCliente(nuevoCliente);
+            }
+
+            // Actualizar otros campos
+            if (entity.getObservaciones() != null) {
+                existente.setObservaciones(entity.getObservaciones());
+            }
+            if (entity.getEstado() != null) {
+                existente.setEstado(entity.getEstado());
+            }
+            if (entity.getFecha() != null) {
+                existente.setFecha(entity.getFecha());
+            }
+
+            ventaDAO.modificar(existente);
+            return Response.ok(existente).build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Server-Exception", "Error updating: " + ex.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "id and entity must be valid")
-                .build();
+    }
+
+    /**
+     * DELETE /cliente/{idCliente}/venta/{idVenta}
+     * Elimina una venta
+     */
+    @DELETE
+    @Path("{idVenta}")
+    public Response delete(
+            @PathParam("idCliente") UUID idCliente,
+            @PathParam("idVenta") UUID idVenta) {
+
+        if (idVenta == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "idVenta no debe ser nulo")
+                    .build();
+        }
+
+        try {
+            // Buscar registro
+            Venta existente = ventaDAO.findById(idVenta);
+
+            if (existente == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "Record with id " + idVenta + " not found")
+                        .build();
+            }
+
+            // Verificar que pertenece al tipo de almacén correcto
+            if (!existente.getIdCliente().getId().equals(idCliente)) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "Venta no pertenece a este cliente")
+                        .build();
+            }
+
+            ventaDAO.eliminar(existente);
+            return Response.noContent().build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Server-Exception", "Cannot delete record: " + ex.getMessage())
+                    .build();
+        }
     }
 }

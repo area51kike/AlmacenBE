@@ -9,6 +9,7 @@ import java.util.UUID;
 @Table(name = "kardex_detalle", schema = "public")
 public class KardexDetalle {
     @Id
+    @GeneratedValue(generator = "UUID")
     @Column(name = "id_kardex_detalle", nullable = false)
     private UUID id;
 

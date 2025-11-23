@@ -1050,3 +1050,74 @@ body .ui-datatable tbody tr.ui-state-highlight td {
     background: #b2e0f2 !important;
     color: #000000 !important;
 }
+.inicio-link {
+    margin: 15px 0;
+    padding: 10px 15px;
+    background: transparent;
+}
+
+.inicio-link .link-inicio {
+    color: white !important;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    transition: opacity 0.3s;
+}
+
+.inicio-link .link-inicio:hover {
+    opacity: 0.8;
+}
+
+.inicio-link .link-inicio i {
+    color: white;
+}
+/* Fondo transparente para el panel menu */
+.sidebar-menu.ui-panelmenu {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Headers de las categorías */
+.sidebar-menu .ui-panelmenu-header {
+    background: transparent !important;
+    border: none !important;
+    margin: 5px 0;
+}
+
+.sidebar-menu .ui-panelmenu-header a {
+    color: white !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 10px 15px;
+}
+
+.sidebar-menu .ui-panelmenu-header a:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Iconos de las categorías */
+.sidebar-menu .ui-panelmenu-header .ui-icon,
+.sidebar-menu .ui-panelmenu-header .pi {
+    color: white !important;
+}
+
+/* Contenido colapsable */
+.sidebar-menu .ui-panelmenu-content {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: none !important;
+    padding: 5px 0;
+}
+
+/* Items dentro de las categorías */
+.sidebar-menu .ui-menuitem-link {
+    color: white !important;
+    padding: 8px 15px 8px 35px !important;
+}
+
+.sidebar-menu .ui-menuitem-link:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.sidebar-menu .ui-menuitem-icon {
+    color: white !important;
+}
