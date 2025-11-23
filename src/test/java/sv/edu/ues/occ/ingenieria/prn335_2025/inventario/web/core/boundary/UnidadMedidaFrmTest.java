@@ -49,7 +49,6 @@ class UnidadMedidaFrmTest {
 
     @BeforeEach
     void setUp() {
-        // Silenciador de consola
         System.setErr(new PrintStream(new OutputStream() {
             @Override
             public void write(int b) {
@@ -62,11 +61,10 @@ class UnidadMedidaFrmTest {
         mockTipo = new TipoUnidadMedida();
         mockTipo.setId(5);
         mockTipo.setNombre("Longitud");
-        mockTipo.setActivo(true); // CORRECCIÓN: Importante para que pase el filtro del stream
+        mockTipo.setActivo(true);
 
         mockUnidad = new UnidadMedida();
         mockUnidad.setId(1);
-        // mockUnidad.setNombre("Metro"); // Eliminado porque no existe en la entidad
         mockUnidad.setComentarios("Metro");
         mockUnidad.setActivo(true);
 
@@ -86,6 +84,11 @@ class UnidadMedidaFrmTest {
         assertEquals("Unidad de Medida", cut.nombreBean);
         assertNotNull(cut.getFacesContext());
         assertNotNull(cut.getDao());
+    }
+
+    @Test
+    void testGetDao() {
+        assertEquals(unidadMedidaDAO, cut.getDao());
     }
 
     @Test
@@ -133,7 +136,7 @@ class UnidadMedidaFrmTest {
     @Test
     void testGetTiposUnidadMedida_Exito() {
         List<TipoUnidadMedida> lista = new ArrayList<>();
-        lista.add(mockTipo); // Este tiene activo=true (ver setUp)
+        lista.add(mockTipo);
 
         TipoUnidadMedida inactivo = new TipoUnidadMedida();
         inactivo.setActivo(false);

@@ -53,7 +53,7 @@ public class CaracteristicaFrm extends DefaultFrm<Caracteristica> implements Ser
     protected Caracteristica buscarRegistroPorId(Object id) {
         if (id != null && id instanceof Integer) {
             try {
-                Caracteristica resultado = caracteristicaDAO.findById(id);
+                Caracteristica resultado = caracteristicaDAO.findById((Integer) id);
                 return resultado;
             } catch (Exception e) {
             }
