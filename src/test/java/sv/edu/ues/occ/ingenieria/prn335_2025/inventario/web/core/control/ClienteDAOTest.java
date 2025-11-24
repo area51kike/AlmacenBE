@@ -55,7 +55,7 @@ class ClienteDAOTest {
 
     @Test
     void testConstructorWithParameter() {
-        ClienteDAO dao = new ClienteDAO(Cliente.class);
+        ClienteDAO dao = new ClienteDAO();
         assertNotNull(dao);
     }
 
