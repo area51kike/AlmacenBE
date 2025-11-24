@@ -2,6 +2,7 @@ package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary;
 
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+import org.mockito.*;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoUnidadMedidaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.UnidadMedidaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoUnidadMedida;
@@ -10,9 +11,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.primefaces.model.LazyDataModel;
 
@@ -319,6 +317,60 @@ class UnidadMedidaFrmTest {
         cut.eliminar();
         verify(unidadMedidaDAO, never()).eliminar(any());
     }
+
+    @Test
+    void guardar_tipoNoEncontrado_agregaMensajeYNoCreaRegistro() {
+        UnidadMedidaFrm frm = new UnidadMedidaFrm();
+        frm.tipoUnidadMedidaDAO = tipoUnidadMedidaDAO;
+        frm.unidadMedidaDAO = unidadMedidaDAO;
+        frm.prepararNuevo();
+
+        Integer idSeleccionado = 5;
+        when(tipoUnidadMedidaDAO.findById(idSeleccionado)).thenReturn(null);
+        frm.setIdTipoSeleccionado(idSeleccionado);
+
+        // Usar el MockedStatic creado en setUp() (no crear uno nuevo aquí)
+        String resultado = frm.guardar();
+        assertNull(resultado, "guardar debe retornar null al fallar validación");
+
+        ArgumentCaptor<FacesMessage> captor = ArgumentCaptor.forClass(FacesMessage.class);
+        verify(facesContext).addMessage(eq(null), captor.capture());
+        FacesMessage msg = captor.getValue();
+        assertNotNull(msg);
+        assertEquals("Error", msg.getSummary());
+        assertEquals("Tipo de unidad no encontrado", msg.getDetail());
+
+        verifyNoInteractions(unidadMedidaDAO);
+    }
+    @Test
+    void esNombreVacio_devuelveTrue_si_noTieneTipo_yFalse_siTiene() {
+        UnidadMedidaFrm frm = new UnidadMedidaFrm();
+
+        UnidadMedida u = new UnidadMedida();
+        u.setIdTipoUnidadMedida(null);
+        assertTrue(frm.esNombreVacio(u));
+
+        TipoUnidadMedida tipo = new TipoUnidadMedida();
+        tipo.setId(10);
+        u.setIdTipoUnidadMedida(tipo);
+        assertFalse(frm.esNombreVacio(u));
+    }
+
+    @Test
+    void setIdTipoSeleccionado_registroNull_noInvocaDAO_y_guardaId() {
+        UnidadMedidaFrm frm = new UnidadMedidaFrm();
+        frm.tipoUnidadMedidaDAO = tipoUnidadMedidaDAO;
+        frm.unidadMedidaDAO = unidadMedidaDAO;
+
+        // registro nulo
+        frm.registro = null;
+
+        frm.setIdTipoSeleccionado(5);
+
+        assertEquals(5, frm.getIdTipoSeleccionado());
+        verifyNoInteractions(tipoUnidadMedidaDAO);
+    }
+
 
     private void setEstado(UnidadMedidaFrm bean, String nombreEstado) {
         try {
