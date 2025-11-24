@@ -37,28 +37,4 @@ public class TipoUnidadMedidaDAO extends InventarioDefaultDataAccess<TipoUnidadM
         }
     }
 
-    @Override
-    public void crear(TipoUnidadMedida registro) throws IllegalArgumentException {
-        if (registro == null) {
-            throw new IllegalArgumentException("El registro no puede ser nulo");
-        }
-
-        try {
-            EntityManager em = getEntityManager();
-            if (em == null) {
-                throw new IllegalStateException("EntityManager no disponible");
-            }
-
-            if (registro.getId() == null || registro.getId() == 0) {
-                Query query = em.createNativeQuery("SELECT nextval('tipo_unidad_medida_id_tipo_unidad_medida_seq'::regclass)");
-                Number nextId = (Number) query.getSingleResult();
-                registro.setId(nextId.intValue());
-            }
-
-            em.persist(registro);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new IllegalStateException("Error al crear el registro", ex);
-        }
-    }
 }

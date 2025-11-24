@@ -15,10 +15,6 @@ public class ClienteDAO extends InventarioDefaultDataAccess<Cliente> implements 
     @PersistenceContext(unitName = "inventarioPU")
     EntityManager em;
 
-    public ClienteDAO(Class<Cliente> entityClass) {
-        super(entityClass);
-    }
-
     @Override
     public EntityManager getEntityManager() {
         return em;

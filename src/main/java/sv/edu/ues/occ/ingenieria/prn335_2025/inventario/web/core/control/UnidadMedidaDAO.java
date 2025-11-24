@@ -24,24 +24,5 @@ public class UnidadMedidaDAO extends InventarioDefaultDataAccess<UnidadMedida> i
         return em;
     }
 
-    @Override
-    public void crear(UnidadMedida registro) throws IllegalArgumentException {
 
-        if (registro == null) {
-            throw new IllegalArgumentException("El registro no puede ser nulo");
-        }
-
-        try {
-            if (registro.getId() == null || registro.getId() == 0) {
-                Query query = em.createNativeQuery("SELECT nextval('unidad_medida_id_unidad_medida_seq'::regclass)");
-                Number nextId = (Number) query.getSingleResult();
-                registro.setId(nextId.intValue());
-            }
-
-            super.crear(registro);
-
-        } catch (Exception ex) {
-            throw new IllegalStateException("Error al crear el registro", ex);
-        }
-    }
 }

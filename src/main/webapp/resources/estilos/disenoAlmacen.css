@@ -23,7 +23,7 @@ body {
 /* SIDEBAR - Menú lateral */
 .sidebar {
     width: 280px;
-    background: linear-gradient(180deg, #34495e 0%, #2c3e50 100%);
+    background: linear-gradient(180deg, rgb(74, 198, 156) 0%, rgb(26, 29, 120) 100%);
     color: white;
     padding: 0;
     box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
@@ -82,7 +82,7 @@ body {
 
 .sidebar a:hover {
     background: rgba(255, 255, 255, 0.15);
-    border-left-color: #16a085;
+    border-left-color: #ffffff;
     padding-left: 30px;
     transform: translateX(5px);
 }
@@ -90,7 +90,7 @@ body {
 .sidebar a:active,
 .sidebar a.active {
     background: rgba(255, 255, 255, 0.2);
-    border-left-color: #16a085;
+    border-left-color: #ffffff;
     font-weight: 600;
 }
 
@@ -98,13 +98,13 @@ body {
 .container {
     margin-left: 280px;
     max-width: calc(100% - 280px);
-    background: white;
+    background: #ffffff;
     min-height: 100vh;
 }
 
 /* Encabezado con fondo degradado y texto centrado */
 .header {
-    background: linear-gradient(135deg, #16a085 0%, #2980b9 100%);
+    background: linear-gradient(135deg, rgb(74, 198, 156) 0%, rgb(26, 29, 120) 100%);
     color: white;
     padding: 30px;
     text-align: center;
@@ -134,17 +134,19 @@ h1 {
     overflow: hidden;
 }
 
-/* Encabezado de tabla con fondo degradado */
+/* Encabezado de tabla con fondo gris suave */
 .data-table thead {
-    background: linear-gradient(135deg, #16a085 0%, #2980b9 100%);
-    color: white;
+    background: linear-gradient(135deg, #a8b3b8 0%, #c5cfd4 100%);
+    color: #000000;
 }
 
 /* Estilo de celdas de encabezado */
 .data-table th {
+    background: linear-gradient(135deg, #a8b3b8 0%, #c5cfd4 100%);
+    color: #000000;
     padding: 15px;
     text-align: left;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     font-size: 0.85em;
     letter-spacing: 0.5px;
@@ -162,7 +164,7 @@ h1 {
 }
 
 .data-table tbody tr:hover {
-    background-color: #f5f5f5;
+    background-color: #973b92;
 }
 
 /* Elimina borde inferior en la última fila */
@@ -311,7 +313,7 @@ h1 {
 /* ===== ESTILO PARA EL BOTÓN NUEVO DE PRIMEFACES ===== */
 .btn-nuevo-custom.ui-button {
     background: #16a085 !important;
-    background-image: linear-gradient(135deg, #16a085 0%, #2980b9 100%) !important;
+    background-image: linear-gradient(135deg, #e36b6b 0%, #f49b5f 100%) !important;
 }
 
 .btn-nuevo-custom.ui-button .ui-button-text {
@@ -427,15 +429,15 @@ h1 {
 }
 
 .tabla-con-bordes.ui-datatable .ui-datatable-tablewrapper table th {
-    background: linear-gradient(135deg, #16a085 0%, #2980b9 100%);
-    color: #ffffff;
-    font-weight: 600;
+    background: linear-gradient(135deg, #a8b3b8 0%, #c5cfd4 100%);
+    color: #000000;
+    font-weight: 700;
     text-transform: uppercase;
     font-size: 0.85em;
 }
 
 .tabla-con-bordes.ui-datatable .ui-datatable-tablewrapper table tbody tr:hover {
-    background-color: #d5f4e6;
+    background-color: rgb(255, 255, 255);
 }
 
 /* Ajustes para pantallas pequeñas */
@@ -498,7 +500,7 @@ h1 {
 
 /* Contenedor de la tabla */
 .content-tabla {
-    background: white;
+    background: rgb(55, 131, 142);
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 20px;
@@ -564,17 +566,17 @@ h1 {
 }
 
 .ui-datatable .ui-datatable-header {
-    background: linear-gradient(135deg, #16a085 0%, #2980b9 100%);
-    color: white;
+    background: linear-gradient(135deg, #a8b3b8 0%, #c5cfd4 100%);
+    color: #000000;
     padding: 15px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .ui-datatable thead th {
-    background: linear-gradient(135deg, #16a085 0%, #2980b9 100%);
-    color: white;
+    background: linear-gradient(135deg, #a8b3b8 0%, #c5cfd4 100%);
+    color: #000000;
     padding: 15px;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     font-size: 0.85em;
     border: none;
@@ -648,6 +650,8 @@ h1 {
     display: inline-block;
     margin-top: 6px;    /* ajusta a 4–10px a tu gusto */
 }
+
+
 /* Estilos para la página de bienvenida */
 .welcome-container {
     width: 100%;
@@ -657,14 +661,14 @@ h1 {
 }
 
 .welcome-card {
-    background: white;
+    background: #37838e;
     border-radius: 8px;
     padding: 30px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .welcome-card h2 {
-    color: #16a085;
+    color: rgb(255, 255, 255);
     margin-bottom: 20px;
     font-size: 2em;
 }
@@ -672,7 +676,7 @@ h1 {
 .welcome-intro {
     font-size: 1.1em;
     line-height: 1.6;
-    color: #555;
+    color: rgb(241, 240, 240);
     margin-bottom: 30px;
 }
 
@@ -681,10 +685,10 @@ h1 {
 }
 
 .features-section h3 {
-    color: #333;
+    color: rgb(255, 255, 255);
     margin-bottom: 20px;
     font-size: 1.5em;
-    border-bottom: 2px solid #16a085;
+    border-bottom: 2px solid rgb(26, 29, 120);
     padding-bottom: 10px;
 }
 
@@ -696,8 +700,8 @@ h1 {
 }
 
 .feature-item {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border: 1px solid #e9ecef;
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+    border: 1px solid #ffffff;
     border-radius: 8px;
     padding: 20px;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -705,24 +709,25 @@ h1 {
 
 .feature-item:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(22, 160, 133, 0.3);
-    border-color: #16a085;
+    box-shadow: 0 4px 12px rgb(11, 49, 104);
+    border-color: #ffffff;
 }
 
 .feature-icon {
     font-size: 2.5em;
     margin-bottom: 10px;
+    color: rgb(55, 131, 142);
 }
 
 .feature-item h4 {
-    color: #16a085;
+    color: rgb(55, 131, 142);
     margin: 10px 0;
-    font-size: 1.1em;
+    font-size: 1.2em;
     font-weight: 600;
 }
 
 .feature-item p {
-    color: #666;
+    color: rgba(16, 16, 16, 0.92);
     font-size: 0.9em;
     line-height: 1.5;
 }
@@ -730,19 +735,19 @@ h1 {
 .instructions-section {
     margin: 40px 0;
     padding: 25px;
-    background: #d5f4e6;
+    background: rgb(255, 255, 255);
     border-radius: 8px;
-    border-left: 4px solid #16a085;
+    border-left: 4px solid rgb(74, 198, 156);
 }
 
 .instructions-section h3 {
-    color: #333;
+    color: #37838e;
     margin-bottom: 15px;
     border-bottom: none;
 }
 
 .instructions-list {
-    color: #555;
+    color: rgba(16, 16, 16, 0.92);
     line-height: 1.8;
     padding-left: 20px;
 }
@@ -756,10 +761,10 @@ h1 {
 }
 
 .statistics-section h3 {
-    color: #333;
+    color: #ffffff;
     margin-bottom: 20px;
     font-size: 1.5em;
-    border-bottom: 2px solid #16a085;
+    border-bottom: 2px solid #0b3168;
     padding-bottom: 10px;
 }
 
@@ -771,7 +776,7 @@ h1 {
 }
 
 .stat-card {
-    background: linear-gradient(135deg, #16a085 0%, #2980b9 100%);
+    background: linear-gradient(135deg, #4ac69c 0%, #4ac69c 100%);
     color: white;
     padding: 25px;
     border-radius: 8px;
@@ -798,13 +803,13 @@ h1 {
 .help-section {
     margin-top: 30px;
     padding: 15px;
-    background: #fff3cd;
-    border: 1px solid #ffc107;
+    background: #f4ebd3;
+    border: 1px solid #860505;
     border-radius: 8px;
 }
 
 .help-text {
-    color: #856404;
+    color: rgba(16, 16, 16, 0.92);
     margin: 0;
     line-height: 1.6;
 }
@@ -988,4 +993,131 @@ h1 {
 
 .btn-cancelar.ui-button:active {
     transform: translateY(0) !important;
+}
+
+/* FORZAR estilos del encabezado*/
+body .ui-datatable thead th,
+body .ui-datatable .ui-datatable-thead > tr > th,
+.ui-datatable thead th.ui-state-default,
+body table.ui-datatable thead th {
+    background: #a8b3b8 !important;
+    background-image: linear-gradient(135deg, #dddcdc 0%, #dddcdc 100%) !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+}
+
+/* FORZAR estilos del botón Nuevo */
+body .btn-nuevo.ui-button,
+body .btn-nuevo.ui-button.ui-state-default,
+.ui-button.btn-nuevo,
+button.btn-nuevo.ui-button {
+    background: #97e4ca !important;
+    background-image: none !important;
+    background-color: #97e4ca !important;
+    border: none !important;
+    color: rgba(16, 16, 16, 0.92) !important;
+}
+
+body .btn-nuevo.ui-button .ui-button-text,
+.btn-nuevo.ui-button span.ui-button-text {
+    color: rgba(16, 16, 16, 0.92) !important;
+    padding: 0 !important;
+}
+
+body .btn-nuevo.ui-button:hover,
+body .btn-nuevo.ui-button.ui-state-hover,
+.btn-nuevo.ui-button:hover {
+    background: #97e4ca !important;
+    background-image: none !important;
+    background-color: #97e4ca !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(26, 188, 156, 0.6) !important;
+}
+
+/* FORZAR color hover en filas de la tabla */
+body .ui-datatable tbody tr:hover,
+body .ui-datatable tbody tr.ui-state-hover,
+.ui-datatable tbody tr:hover td,
+body table.ui-datatable tbody tr:hover {
+    background-color: #e5f8fb !important;
+    background: #e5f8fb !important;
+}
+
+/* También para las filas seleccionadas */
+body .ui-datatable tbody tr.ui-state-highlight,
+body .ui-datatable tbody tr.ui-state-highlight td {
+    background-color: #b2e0f2 !important;
+    background: #b2e0f2 !important;
+    color: #000000 !important;
+}
+.inicio-link {
+    margin: 15px 0;
+    padding: 10px 15px;
+    background: transparent;
+}
+
+.inicio-link .link-inicio {
+    color: white !important;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    transition: opacity 0.3s;
+}
+
+.inicio-link .link-inicio:hover {
+    opacity: 0.8;
+}
+
+.inicio-link .link-inicio i {
+    color: white;
+}
+/* Fondo transparente para el panel menu */
+.sidebar-menu.ui-panelmenu {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Headers de las categorías */
+.sidebar-menu .ui-panelmenu-header {
+    background: transparent !important;
+    border: none !important;
+    margin: 5px 0;
+}
+
+.sidebar-menu .ui-panelmenu-header a {
+    color: white !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 10px 15px;
+}
+
+.sidebar-menu .ui-panelmenu-header a:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Iconos de las categorías */
+.sidebar-menu .ui-panelmenu-header .ui-icon,
+.sidebar-menu .ui-panelmenu-header .pi {
+    color: white !important;
+}
+
+/* Contenido colapsable */
+.sidebar-menu .ui-panelmenu-content {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: none !important;
+    padding: 5px 0;
+}
+
+/* Items dentro de las categorías */
+.sidebar-menu .ui-menuitem-link {
+    color: white !important;
+    padding: 8px 15px 8px 35px !important;
+}
+
+.sidebar-menu .ui-menuitem-link:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.sidebar-menu .ui-menuitem-icon {
+    color: white !important;
 }

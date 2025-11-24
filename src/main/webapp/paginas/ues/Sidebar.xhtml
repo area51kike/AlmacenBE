@@ -9,46 +9,102 @@
             <h:form class="language-selector">
                 <p:selectOneMenu value="#{idiomaBean.idioma}"
                                  styleClass="idioma-dropdown">
-                    <f:selectItem itemLabel= "#{msg['idioma.espanol']}" itemValue="es" />
+                    <f:selectItem itemLabel="#{msg['idioma.espanol']}" itemValue="es" />
                     <f:selectItem itemLabel="#{msg['idioma.ingles']}" itemValue="en" />
                     <f:selectItem itemLabel="#{msg['idioma.frances']}" itemValue="fr" />
-                    <p:ajax
-                            event="change" listener="#{idiomaBean.cambiarIdioma(idiomaBean.idioma)}"
+                    <p:ajax event="change"
+                            listener="#{idiomaBean.cambiarIdioma(idiomaBean.idioma)}"
                             update="@all" />
                 </p:selectOneMenu>
             </h:form>
 
             <h2>#{msg['sidebar.titulo']}</h2>
-            <ul>
-                <li><h:link value="#{msg['sidebar.inicio']}" outcome="/paginas/Inicio.jsf"> <i class="pi pi-home" style="margin-right: 8px;"></i></h:link> </li>
 
-                <!-- Sección de Almacenes -->
-                <li><h:link value="#{msg['sidebar.almacen']}" outcome="/paginas/Almacen.jsf"> <i class="pi pi-building" style="margin-right: 8px;"></i></h:link> </li>
-                <li><h:link value="#{msg['sidebar.tipoAlmacen']}" outcome="/paginas/TipoAlmacen.jsf"> <i class="pi pi-warehouse" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.kardexDetalle']}" outcome="/paginas/KardexDetalle.jsf"> <i class="pi pi-book" style="margin-right: 8px;"></i></h:link></li>
+            <!-- Inicio fuera del menú -->
+            <div class="inicio-link">
+                <h:link value="#{msg['sidebar.inicio']}" outcome="/paginas/Inicio.jsf" styleClass="link-inicio">
+                    <i class="pi pi-home" style="margin-right: 8px;"></i>
+                </h:link>
+            </div>
 
-                <!-- Sección de Productos -->
-                <li><h:link value="#{msg['sidebar.productos']}" outcome="/paginas/Producto.jsf"> <i class="pi pi-box" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.tipoProducto']}" outcome="/paginas/TipoProducto.jsf"> <i class="pi pi-th-large" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.caracteristica']}" outcome="/paginas/Caracteristica.jsf"> <i class="pi pi-list" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.productoTipoProducto']}" outcome="/paginas/ProductoTipoProducto.jsf"> <i class="pi pi-tags" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.productoTipoProductoCaracteristica']}" outcome="/paginas/ProductoTipoProductoCaracteristica.jsf"> <i class="pi pi-tag" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.tipoProductoCaracteristica']}" outcome="/paginas/TipoProductoCaracteristica.jsf"> <i class="pi pi-sliders-h" style="margin-right: 8px;"></i></h:link></li>
+            <h:form>
+                <p:panelMenu styleClass="sidebar-menu">
 
-                <!-- Sección de Unidades de Medida -->
-                <li><h:link value="#{msg['sidebar.unidadMedida']}" outcome="/paginas/UnidadMedida.jsf"> <i class="pi pi-calculator" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.tipoUnidadMedida']}" outcome="/paginas/TipoUnidadMedida.jsf"> <i class="pi pi-cog" style="margin-right: 8px;"></i></h:link></li>
+                    <!-- Categoría: Almacenes -->
+                    <p:submenu label="#{msg['sidebar.categoria.almacenes']}" icon="pi pi-building">
+                        <p:menuitem value="#{msg['sidebar.almacen']}"
+                                    outcome="/paginas/Almacen.jsf"
+                                    icon="pi pi-building" />
+                        <p:menuitem value="#{msg['sidebar.tipoAlmacen']}"
+                                    outcome="/paginas/TipoAlmacen.jsf"
+                                    icon="pi pi-warehouse" />
+                        <p:menuitem value="#{msg['sidebar.kardexDetalle']}"
+                                    outcome="/paginas/KardexDetalle.jsf"
+                                    icon="pi pi-book" />
+                        <p:menuitem value="#{msg['sidebar.kardex']}"
+                                    outcome="/paginas/Kardex.jsf"
+                                    icon="pi pi-book" />
+                    </p:submenu>
 
-                <!-- Sección de Compras -->
-                <li><h:link value="#{msg['sidebar.compra']}" outcome="/paginas/Compra.jsf"> <i class="pi pi-shopping-cart" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.compraDetalle']}" outcome="/paginas/CompraDetalle.jsf"> <i class="pi pi-receipt" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.proveedores']}" outcome="/paginas/Proveedor.jsf"> <i class="pi pi-truck" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.kardex']}" outcome="/paginas/Kardex.jsf"> <i class="pi pi-book" style="margin-right: 8px;"></i></h:link></li>
-                <!-- Sección de Ventas -->
-                <li><h:link value="#{msg['sidebar.venta']}" outcome="/paginas/Venta.jsf"> <i class="pi pi-money-bill" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.ventaDetalle']}" outcome="/paginas/VentaDetalle.jsf"> <i class="pi pi-file" style="margin-right: 8px;"></i></h:link></li>
-                <li><h:link value="#{msg['sidebar.clientes']}" outcome="/paginas/Cliente.jsf"> <i class="pi pi-users" style="margin-right: 8px;"></i></h:link></li>
-            </ul>
+                    <!-- Categoría: Productos -->
+                    <p:submenu label="#{msg['sidebar.categoria.productos']}" icon="pi pi-box">
+                        <p:menuitem value="#{msg['sidebar.productos']}"
+                                    outcome="/paginas/Producto.jsf"
+                                    icon="pi pi-box" />
+                        <p:menuitem value="#{msg['sidebar.tipoProducto']}"
+                                    outcome="/paginas/TipoProducto.jsf"
+                                    icon="pi pi-th-large" />
+                        <p:menuitem value="#{msg['sidebar.caracteristica']}"
+                                    outcome="/paginas/Caracteristica.jsf"
+                                    icon="pi pi-list" />
+                        <p:menuitem value="#{msg['sidebar.productoTipoProducto']}"
+                                    outcome="/paginas/ProductoTipoProducto.jsf"
+                                    icon="pi pi-tags" />
+                        <p:menuitem value="#{msg['sidebar.productoTipoProductoCaracteristica']}"
+                                    outcome="/paginas/ProductoTipoProductoCaracteristica.jsf"
+                                    icon="pi pi-tag" />
+                        <p:menuitem value="#{msg['sidebar.tipoProductoCaracteristica']}"
+                                    outcome="/paginas/TipoProductoCaracteristica.jsf"
+                                    icon="pi pi-sliders-h" />
+                    </p:submenu>
+
+                    <!-- Categoría: Unidades de Medida -->
+                    <p:submenu label="#{msg['sidebar.categoria.unidades']}" icon="pi pi-calculator">
+                        <p:menuitem value="#{msg['sidebar.unidadMedida']}"
+                                    outcome="/paginas/UnidadMedida.jsf"
+                                    icon="pi pi-calculator" />
+                        <p:menuitem value="#{msg['sidebar.tipoUnidadMedida']}"
+                                    outcome="/paginas/TipoUnidadMedida.jsf"
+                                    icon="pi pi-cog" />
+                    </p:submenu>
+
+                    <!-- Categoría: Compras -->
+                    <p:submenu label="#{msg['sidebar.categoria.compras']}" icon="pi pi-shopping-cart">
+                        <p:menuitem value="#{msg['sidebar.compra']}"
+                                    outcome="/paginas/Compra.jsf"
+                                    icon="pi pi-shopping-cart" />
+                        <p:menuitem value="#{msg['sidebar.compraDetalle']}"
+                                    outcome="/paginas/CompraDetalle.jsf"
+                                    icon="pi pi-receipt" />
+                        <p:menuitem value="#{msg['sidebar.proveedores']}"
+                                    outcome="/paginas/Proveedor.jsf"
+                                    icon="pi pi-truck" />
+                    </p:submenu>
+
+                    <!-- Categoría: Ventas -->
+                    <p:submenu label="#{msg['sidebar.categoria.ventas']}" icon="pi pi-money-bill">
+                        <p:menuitem value="#{msg['sidebar.venta']}"
+                                    outcome="/paginas/Venta.jsf"
+                                    icon="pi pi-money-bill" />
+                        <p:menuitem value="#{msg['sidebar.ventaDetalle']}"
+                                    outcome="/paginas/VentaDetalle.jsf"
+                                    icon="pi pi-file" />
+                        <p:menuitem value="#{msg['sidebar.clientes']}"
+                                    outcome="/paginas/Cliente.jsf"
+                                    icon="pi pi-users" />
+                    </p:submenu>
+                </p:panelMenu>
+            </h:form>
         </div>
     </f:view>
 

@@ -61,24 +61,4 @@ public class CaracteristicaDAO extends InventarioDefaultDataAccess<Caracteristic
         }
     }
 
-    @Override
-    public void crear(Caracteristica registro) throws IllegalArgumentException {
-        if (registro == null) {
-            throw new IllegalArgumentException("El registro no puede ser nulo");
-        }
-
-        try {
-            if (registro.getId() == null || registro.getId() == 0) {
-                Query query = em.createNativeQuery("SELECT nextval('caracteristica_id_caracteristica_seq'::regclass)");
-                Number nextId = (Number) query.getSingleResult();
-                registro.setId(nextId.intValue());
-            }
-
-            super.crear(registro);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new IllegalStateException("Error al crear el registro", ex);
-        }
-    }
 }

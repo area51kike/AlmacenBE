@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 @Table(name = "unidad_medida", schema = "public")
 public class UnidadMedida {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_unidad_medida", nullable = false)
     private Integer id;
 

@@ -48,9 +48,6 @@ public class CompraDAO extends InventarioDefaultDataAccess<Compra> implements Se
             // Asignar la entidad completa del proveedor
             entidad.setProveedor(proveedor);
 
-            // Asegurarse de que el ID sea null para que la secuencia lo genere
-            entidad.setId(null);
-
             LOGGER.log(Level.INFO, "Guardando compra: {0}", entidad);
 
             // Persistir usando el método de la clase base

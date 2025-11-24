@@ -1,21 +1,20 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.rest.server;
 
 import jakarta.inject.Inject;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoCaracteristicaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CaracteristicaDAO;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoCaracteristicaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoProductoDAO;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProductoCaracteristica;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Caracteristica;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoProducto;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.*;
 
-@Path("tipo_producto_caracteristica")
+import java.util.List;
+
+@Path("tipo_producto/{idTipoProducto}/caracteristica")
+@Produces(MediaType.APPLICATION_JSON)
 public class TipoProductoCaracteristicaResource {
 
     @Inject
@@ -25,194 +24,274 @@ public class TipoProductoCaracteristicaResource {
     CaracteristicaDAO caracteristicaDAO;
 
     @Inject
-    TipoProductoDAO tipoProductoDao;
+    TipoProductoDAO tipoProductoDAO;
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response findRange(@Min(0) @DefaultValue("0") @QueryParam("first") int first,
-                              @Max(100) @DefaultValue("50") @QueryParam("max") int max) {
-        if (first >= 0 && max <= 100) {
-            try {
-                Long total = tipoProductoCaracteristicaDAO.count();
-                return Response.ok(tipoProductoCaracteristicaDAO.findRange(first, max))
-                        .header("Total-records", total)
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+    public Response getCaracteristicas(@PathParam("idTipoProducto") Long idTipoProducto) {
+
+        if (idTipoProducto == null || idTipoProducto <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "idTipoProducto must be a positive number")
+                    .build();
+        }
+
+        try {
+            TipoProducto tipoProducto = tipoProductoDAO.findById(idTipoProducto);
+            if (tipoProducto == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "TipoProducto with id " + idTipoProducto + " not found")
                         .build();
             }
+
+            // CAMBIO: Retornar las relaciones completas en lugar de solo las características
+            List<TipoProductoCaracteristica> relaciones =
+                    tipoProductoCaracteristicaDAO.findByIdTipoProducto(idTipoProducto);
+
+            if (relaciones == null || relaciones.isEmpty()) {
+                return Response.ok(List.of()).build();
+            }
+
+            // Retornamos las relaciones completas con toda la información
+            return Response.ok(relaciones).build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Server-Exception", "Error: " + ex.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "first or max out of range")
-                .build();
     }
 
     @GET
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response findById(@PathParam("id") Long id) {
-        if (id != null && id > 0) {
-            try {
-                TipoProductoCaracteristica resp = tipoProductoCaracteristicaDAO.findById(id);
-                if (resp != null) {
-                    return Response.ok(resp).build();
-                }
-                return Response.status(Response.Status.NOT_FOUND)
-                        .header("Record-not-found", "Record with id " + id + " not found")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
-                        .build();
-            }
-        }
-        return Response.status(422)
-                .header("Missing-parameter", "id must be greater than 0")
-                .build();
-    }
+    @Path("{idTPC}")
+    public Response findById(
+            @PathParam("idTipoProducto") Long idTipoProducto,
+            @PathParam("idTPC") Long idTPC) {
 
-    @DELETE
-    @Path("{id}")
-    public Response delete(@PathParam("id") Long id) {
-        if (id != null && id > 0) {
-            try {
-                TipoProductoCaracteristica resp = tipoProductoCaracteristicaDAO.findById(id);
-                if (resp != null) {
-                    tipoProductoCaracteristicaDAO.eliminar(resp);
-                    return Response.noContent().build();
-                }
+        if (idTPC == null || idTPC <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "idTPC must be a positive number")
+                    .build();
+        }
+
+        try {
+            TipoProductoCaracteristica tpc = tipoProductoCaracteristicaDAO.findById(idTPC);
+
+            if (tpc == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .header("Record-not-found", "Record with id " + id + " not found")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+                        .header("Not-Found", "Record with id " + idTPC + " not found")
                         .build();
             }
+
+            if (!tpc.getTipoProducto().getId().equals(idTipoProducto)) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "Caracteristica does not belong to this tipo_producto")
+                        .build();
+            }
+
+            return Response.ok(tpc).build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Server-Exception", "Cannot access db: " + ex.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "id must be greater than 0")
-                .build();
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(TipoProductoCaracteristica entity, @Context UriInfo uriInfo) {
-        if (entity != null && entity.getId() == null) {
-            try {
-                // Validar que Caracteristica sea obligatoria
-                if (entity.getCaracteristica() == null || entity.getCaracteristica().getId() == null) {
-                    return Response.status(422)
-                            .header("Missing-parameter", "Caracteristica is required")
-                            .build();
-                }
+    public Response create(
+            @PathParam("idTipoProducto") Long idTipoProducto,
+            TipoProductoCaracteristica entity,
+            @Context UriInfo uriInfo) {
 
-                // Validar que TipoProducto sea obligatorio
-                if (entity.getTipoProducto() == null || entity.getTipoProducto().getId() == null) {
-                    return Response.status(422)
-                            .header("Missing-parameter", "TipoProducto is required")
-                            .build();
-                }
+        if (idTipoProducto == null || idTipoProducto <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "idTipoProducto must be a positive number")
+                    .build();
+        }
 
-                // Validar que Caracteristica exista
-                Caracteristica caracteristica = caracteristicaDAO.findById(entity.getCaracteristica().getId());
-                if (caracteristica == null) {
-                    return Response.status(422)
-                            .header("Missing-parameter",
-                                    "Caracteristica with id " + entity.getCaracteristica().getId() +
-                                            " does not exist in database")
-                            .build();
-                }
+        if (entity == null || entity.getCaracteristica() == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "idCaracteristica is required")
+                    .build();
+        }
 
-                // Validar que TipoProducto exista
-                TipoProducto tipoProducto = tipoProductoDao.findById(entity.getTipoProducto().getId());
-                if (tipoProducto == null) {
-                    return Response.status(422)
-                            .header("Missing-parameter",
-                                    "TipoProducto with id " + entity.getTipoProducto().getId() +
-                                            " does not exist in database")
-                            .build();
-                }
+        if (entity.getId() != null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "idTipoProductoCaracteristica must be null for new records")
+                    .build();
+        }
 
-                // Asignar entidades completas
-                entity.setCaracteristica(caracteristica);
-                entity.setTipoProducto(tipoProducto);
-
-                // Generar ID usando el método del DAO
-                Long nuevoId = tipoProductoCaracteristicaDAO.obtenerMaximoId() + 1;
-                entity.setId(nuevoId);
-
-                tipoProductoCaracteristicaDAO.crear(entity);
-
-                return Response.created(
-                        uriInfo.getAbsolutePathBuilder()
-                                .path(String.valueOf(entity.getId()))
-                                .build()
-                ).build();
-
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+        try {
+            TipoProducto tipoProducto = tipoProductoDAO.findById(idTipoProducto);
+            if (tipoProducto == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "TipoProducto with id " + idTipoProducto + " not found")
                         .build();
             }
+
+            Integer idCaracteristica = entity.getCaracteristica().getId();
+            if (idCaracteristica == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .header("Error", "idCaracteristica.id cannot be null")
+                        .build();
+            }
+
+            Caracteristica caracteristica = caracteristicaDAO.findById(idCaracteristica);
+            if (caracteristica == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "Caracteristica with id " + idCaracteristica + " not found")
+                        .build();
+            }
+
+            // Generar nuevo ID
+            Long nuevoId = tipoProductoCaracteristicaDAO.obtenerMaximoId() + 1;
+            entity.setId(nuevoId);
+
+            entity.setTipoProducto(tipoProducto);
+            entity.setCaracteristica(caracteristica);
+
+            tipoProductoCaracteristicaDAO.crear(entity);
+
+            return Response.created(
+                    uriInfo.getAbsolutePathBuilder()
+                            .path(entity.getId().toString())
+                            .build()
+            ).entity(entity).build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Server-Exception", "Error creating: " + ex.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "entity must not be null and id must be null")
-                .build();
     }
 
     @PUT
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Path("{idTPC}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response update(@PathParam("id") Long id, TipoProductoCaracteristica entity) {
-        if (id != null && id > 0 && entity != null) {
-            try {
-                TipoProductoCaracteristica existing = tipoProductoCaracteristicaDAO.findById(id);
-                if (existing != null) {
-                    // Validar Caracteristica si se proporciona
-                    if (entity.getCaracteristica() != null && entity.getCaracteristica().getId() != null) {
-                        Caracteristica caracteristica = caracteristicaDAO.findById(entity.getCaracteristica().getId());
-                        if (caracteristica == null) {
-                            return Response.status(422)
-                                    .header("Missing-parameter",
-                                            "Caracteristica with id " + entity.getCaracteristica().getId() +
-                                                    " does not exist in database")
-                                    .build();
-                        }
-                        entity.setCaracteristica(caracteristica);
-                    }
+    public Response update(
+            @PathParam("idTipoProducto") Long idTipoProducto,
+            @PathParam("idTPC") Long idTPC,
+            TipoProductoCaracteristica entity) {
 
-                    // Validar TipoProducto si se proporciona
-                    if (entity.getTipoProducto() != null && entity.getTipoProducto().getId() != null) {
-                        TipoProducto tipoProducto = tipoProductoDao.findById(entity.getTipoProducto().getId());
-                        if (tipoProducto == null) {
-                            return Response.status(422)
-                                    .header("Missing-parameter",
-                                            "TipoProducto with id " + entity.getTipoProducto().getId() +
-                                                    " does not exist in database")
-                                    .build();
-                        }
-                        entity.setTipoProducto(tipoProducto);
-                    }
+        if (idTipoProducto == null || idTPC == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "IDs cannot be null")
+                    .build();
+        }
 
-                    entity.setId(id);
-                    tipoProductoCaracteristicaDAO.modificar(entity);
-                    return Response.ok(entity).build();
-                }
+        if (entity == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "Request body is required")
+                    .build();
+        }
+
+        try {
+            TipoProductoCaracteristica existente = tipoProductoCaracteristicaDAO.findById(idTPC);
+
+            if (existente == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .header("Record-not-found", "Record with id " + id + " not found")
-                        .build();
-            } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Server-exception", "Cannot access db")
+                        .header("Not-Found", "Record with id " + idTPC + " not found")
                         .build();
             }
+
+            // Verificar que pertenece al tipo_producto del path
+            if (!existente.getTipoProducto().getId().equals(idTipoProducto)) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "Caracteristica does not belong to this tipo_producto")
+                        .build();
+            }
+
+            // Manejar actualización de idTipoProducto
+            if (entity.getTipoProducto() != null) {
+                Long idTipoProductoBody = entity.getTipoProducto().getId();
+                if (idTipoProductoBody == null) {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .header("Error", "idTipoProducto.id cannot be null")
+                            .build();
+                }
+
+                TipoProducto nuevoTipoProducto = tipoProductoDAO.findById(idTipoProductoBody);
+                if (nuevoTipoProducto == null) {
+                    return Response.status(Response.Status.NOT_FOUND)
+                            .header("Not-Found", "TipoProducto with id " + idTipoProductoBody + " not found")
+                            .build();
+                }
+                existente.setTipoProducto(nuevoTipoProducto);
+            }
+
+            // Manejar actualización de idCaracteristica
+            if (entity.getCaracteristica() != null) {
+                Integer idCaracteristicaBody = entity.getCaracteristica().getId();
+                if (idCaracteristicaBody == null) {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .header("Error", "idCaracteristica.id cannot be null")
+                            .build();
+                }
+
+                Caracteristica nuevaCaracteristica = caracteristicaDAO.findById(idCaracteristicaBody);
+                if (nuevaCaracteristica == null) {
+                    return Response.status(Response.Status.NOT_FOUND)
+                            .header("Not-Found", "Caracteristica with id " + idCaracteristicaBody + " not found")
+                            .build();
+                }
+                existente.setCaracteristica(nuevaCaracteristica);
+            }
+
+            // Actualizar otros campos
+            if (entity.getObligatorio() != null) {
+                existente.setObligatorio(entity.getObligatorio());
+            }
+            if (entity.getFechaCreacion() != null) {
+                existente.setFechaCreacion(entity.getFechaCreacion());
+            }
+
+            tipoProductoCaracteristicaDAO.modificar(existente);
+
+            return Response.ok(existente).build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Server-Exception", "Error updating: " + ex.getMessage())
+                    .build();
         }
-        return Response.status(422)
-                .header("Missing-parameter", "id and entity must be valid")
-                .build();
+    }
+
+    @DELETE
+    @Path("{idTPC}")
+    public Response delete(
+            @PathParam("idTipoProducto") Long idTipoProducto,
+            @PathParam("idTPC") Long idTPC) {
+
+        if (idTPC == null || idTPC <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Error", "idTPC must be a positive number")
+                    .build();
+        }
+
+        try {
+            TipoProductoCaracteristica existente = tipoProductoCaracteristicaDAO.findById(idTPC);
+
+            if (existente == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "Record with id " + idTPC + " not found")
+                        .build();
+            }
+
+            if (!existente.getTipoProducto().getId().equals(idTipoProducto)) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-Found", "Caracteristica does not belong to this tipo_producto")
+                        .build();
+            }
+
+            tipoProductoCaracteristicaDAO.eliminar(existente);
+
+            return Response.noContent().build();
+
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Server-Exception", "Cannot delete record: " + ex.getMessage())
+                    .build();
+        }
     }
 }

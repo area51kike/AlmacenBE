@@ -4,9 +4,11 @@ import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.VentaDetalle;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -25,6 +27,14 @@ public class VentaDetalleDAO extends InventarioDefaultDataAccess<VentaDetalle> i
      */
     public VentaDetalleDAO() {
         super(VentaDetalle.class);
+    }
+    public List<Producto> findProductosByIdVenta(UUID idVenta) {
+        return em.createQuery(
+                        "SELECT vd.idProducto FROM VentaDetalle vd WHERE vd.idVenta.id = :idVenta",
+                        Producto.class
+                )
+                .setParameter("idVenta", idVenta)
+                .getResultList();
     }
 
     /**
