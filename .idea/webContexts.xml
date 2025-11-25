@@ -4,6 +4,7 @@
     <option name="state">
       <map>
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/Cliente.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/Compra.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/ManejarTodo.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/ProductoTipoProducto.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/paginas/RecepcionCompra.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/paginas" />

@@ -1,8 +1,11 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.ws;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.KardexEvent;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -11,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @ApplicationScoped
-@ServerEndpoint("/notificadorKardex")  // URL del WebSocket
+@ServerEndpoint("/notificadorKardex")
 public class KardexEndpoint {
 
     private static final Logger LOGGER = Logger.getLogger(KardexEndpoint.class.getName());
@@ -24,6 +27,9 @@ public class KardexEndpoint {
         sessions.add(session);
         LOGGER.log(Level.INFO, "Cliente conectado: {0}", session.getId());
         LOGGER.log(Level.INFO, "Total de clientes: {0}", sessions.size());
+
+        // Enviar mensaje de bienvenida
+        enviarMensaje(session, "Conectado al servidor WebSocket");
     }
 
     @OnClose
@@ -44,8 +50,20 @@ public class KardexEndpoint {
     public void onMessage(String message, Session session) {
         LOGGER.log(Level.INFO, "Mensaje recibido de {0}: {1}",
                 new Object[]{session.getId(), message});
-        // Opcional: responder al cliente
+        // Responder al cliente
         enviarMensaje(session, "Servidor recibió: " + message);
+    }
+
+    /**
+     * Observador de eventos CDI - se ejecuta cuando ReceptorKardex dispara el evento
+     */
+    public void onKardexEvent(@Observes KardexEvent event) {
+        LOGGER.log(Level.INFO, "=== Evento CDI recibido en KardexEndpoint ===");
+        LOGGER.log(Level.INFO, "Mensaje del evento: {0}", event.getMensaje());
+        LOGGER.log(Level.INFO, "Clientes conectados: {0}", sessions.size());
+
+        // Enviar a todos los clientes WebSocket
+        broadcast(event.getMensaje());
     }
 
     // Método para enviar mensaje a un cliente específico
@@ -53,6 +71,7 @@ public class KardexEndpoint {
         if (session != null && session.isOpen()) {
             try {
                 session.getBasicRemote().sendText(mensaje);
+                LOGGER.log(Level.FINE, "Mensaje enviado a {0}", session.getId());
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Error enviando mensaje", e);
             }
@@ -61,22 +80,34 @@ public class KardexEndpoint {
 
     // Método para broadcast (enviar a TODOS los clientes conectados)
     public void broadcast(String mensaje) {
+        LOGGER.log(Level.INFO, "Iniciando broadcast a {0} clientes", sessions.size());
+
         synchronized (sessions) {
+            int exitosos = 0;
+            int fallidos = 0;
+
             for (Session session : sessions) {
                 if (session.isOpen()) {
                     try {
                         session.getBasicRemote().sendText(mensaje);
+                        exitosos++;
                         LOGGER.log(Level.INFO, "Mensaje enviado a: {0}", session.getId());
                     } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE, "Error enviando broadcast", e);
+                        fallidos++;
+                        LOGGER.log(Level.SEVERE, "Error enviando broadcast a " + session.getId(), e);
                     }
+                } else {
+                    fallidos++;
+                    LOGGER.log(Level.WARNING, "Sesión cerrada: {0}", session.getId());
                 }
             }
+
+            LOGGER.log(Level.INFO, "Broadcast completado: {0} exitosos, {1} fallidos",
+                    new Object[]{exitosos, fallidos});
         }
-        LOGGER.log(Level.INFO, "Broadcast enviado a {0} clientes", sessions.size());
     }
 
-    // Getter para las sesiones (si lo necesitas)
+    // Getter para las sesiones
     public Set<Session> getSessions() {
         return sessions;
     }
