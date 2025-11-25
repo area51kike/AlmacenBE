@@ -14,7 +14,7 @@ import java.util.UUID;
 @LocalBean
 public class CompraDetalleDAO extends InventarioDefaultDataAccess<CompraDetalle> implements Serializable {
 
-    // Nombre de la unidad de persistencia (asegúrate de que coincida con tu persistence.xml)
+    // Nombre de la unidad de persistencia
     @PersistenceContext(unitName = "inventarioPU")
     EntityManager em;
 

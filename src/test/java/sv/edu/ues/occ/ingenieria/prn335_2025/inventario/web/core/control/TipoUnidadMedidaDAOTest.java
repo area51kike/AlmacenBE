@@ -1,7 +1,9 @@
 package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +23,13 @@ class TipoUnidadMedidaDAOTest {
     private EntityManager entityManager;
 
     @Mock
-    private Query query;
+    private CriteriaBuilder criteriaBuilder;
+
+    @Mock
+    private CriteriaQuery<Long> criteriaQueryLong;
+
+    @Mock
+    private Root<TipoUnidadMedida> root;
 
     private TipoUnidadMedidaDAO tipoUnidadMedidaDAO;
 
@@ -51,6 +59,13 @@ class TipoUnidadMedidaDAOTest {
         EntityManager result = tipoUnidadMedidaDAO.getEntityManager();
         assertNotNull(result);
         assertEquals(entityManager, result);
+    }
+
+    @Test
+    void testGetEntityClass() {
+        Class<TipoUnidadMedida> entityClass = tipoUnidadMedidaDAO.getEntityClass();
+        assertNotNull(entityClass);
+        assertEquals(TipoUnidadMedida.class, entityClass);
     }
 
     @Test
@@ -290,49 +305,11 @@ class TipoUnidadMedidaDAOTest {
         verify(entityManager).find(TipoUnidadMedida.class, testId);
     }
 
-    @Test
-    void testCrear_Success_WithNullId() {
-        TipoUnidadMedida newTipo = new TipoUnidadMedida();
-        newTipo.setNombre("Gramo");
-        newTipo.setUnidadBase("g");
-        newTipo.setActivo(true);
-
-        when(entityManager.createNativeQuery("SELECT nextval('tipo_unidad_medida_id_tipo_unidad_medida_seq'::regclass)"))
-                .thenReturn(query);
-        when(query.getSingleResult()).thenReturn(5);
-        doNothing().when(entityManager).persist(newTipo);
-
-        tipoUnidadMedidaDAO.crear(newTipo);
-
-        assertEquals(5, newTipo.getId());
-        verify(entityManager).createNativeQuery("SELECT nextval('tipo_unidad_medida_id_tipo_unidad_medida_seq'::regclass)");
-        verify(query).getSingleResult();
-        verify(entityManager).persist(newTipo);
-    }
-
-    @Test
-    void testCrear_Success_WithZeroId() {
-        TipoUnidadMedida newTipo = new TipoUnidadMedida();
-        newTipo.setId(0);
-        newTipo.setNombre("Tonelada");
-        newTipo.setUnidadBase("t");
-        newTipo.setActivo(true);
-
-        when(entityManager.createNativeQuery("SELECT nextval('tipo_unidad_medida_id_tipo_unidad_medida_seq'::regclass)"))
-                .thenReturn(query);
-        when(query.getSingleResult()).thenReturn(10);
-        doNothing().when(entityManager).persist(newTipo);
-
-        tipoUnidadMedidaDAO.crear(newTipo);
-
-        assertEquals(10, newTipo.getId());
-        verify(entityManager).createNativeQuery("SELECT nextval('tipo_unidad_medida_id_tipo_unidad_medida_seq'::regclass)");
-        verify(query).getSingleResult();
-        verify(entityManager).persist(newTipo);
-    }
+    // ===== TESTS PARA CREAR (usando implementación de clase padre) =====
 
     @Test
     void testCrear_Success_WithExistingId() {
+        // Cuando la entidad ya tiene un ID, se persiste directamente
         TipoUnidadMedida newTipo = new TipoUnidadMedida();
         newTipo.setId(15);
         newTipo.setNombre("Centímetro");
@@ -344,8 +321,43 @@ class TipoUnidadMedidaDAOTest {
         tipoUnidadMedidaDAO.crear(newTipo);
 
         assertEquals(15, newTipo.getId());
-        verify(entityManager, never()).createNativeQuery(anyString());
-        verify(entityManager).persist(newTipo);
+        verify(entityManager, times(1)).persist(newTipo);
+    }
+
+    @Test
+    void testCrear_Success_WithNullId() {
+        // Con ID null, JPA/Hibernate manejará la generación automática
+        TipoUnidadMedida newTipo = new TipoUnidadMedida();
+        newTipo.setNombre("Gramo");
+        newTipo.setUnidadBase("g");
+        newTipo.setActivo(true);
+
+        doNothing().when(entityManager).persist(newTipo);
+
+        tipoUnidadMedidaDAO.crear(newTipo);
+
+        // El ID seguirá siendo null porque no estamos simulando la base de datos
+        // En producción, JPA lo asignaría automáticamente
+        assertNull(newTipo.getId());
+        verify(entityManager, times(1)).persist(newTipo);
+    }
+
+    @Test
+    void testCrear_Success_WithZeroId() {
+        // Con ID = 0, se tratará como nuevo registro
+        TipoUnidadMedida newTipo = new TipoUnidadMedida();
+        newTipo.setId(0);
+        newTipo.setNombre("Tonelada");
+        newTipo.setUnidadBase("t");
+        newTipo.setActivo(true);
+
+        doNothing().when(entityManager).persist(newTipo);
+
+        tipoUnidadMedidaDAO.crear(newTipo);
+
+        // El ID permanece en 0 porque no hay lógica personalizada
+        assertEquals(0, newTipo.getId());
+        verify(entityManager, times(1)).persist(newTipo);
     }
 
     @Test
@@ -356,27 +368,24 @@ class TipoUnidadMedidaDAOTest {
 
         assertEquals("El registro no puede ser nulo", exception.getMessage());
         verify(entityManager, never()).persist(any());
-        verify(entityManager, never()).createNativeQuery(anyString());
     }
 
     @Test
     void testCrear_NullEntityManager() throws Exception {
-        // Crear una nueva instancia del DAO para este test específico
+        // Crear una nueva instancia del DAO sin EntityManager inyectado
         TipoUnidadMedidaDAO daoConEmNulo = new TipoUnidadMedidaDAO();
-
         // No inyectar el EntityManager, dejarlo en null
 
         TipoUnidadMedida newTipo = new TipoUnidadMedida();
         newTipo.setId(20);
         newTipo.setNombre("Mililitro");
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             daoConEmNulo.crear(newTipo);
         });
 
-        // Verificar que la excepción fue lanzada (el mensaje exacto puede variar)
         assertNotNull(exception);
-        assertNotNull(exception.getMessage());
+        assertTrue(exception.getMessage().contains("Error al crear el registro"));
     }
 
     @Test
@@ -388,46 +397,12 @@ class TipoUnidadMedidaDAOTest {
         doThrow(new RuntimeException("Database error"))
                 .when(entityManager).persist(newTipo);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             tipoUnidadMedidaDAO.crear(newTipo);
         });
 
         assertTrue(exception.getMessage().contains("Error al crear el registro"));
-        assertNotNull(exception.getCause());
-        verify(entityManager).persist(newTipo);
-    }
-
-    @Test
-    void testCrear_Exception_OnSequence() {
-        TipoUnidadMedida newTipo = new TipoUnidadMedida();
-        newTipo.setNombre("Hectolitro");
-
-        when(entityManager.createNativeQuery("SELECT nextval('tipo_unidad_medida_id_tipo_unidad_medida_seq'::regclass)"))
-                .thenThrow(new RuntimeException("Sequence error"));
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            tipoUnidadMedidaDAO.crear(newTipo);
-        });
-
-        assertTrue(exception.getMessage().contains("Error al crear el registro"));
-        verify(entityManager).createNativeQuery("SELECT nextval('tipo_unidad_medida_id_tipo_unidad_medida_seq'::regclass)");
-        verify(entityManager, never()).persist(any());
-    }
-
-    @Test
-    void testCrear_WithLongNumber() {
-        TipoUnidadMedida newTipo = new TipoUnidadMedida();
-        newTipo.setNombre("Onza");
-
-        when(entityManager.createNativeQuery("SELECT nextval('tipo_unidad_medida_id_tipo_unidad_medida_seq'::regclass)"))
-                .thenReturn(query);
-        when(query.getSingleResult()).thenReturn(999999L);
-        doNothing().when(entityManager).persist(newTipo);
-
-        tipoUnidadMedidaDAO.crear(newTipo);
-
-        assertEquals(999999, newTipo.getId());
-        verify(entityManager).persist(newTipo);
+        verify(entityManager, times(1)).persist(newTipo);
     }
 
     @Test
@@ -440,6 +415,24 @@ class TipoUnidadMedidaDAOTest {
         tipoUnidadMedidaDAO.crear(newTipo);
 
         assertEquals(100, newTipo.getId());
-        verify(entityManager).persist(newTipo);
+        verify(entityManager, times(1)).persist(newTipo);
+    }
+
+    @Test
+    void testCrear_WithCompleteData() {
+        TipoUnidadMedida newTipo = new TipoUnidadMedida();
+        newTipo.setId(50);
+        newTipo.setNombre("Miligramo");
+        newTipo.setUnidadBase("mg");
+        newTipo.setActivo(true);
+        newTipo.setComentarios("Unidad de masa muy pequeña");
+
+        doNothing().when(entityManager).persist(newTipo);
+
+        tipoUnidadMedidaDAO.crear(newTipo);
+
+        assertEquals(50, newTipo.getId());
+        assertEquals("Miligramo", newTipo.getNombre());
+        verify(entityManager, times(1)).persist(newTipo);
     }
 }

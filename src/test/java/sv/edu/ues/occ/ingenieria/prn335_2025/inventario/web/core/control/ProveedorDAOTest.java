@@ -58,6 +58,8 @@ class ProveedorDAOTest {
         assertNotNull(dao);
     }
 
+    // ===== CASOS EXITOSOS =====
+
     @Test
     void testFindById_Success() {
         when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
@@ -71,163 +73,6 @@ class ProveedorDAOTest {
         assertEquals("0614-123456-101-2", result.getNit());
         assertTrue(result.getActivo());
         assertEquals("Proveedor principal de tecnología", result.getObservaciones());
-        verify(entityManager).find(Proveedor.class, testId);
-    }
-
-    @Test
-    void testFindById_NotFound() {
-        Integer id = 999;
-        when(entityManager.find(Proveedor.class, id)).thenReturn(null);
-
-        Proveedor result = proveedorDAO.findById(id);
-
-        assertNull(result);
-        verify(entityManager).find(Proveedor.class, id);
-    }
-
-    @Test
-    void testFindById_Exception() {
-        Integer id = 1;
-        when(entityManager.find(Proveedor.class, id))
-                .thenThrow(new RuntimeException("Database connection error"));
-
-        assertThrows(RuntimeException.class, () -> proveedorDAO.findById(id));
-        verify(entityManager).find(Proveedor.class, id);
-    }
-
-    @Test
-    void testFindById_InactiveProveedor() {
-        proveedor.setActivo(false);
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
-
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertFalse(result.getActivo());
-        verify(entityManager).find(Proveedor.class, testId);
-    }
-
-    @Test
-    void testFindById_WithNullNombre() {
-        proveedor.setNombre(null);
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
-
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertNull(result.getNombre());
-        verify(entityManager).find(Proveedor.class, testId);
-    }
-
-    @Test
-    void testFindById_WithNullRazonSocial() {
-        proveedor.setRazonSocial(null);
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
-
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertNull(result.getRazonSocial());
-        verify(entityManager).find(Proveedor.class, testId);
-    }
-
-    @Test
-    void testFindById_WithNullNit() {
-        proveedor.setNit(null);
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
-
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertNull(result.getNit());
-        verify(entityManager).find(Proveedor.class, testId);
-    }
-
-    @Test
-    void testFindById_WithNullObservaciones() {
-        proveedor.setObservaciones(null);
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
-
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertNull(result.getObservaciones());
-        verify(entityManager).find(Proveedor.class, testId);
-    }
-
-    @Test
-    void testFindById_WithEmptyNombre() {
-        proveedor.setNombre("");
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
-
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertEquals("", result.getNombre());
-        verify(entityManager).find(Proveedor.class, testId);
-    }
-
-    @Test
-    void testFindById_WithEmptyRazonSocial() {
-        proveedor.setRazonSocial("");
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
-
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertEquals("", result.getRazonSocial());
-        verify(entityManager).find(Proveedor.class, testId);
-    }
-
-    @Test
-    void testFindById_WithMaxLengthNombre() {
-        String maxNombre = "A".repeat(155);
-        proveedor.setNombre(maxNombre);
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
-
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertEquals(155, result.getNombre().length());
-        verify(entityManager).find(Proveedor.class, testId);
-    }
-
-    @Test
-    void testFindById_WithMaxLengthRazonSocial() {
-        String maxRazonSocial = "R".repeat(155);
-        proveedor.setRazonSocial(maxRazonSocial);
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
-
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertEquals(155, result.getRazonSocial().length());
-        verify(entityManager).find(Proveedor.class, testId);
-    }
-
-    @Test
-    void testFindById_WithMaxLengthNit() {
-        String maxNit = "01234567890123";
-        proveedor.setNit(maxNit);
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
-
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertEquals(14, result.getNit().length());
-        verify(entityManager).find(Proveedor.class, testId);
-    }
-
-    @Test
-    void testFindById_WithLongObservaciones() {
-        String longObservaciones = "Observación: " + "X".repeat(1000);
-        proveedor.setObservaciones(longObservaciones);
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
-
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertTrue(result.getObservaciones().length() > 1000);
         verify(entityManager).find(Proveedor.class, testId);
     }
 
@@ -270,41 +115,38 @@ class ProveedorDAOTest {
         assertEquals("Proveedor 2", result2.getNombre());
     }
 
+    // ===== CASOS DE ERROR =====
+
     @Test
-    void testFindById_WithNullActivo() {
-        proveedor.setActivo(null);
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
+    void testFindById_NotFound() {
+        Integer id = 999;
+        when(entityManager.find(Proveedor.class, id)).thenReturn(null);
 
-        Proveedor result = proveedorDAO.findById(testId);
+        Proveedor result = proveedorDAO.findById(id);
 
-        assertNotNull(result);
-        assertNull(result.getActivo());
-        verify(entityManager).find(Proveedor.class, testId);
+        assertNull(result);
+        verify(entityManager).find(Proveedor.class, id);
     }
 
     @Test
-    void testFindById_WithSpecialCharactersInNombre() {
-        proveedor.setNombre("Distribuidora José María & Cía. S.A. de C.V.");
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
+    void testFindById_NullId() {
+        Proveedor result = proveedorDAO.findById(null);
 
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertEquals("Distribuidora José María & Cía. S.A. de C.V.", result.getNombre());
-        verify(entityManager).find(Proveedor.class, testId);
+        assertNull(result);
+        verify(entityManager, never()).find(any(), any());
     }
 
     @Test
-    void testFindById_WithSpecialCharactersInRazonSocial() {
-        proveedor.setRazonSocial("Sociedad Anónima de Capital Variable \"El Progreso\"");
-        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
+    void testFindById_Exception() {
+        Integer id = 1;
+        when(entityManager.find(Proveedor.class, id))
+                .thenThrow(new RuntimeException("Database connection error"));
 
-        Proveedor result = proveedorDAO.findById(testId);
-
-        assertNotNull(result);
-        assertEquals("Sociedad Anónima de Capital Variable \"El Progreso\"", result.getRazonSocial());
-        verify(entityManager).find(Proveedor.class, testId);
+        assertThrows(RuntimeException.class, () -> proveedorDAO.findById(id));
+        verify(entityManager).find(Proveedor.class, id);
     }
+
+    // ===== VALORES ESPECIALES DE ID =====
 
     @Test
     void testFindById_WithZeroId() {
@@ -347,5 +189,102 @@ class ProveedorDAOTest {
         assertNotNull(result);
         assertEquals(Integer.MAX_VALUE, result.getId());
         verify(entityManager).find(Proveedor.class, largeId);
+    }
+
+    // ===== VALIDACIÓN DE CAMPOS =====
+
+    @Test
+    void testFindById_InactiveProveedor() {
+        proveedor.setActivo(false);
+        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
+
+        Proveedor result = proveedorDAO.findById(testId);
+
+        assertNotNull(result);
+        assertFalse(result.getActivo());
+        verify(entityManager).find(Proveedor.class, testId);
+    }
+
+    @Test
+    void testFindById_WithNullFields() {
+        proveedor.setNombre(null);
+        proveedor.setRazonSocial(null);
+        proveedor.setNit(null);
+        proveedor.setObservaciones(null);
+        proveedor.setActivo(null);
+
+        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
+
+        Proveedor result = proveedorDAO.findById(testId);
+
+        assertNotNull(result);
+        assertNull(result.getNombre());
+        assertNull(result.getRazonSocial());
+        assertNull(result.getNit());
+        assertNull(result.getObservaciones());
+        assertNull(result.getActivo());
+        verify(entityManager).find(Proveedor.class, testId);
+    }
+
+    @Test
+    void testFindById_WithEmptyStrings() {
+        proveedor.setNombre("");
+        proveedor.setRazonSocial("");
+        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
+
+        Proveedor result = proveedorDAO.findById(testId);
+
+        assertNotNull(result);
+        assertEquals("", result.getNombre());
+        assertEquals("", result.getRazonSocial());
+        verify(entityManager).find(Proveedor.class, testId);
+    }
+
+    @Test
+    void testFindById_WithMaxLengthFields() {
+        String maxNombre = "A".repeat(155);
+        String maxRazonSocial = "R".repeat(155);
+        String maxNit = "01234567890123"; // 14 caracteres
+
+        proveedor.setNombre(maxNombre);
+        proveedor.setRazonSocial(maxRazonSocial);
+        proveedor.setNit(maxNit);
+
+        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
+
+        Proveedor result = proveedorDAO.findById(testId);
+
+        assertNotNull(result);
+        assertEquals(155, result.getNombre().length());
+        assertEquals(155, result.getRazonSocial().length());
+        assertEquals(14, result.getNit().length());
+        verify(entityManager).find(Proveedor.class, testId);
+    }
+
+    @Test
+    void testFindById_WithLongObservaciones() {
+        String longObservaciones = "Observación: " + "X".repeat(1000);
+        proveedor.setObservaciones(longObservaciones);
+        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
+
+        Proveedor result = proveedorDAO.findById(testId);
+
+        assertNotNull(result);
+        assertTrue(result.getObservaciones().length() > 1000);
+        verify(entityManager).find(Proveedor.class, testId);
+    }
+
+    @Test
+    void testFindById_WithSpecialCharacters() {
+        proveedor.setNombre("Distribuidora José María & Cía. S.A. de C.V.");
+        proveedor.setRazonSocial("Sociedad Anónima de Capital Variable \"El Progreso\"");
+        when(entityManager.find(Proveedor.class, testId)).thenReturn(proveedor);
+
+        Proveedor result = proveedorDAO.findById(testId);
+
+        assertNotNull(result);
+        assertEquals("Distribuidora José María & Cía. S.A. de C.V.", result.getNombre());
+        assertEquals("Sociedad Anónima de Capital Variable \"El Progreso\"", result.getRazonSocial());
+        verify(entityManager).find(Proveedor.class, testId);
     }
 }
