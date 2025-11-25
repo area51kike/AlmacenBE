@@ -8,6 +8,7 @@ import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Proveedor;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -87,8 +88,21 @@ public class CompraDAO extends InventarioDefaultDataAccess<Compra> implements Se
         LOGGER.log(Level.FINE, "Buscando compra por ID: {0}", id);
         return super.findById(id);
     }
+    public List<Compra> buscarPagadasParaRecepcion(int first, int max) {
+        return em.createQuery(
+                        "SELECT c FROM Compra c WHERE c.estado = 'PAGADA' ORDER BY c.fecha",
+                        Compra.class)
+                .setFirstResult(first)
+                .setMaxResults(max)
+                .getResultList();
+    }
 
-    // Método auxiliar para validar el proveedor antes de modificar
+    public Long contarPagadasParaRecepcion() {
+        return em.createQuery(
+                        "SELECT COUNT(c) FROM Compra c WHERE c.estado = 'PAGADA'",
+                        Long.class)
+                .getSingleResult();
+    }
     public void validarProveedor(Integer idProveedor) {
         if (idProveedor != null) {
             Proveedor proveedor = em.find(Proveedor.class, idProveedor);

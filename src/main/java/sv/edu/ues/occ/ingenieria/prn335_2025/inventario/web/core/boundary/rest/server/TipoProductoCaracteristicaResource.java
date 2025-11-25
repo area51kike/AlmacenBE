@@ -12,6 +12,7 @@ import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoPro
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("tipo_producto/{idTipoProducto}/caracteristica")
 @Produces(MediaType.APPLICATION_JSON)
@@ -43,7 +44,6 @@ public class TipoProductoCaracteristicaResource {
                         .build();
             }
 
-            // CAMBIO: Retornar las relaciones completas en lugar de solo las características
             List<TipoProductoCaracteristica> relaciones =
                     tipoProductoCaracteristicaDAO.findByIdTipoProducto(idTipoProducto);
 
@@ -51,8 +51,11 @@ public class TipoProductoCaracteristicaResource {
                 return Response.ok(List.of()).build();
             }
 
-            // Retornamos las relaciones completas con toda la información
-            return Response.ok(relaciones).build();
+            List<Caracteristica> caracteristicas = relaciones.stream()
+                    .map(TipoProductoCaracteristica::getCaracteristica)
+                    .collect(Collectors.toList());
+
+            return Response.ok(caracteristicas).build();
 
         } catch (Exception ex) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -112,13 +115,13 @@ public class TipoProductoCaracteristicaResource {
 
         if (entity == null || entity.getCaracteristica() == null) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .header("Error", "idCaracteristica is required")
+                    .header("Error", "caracteristica is required")
                     .build();
         }
 
         if (entity.getId() != null) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .header("Error", "idTipoProductoCaracteristica must be null for new records")
+                    .header("Error", "id must be null for new records")
                     .build();
         }
 
@@ -133,7 +136,7 @@ public class TipoProductoCaracteristicaResource {
             Integer idCaracteristica = entity.getCaracteristica().getId();
             if (idCaracteristica == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .header("Error", "idCaracteristica.id cannot be null")
+                        .header("Error", "caracteristica.id cannot be null")
                         .build();
             }
 
@@ -143,10 +146,6 @@ public class TipoProductoCaracteristicaResource {
                         .header("Not-Found", "Caracteristica with id " + idCaracteristica + " not found")
                         .build();
             }
-
-            // Generar nuevo ID
-            Long nuevoId = tipoProductoCaracteristicaDAO.obtenerMaximoId() + 1;
-            entity.setId(nuevoId);
 
             entity.setTipoProducto(tipoProducto);
             entity.setCaracteristica(caracteristica);
@@ -202,12 +201,12 @@ public class TipoProductoCaracteristicaResource {
                         .build();
             }
 
-            // Manejar actualización de idTipoProducto
+            // Manejar actualización de tipoProducto
             if (entity.getTipoProducto() != null) {
                 Long idTipoProductoBody = entity.getTipoProducto().getId();
                 if (idTipoProductoBody == null) {
                     return Response.status(Response.Status.BAD_REQUEST)
-                            .header("Error", "idTipoProducto.id cannot be null")
+                            .header("Error", "tipoProducto.id cannot be null")
                             .build();
                 }
 
@@ -220,12 +219,12 @@ public class TipoProductoCaracteristicaResource {
                 existente.setTipoProducto(nuevoTipoProducto);
             }
 
-            // Manejar actualización de idCaracteristica
+            // Manejar actualización de caracteristica
             if (entity.getCaracteristica() != null) {
                 Integer idCaracteristicaBody = entity.getCaracteristica().getId();
                 if (idCaracteristicaBody == null) {
                     return Response.status(Response.Status.BAD_REQUEST)
-                            .header("Error", "idCaracteristica.id cannot be null")
+                            .header("Error", "caracteristica.id cannot be null")
                             .build();
                 }
 

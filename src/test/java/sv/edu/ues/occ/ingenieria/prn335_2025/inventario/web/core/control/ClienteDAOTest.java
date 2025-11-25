@@ -55,10 +55,9 @@ class ClienteDAOTest {
 
     @Test
     void testConstructorWithParameter() {
-        ClienteDAO dao = new ClienteDAO();
+        ClienteDAO dao = new ClienteDAO();  // Sin parámetros
         assertNotNull(dao);
     }
-
     @Test
     void testFindById_Success() {
         when(entityManager.find(Cliente.class, testUUID)).thenReturn(cliente);

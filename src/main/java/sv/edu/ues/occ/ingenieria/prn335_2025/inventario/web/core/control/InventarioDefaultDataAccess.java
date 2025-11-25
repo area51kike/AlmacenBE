@@ -105,7 +105,22 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
             throw new IllegalStateException("Error al contar registros", ex);
         }
     }
-
+    public int contar() throws IllegalArgumentException {
+        try {
+            EntityManager em = getEntityManager();
+            if (em != null) {
+                CriteriaBuilder cb = em.getCriteriaBuilder();
+                CriteriaQuery<Long> cp = cb.createQuery(Long.class);
+                Root<T> rootEntry = cp.from(entityClass);
+                cp.select(cb.count(rootEntry));
+                TypedQuery<Long> allQuery = em.createQuery(cp);
+                return ((Long) allQuery.getSingleResult()).intValue();
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException("dao.AccesoDB");
+        }
+        return -1;
+    }
     public void crear(T registro) {
         if (registro == null) {
             throw new IllegalArgumentException("El registro no puede ser nulo");

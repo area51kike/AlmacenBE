@@ -17,7 +17,6 @@ public class Caracteristica {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_unidad_medida")
-    @JsonbTransient  // Este de aca
     private TipoUnidadMedida idTipoUnidadMedida;
 
     @Column(name = "activo")
