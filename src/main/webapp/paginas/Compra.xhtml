@@ -126,6 +126,19 @@
                             <ui:param name="section" value="crud"/>
                             <ui:param name="bean" value="#{compraFrm}"/>
                         </ui:include>
+
+                        <!-- ✅ NUEVO: Botón para cerrar compra -->
+                        <p:commandButton value="Cerrar Compra"
+                                         icon="pi pi-lock"
+                                         styleClass="ui-button-success"
+                                         actionListener="#{compraFrm.btnCerrarCompraHandler}"
+                                         update=":pnlTabla :pnlDetalle msgGlobal"
+                                         rendered="#{compraFrm.estado eq 'MODIFICAR'}"
+                                         style="margin-top: 10px;">
+                            <p:confirm header="Confirmación"
+                                       message="¿Está seguro de cerrar esta compra?"
+                                       icon="pi pi-exclamation-triangle"/>
+                        </p:commandButton>
                     </h:form>
 
                     <h:form id="frmCancelar">
@@ -138,5 +151,11 @@
             </div>
         </div>
     </div>
+
+    <!-- ✅ NUEVO: Diálogo de confirmación -->
+    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+        <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times"/>
+    </p:confirmDialog>
 </h:body>
 </html>

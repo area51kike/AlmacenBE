@@ -30,6 +30,7 @@
 
         <properties>
             <!-- Configuración específica para EclipseLink como proveedor JPA -->
+            <property name="eclipselink.jdbc.bind-parameters" value="false"/>
             <property name="eclipselink.target-database" value="PostgreSQL"/>
             <property name="eclipselink.logging.level" value="FINE"/>
             <property name="eclipselink.logging.parameters" value="true"/>

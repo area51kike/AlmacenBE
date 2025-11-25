@@ -10,6 +10,8 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.NotificadorKardex;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ClienteDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
@@ -25,6 +27,9 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
 
     @Inject
     private ClienteDAO clienteDao;
+
+    @Inject
+    private NotificadorKardex notificadorKardex;
 
     private List<Cliente> clientesDisponibles;
 
@@ -70,7 +75,7 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         Venta v = new Venta();
         v.setId(UUID.randomUUID());
         v.setIdCliente(new Cliente());
-        v.setEstado(null);
+        v.setEstado("CREADA"); // Estado inicial por defecto
         v.setFecha(OffsetDateTime.now());
         v.setObservaciones("");
         return v;
@@ -158,7 +163,16 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
                 getDao().crear(this.registro);
                 System.out.println("✅ Venta guardada con ID: " + this.registro.getId());
 
-                // 4. Limpieza y Notificación
+                // 4. ✅ NUEVO: Notificar cambio en Kardex
+                try {
+                    notificadorKardex.notificarCambio("NUEVA_VENTA:" + this.registro.getId());
+                    System.out.println("📢 Notificación JMS enviada para venta: " + this.registro.getId());
+                } catch (Exception e) {
+                    System.err.println("⚠️ Error al enviar notificación JMS (no crítico): " + e.getMessage());
+                    // No interrumpimos el flujo si falla la notificación
+                }
+
+                // 5. Limpieza y Notificación
                 this.registro = null;
                 this.estado = ESTADO_CRUD.NADA;
                 this.modelo = null; // ✅ Forzar recreación del modelo
@@ -175,6 +189,55 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "No hay registro para guardar"));
+        }
+    }
+
+    @Override
+    public void btnModificarHandler(ActionEvent actionEvent) {
+        super.btnModificarHandler(actionEvent);
+
+        // ✅ NUEVO: Notificar cambio en Kardex después de modificar
+        if (this.registro != null && this.registro.getId() != null) {
+            try {
+                notificadorKardex.notificarCambio("VENTA_MODIFICADA:" + this.registro.getId());
+                System.out.println("📢 Notificación JMS enviada para modificación de venta: " + this.registro.getId());
+            } catch (Exception e) {
+                System.err.println("⚠️ Error al enviar notificación JMS (no crítico): " + e.getMessage());
+            }
+        }
+    }
+
+    // ✅ NUEVO: Método para cerrar/finalizar venta
+    public void btnCerrarVentaHandler(ActionEvent actionEvent) {
+        if (this.registro != null) {
+            System.out.println("🔒 Cerrando venta: " + this.registro.getId());
+            this.registro.setEstado("FINALIZADA");
+            btnModificarHandler(actionEvent);
+
+            // Notificación específica para cierre de venta
+            try {
+                notificadorKardex.notificarCambio("VENTA_CERRADA:" + this.registro.getId());
+                System.out.println("📢 Notificación JMS enviada para cierre de venta");
+            } catch (Exception e) {
+                System.err.println("⚠️ Error al enviar notificación JMS (no crítico): " + e.getMessage());
+            }
+        }
+    }
+
+    // ✅ NUEVO: Método para anular venta
+    public void btnAnularVentaHandler(ActionEvent actionEvent) {
+        if (this.registro != null) {
+            System.out.println("❌ Anulando venta: " + this.registro.getId());
+            this.registro.setEstado("ANULADA");
+            btnModificarHandler(actionEvent);
+
+            // Notificación específica para anulación de venta
+            try {
+                notificadorKardex.notificarCambio("VENTA_ANULADA:" + this.registro.getId());
+                System.out.println("📢 Notificación JMS enviada para anulación de venta");
+            } catch (Exception e) {
+                System.err.println("⚠️ Error al enviar notificación JMS (no crítico): " + e.getMessage());
+            }
         }
     }
 

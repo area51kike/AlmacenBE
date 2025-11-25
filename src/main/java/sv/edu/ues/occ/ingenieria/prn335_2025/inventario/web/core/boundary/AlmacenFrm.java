@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.AlmacenDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.NotificadorKardex;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.TipoAlmacenDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Almacen;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.TipoAlmacen;
@@ -28,6 +29,9 @@ public class AlmacenFrm extends DefaultFrm<Almacen> implements Serializable {
 
     @Inject
     TipoAlmacenDAO tipoAlmacenDAO;
+
+    @Inject
+    NotificadorKardex notificador;
 
     private List<TipoAlmacen> listaTiposAlmacen;
     private Integer idTipoSeleccionado;
@@ -92,6 +96,8 @@ public class AlmacenFrm extends DefaultFrm<Almacen> implements Serializable {
 
     @Override
     public void btnGuardarHandler(ActionEvent actionEvent) {
+        notificador.notificarCambio("Se actualizó almacén");
+
         if (this.registro != null && this.idTipoSeleccionado == null) {
             facesContext.addMessage("frmCrear:cbTipoAlmacen",
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

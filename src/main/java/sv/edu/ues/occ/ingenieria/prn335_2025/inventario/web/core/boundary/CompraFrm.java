@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.NotificadorKardex;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProveedorDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Proveedor;
@@ -29,6 +30,9 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
 
     @Inject
     private ProveedorDAO proveedorDao;
+
+    @Inject
+    private NotificadorKardex notificadorKardex;
 
     private List<Proveedor> proveedoresDisponibles;
     private List<EstadoCompra> estadosDisponibles;
@@ -157,6 +161,10 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
             // Ejecuta la operación según el estado
             if (this.estado == ESTADO_CRUD.CREAR) {
                 crearEntidad(this.registro);
+
+                // Notificar creación de compra
+                notificadorKardex.notificarCambio("RELOAD_TABLE");
+
             } else if (this.estado == ESTADO_CRUD.MODIFICAR) {
                 // Validar que el proveedor exista antes de modificar
                 compraDao.validarProveedor(this.registro.getIdProveedor());
@@ -166,6 +174,9 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
                 this.registro.setProveedor(proveedor);
 
                 getDao().modificar(this.registro);
+
+                // Notificar modificación de compra
+                notificadorKardex.notificarCambio("RELOAD_TABLE");
             }
 
             // Limpiar y recargar después de guardar
@@ -196,6 +207,43 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Error al guardar", causa.getMessage()));
+        }
+    }
+
+    // ✅ NUEVO: Método para cerrar compra
+    public void btnCerrarCompraHandler(ActionEvent actionEvent) {
+        if (this.registro == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "Atención", "No hay registro seleccionado"));
+            return;
+        }
+
+        try {
+            // Cambiar estado a PAGADA
+            this.registro.setEstado("PAGADA");
+
+            // Llamar al modificar para guardar el cambio
+            getDao().modificar(this.registro);
+
+            // Notificar cambio
+            notificadorKardex.notificarCambio("RELOAD_TABLE");
+
+            // Limpiar y recargar
+            this.registro = null;
+            this.estado = ESTADO_CRUD.NADA;
+            this.modelo = null;
+            inicializarRegistros();
+
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Éxito", "Compra cerrada correctamente"));
+
+        } catch (Exception e) {
+            Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error al cerrar compra", e);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Error", "No se pudo cerrar la compra: " + e.getMessage()));
         }
     }
 }
