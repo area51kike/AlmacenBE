@@ -76,11 +76,10 @@ public class TipoProductoResource {
             try {
                 if(entity.getIdTipoProductoPadre()!=null && entity.getIdTipoProductoPadre().getId()!=null){
                     TipoProducto padre= tipoProductoDao.findById(entity.getIdTipoProductoPadre().getId());
-                    if(padre!=null){
-                        return Response.status(422).header("Missing.parameter", "If parent is assigned, must be null and exist in the db").build();
-
+                    if(padre==null){
+                        return Response.status(422).header("Missing.parameter", "Parent type product does not exist").build();
                     }
-                   entity.setIdTipoProductoPadre(padre);
+                    entity.setIdTipoProductoPadre(padre);
                 }
                 tipoProductoDao.crear(entity);
                 return Response.created(uriInfo.getAbsolutePathBuilder().path(String.valueOf(entity.getId())).build()).build();
@@ -89,6 +88,6 @@ public class TipoProductoResource {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Server-exception", "Cannot access db").build();
             }
         }
-        return Response.status(422).header("Missing.parameter", "entity must  not be null and entity").build();
+        return Response.status(422).header("Missing.parameter", "entity must not be null and id must be null").build();
     }
 }

@@ -29,19 +29,19 @@ public class KardexResource {
     private static final Logger LOGGER = Logger.getLogger(KardexResource.class.getName());
 
     @Inject
-    private KardexDAO kardexDAO;
+    KardexDAO kardexDAO;
 
     @Inject
-    private ProductoDAO productoDAO;
+    ProductoDAO productoDAO;
 
     @Inject
-    private AlmacenDAO almacenDAO;
+    AlmacenDAO almacenDAO;
 
     @Inject
-    private CompraDetalleDAO compraDetalleDAO;
+    CompraDetalleDAO compraDetalleDAO;
 
     @Inject
-    private VentaDetalleDAO ventaDetalleDAO;
+    VentaDetalleDAO ventaDetalleDAO;
 
     // ==================== CRUD GENERAL ====================
 

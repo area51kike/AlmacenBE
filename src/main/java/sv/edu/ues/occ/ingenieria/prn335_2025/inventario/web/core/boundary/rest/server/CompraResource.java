@@ -26,10 +26,10 @@ public class CompraResource {
     private static final Logger LOGGER = Logger.getLogger(CompraResource.class.getName());
 
     @Inject
-    private CompraDAO compraDAO;
+    CompraDAO compraDAO;
 
     @Inject
-    private ProveedorDAO proveedorDAO;
+    ProveedorDAO proveedorDAO;
 
     /**
      * GET /proveedores/{idProveedor}/compras
