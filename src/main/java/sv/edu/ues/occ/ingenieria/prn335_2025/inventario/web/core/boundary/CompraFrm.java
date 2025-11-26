@@ -210,7 +210,7 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
         }
     }
 
-    // ✅ NUEVO: Método para cerrar compra eso
+    // ✅ NUEVO: Método para cerrar compra
     public void btnCerrarCompraHandler(ActionEvent actionEvent) {
         if (this.registro == null) {
             getFacesContext().addMessage(null,

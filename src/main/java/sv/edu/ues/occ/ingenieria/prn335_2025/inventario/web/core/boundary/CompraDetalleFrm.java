@@ -10,10 +10,14 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.primefaces.model.FilterMeta;
+import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortMeta;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDetalleDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProductoDAO;
@@ -333,4 +337,37 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
     public List<String> getEstadosDisponibles() {
         return estadosDisponibles;
     }
+
+    public void cargarDetallesPorCompra(Long idCompra) {
+        this.idCompra = idCompra;
+        this.registro = null;
+        this.estado = ESTADO_CRUD.NADA;
+
+        this.modelo = new LazyDataModel<CompraDetalle>() {
+            @Override
+            public int count(Map<String, FilterMeta> filterBy) {
+                return Math.toIntExact(compraDetalleDao.contarDetallesPorCompra(idCompra));
+            }
+
+            @Override
+            public List<CompraDetalle> load(int first, int pageSize,
+                                            Map<String, SortMeta> sortBy,
+                                            Map<String, FilterMeta> filterBy) {
+                List<CompraDetalle> lista = compraDetalleDao.findByIdCompra(idCompra);
+                this.setRowCount(Math.toIntExact(compraDetalleDao.contarDetallesPorCompra(idCompra)));
+                return lista;
+            }
+
+            @Override
+            public CompraDetalle getRowData(String rowKey) {
+                return compraDetalleDao.findById(UUID.fromString(rowKey));
+            }
+
+            @Override
+            public String getRowKey(CompraDetalle object) {
+                return object != null && object.getId() != null ? object.getId().toString() : null;
+            }
+        };
+    }
+
 }

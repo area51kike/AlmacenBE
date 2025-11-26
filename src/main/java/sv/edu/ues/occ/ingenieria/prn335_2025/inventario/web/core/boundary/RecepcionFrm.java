@@ -71,6 +71,25 @@ public class RecepcionFrm extends DefaultFrm<Compra> implements Serializable {
         return null;
     }
 
+    public void selectionHandler(org.primefaces.event.SelectEvent<Compra> event) {
+        Compra compraSeleccionada = event.getObject();
+
+        if (compraSeleccionada != null) {
+            this.registro = compraSeleccionada;
+            this.estado = ESTADO_CRUD.MODIFICAR;
+
+            // 🔑 Aquí cargas SOLO los detalles de esa compra
+            if (compraSeleccionada.getId() != null) {
+                compraDetalleFrm.cargarDetallesPorCompra(compraSeleccionada.getId());
+            }
+
+            if (recepcionKardexFrm != null) {
+                // opcional: limpiar kardex
+            }
+        }
+    }
+
+
     @Override
     protected Compra getIdByText(String id) {
         if (id == null) return null;

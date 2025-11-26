@@ -101,4 +101,35 @@ public class VentaDetalleDAO extends InventarioDefaultDataAccess<VentaDetalle> i
     public VentaDetalle findById(UUID id) {
         return getEntityManager().find(VentaDetalle.class, id);
     }
+
+    public int contarPorVenta(UUID idVenta) {
+        try {
+            Long cuenta = em.createQuery(
+                            "SELECT COUNT(d) FROM VentaDetalle d WHERE d.idVenta.id = :idVenta",
+                            Long.class)
+                    .setParameter("idVenta", idVenta)
+                    .getSingleResult();
+            return cuenta != null ? cuenta.intValue() : 0;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /**
+     * [NUEVO] Busca los detalles de una venta con PAGINACIÓN (first, max).
+     * Requerido por PrimeFaces LazyDataModel.
+     */
+    public List<VentaDetalle> findPorVenta(UUID idVenta, int first, int max) {
+        try {
+            return em.createQuery("SELECT vd FROM VentaDetalle vd WHERE vd.idVenta.id = :idVenta", VentaDetalle.class)
+                    .setParameter("idVenta", idVenta)
+                    .setFirstResult(first)
+                    .setMaxResults(max)
+                    .getResultList();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+    }
+
+
 }

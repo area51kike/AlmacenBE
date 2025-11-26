@@ -153,4 +153,27 @@ public class DespachoFrm extends DefaultFrm<Venta> implements Serializable {
         }
         return ventaDetalleFrm;
     }
+    public void selectionHandler(org.primefaces.event.SelectEvent<Venta> event) {
+        Venta ventaSeleccionada = event.getObject();
+
+        if (ventaSeleccionada != null) {
+            this.registro = ventaSeleccionada;
+            this.estado = ESTADO_CRUD.MODIFICAR;
+
+            // 👉 Aquí cargas SOLO los detalles de esa venta
+            if (ventaSeleccionada.getId() != null) {
+                ventaDetalleFrm.cargarDetallesPorVenta(ventaSeleccionada.getId());
+            }
+
+            if (despachoKardexFrm != null) {
+                despachoKardexFrm.limpiar();
+            }
+        }
+    }
+
+
+    @Override
+    protected boolean esNombreVacio(Venta registro) {
+        return false;
+    }
 }

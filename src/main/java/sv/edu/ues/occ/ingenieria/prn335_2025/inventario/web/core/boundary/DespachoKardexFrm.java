@@ -36,6 +36,8 @@ public class DespachoKardexFrm extends DefaultFrm<Kardex> implements Serializabl
     @Inject
     KardexDetalleDAO kardexDetalleDAO;
 
+    private VentaDetalle ventaDetalleActual;
+
     @Inject
     VentaDAO ventaDAO;
 
@@ -211,5 +213,10 @@ public class DespachoKardexFrm extends DefaultFrm<Kardex> implements Serializabl
 
     public KardexDetalle getDetalleKardex() {
         return detalleKardex;
+    }
+    public void limpiar() {
+        this.registro = null;          // limpia el Kardex actual
+        this.detalleKardex = new KardexDetalle(); // reinicia el detalle
+        this.detalleActual = null;     // borra el detalle de venta en proceso
     }
 }

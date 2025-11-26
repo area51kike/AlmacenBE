@@ -10,10 +10,14 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.primefaces.model.FilterMeta;
+import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortMeta;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDetalleDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDAO;
@@ -28,6 +32,7 @@ import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto
 @ViewScoped
 public class VentaDetalleFrm extends DefaultFrm<VentaDetalle> implements Serializable {
     protected UUID idVenta;
+    private UUID idVentaActual;
 
     private static final Logger LOGGER = Logger.getLogger(VentaDetalleFrm.class.getName());
 
@@ -294,6 +299,50 @@ public class VentaDetalleFrm extends DefaultFrm<VentaDetalle> implements Seriali
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al modificar",
                             "Ocurrió un error: " + e.getMessage()));
         }
+    }
+
+    /**
+     * [NUEVO] Método llamado por DespachoFrm (Padre) cuando se selecciona una venta.
+     * Crea un LazyDataModel filtrado específicamente por esa venta.
+     */
+    public void cargarDetallesPorVenta(UUID idVenta) {
+        this.idVentaActual = idVenta;
+        this.registro = null;
+        this.estado = ESTADO_CRUD.NADA;
+
+        // Creamos el LazyDataModel dinámico
+        this.modelo = new LazyDataModel<VentaDetalle>() {
+            @Override
+            public int count(Map<String, FilterMeta> filterBy) {
+                // Llama al método int del DAO
+                return ventaDetalleDao.contarPorVenta(idVentaActual);
+            }
+
+            @Override
+            public List<VentaDetalle> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
+                // Llama al método de lista paginada del DAO
+                List<VentaDetalle> lista = ventaDetalleDao.findPorVenta(idVentaActual, first, pageSize);
+
+                // Es importante setear el rowCount aquí para que el paginador de PrimeFaces funcione
+                this.setRowCount(ventaDetalleDao.contarPorVenta(idVentaActual));
+
+                return lista;
+            }
+
+            @Override
+            public VentaDetalle getRowData(String rowKey) {
+                try {
+                    return ventaDetalleDao.findById(UUID.fromString(rowKey));
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+
+            @Override
+            public String getRowKey(VentaDetalle object) {
+                return object != null && object.getId() != null ? object.getId().toString() : null;
+            }
+        };
     }
 
 
