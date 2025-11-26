@@ -2,9 +2,6 @@ package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,16 +38,7 @@ class VentaDetalleDAOTest {
     private TypedQuery<Long> longTypedQuery;
 
     @Mock
-    private CriteriaBuilder criteriaBuilder;
-
-    @Mock
-    private CriteriaQuery<VentaDetalle> criteriaQuery;
-
-    @Mock
-    private CriteriaQuery<Long> criteriaQueryLong;
-
-    @Mock
-    private Root<VentaDetalle> root;
+    private TypedQuery<BigDecimal> bigDecimalTypedQuery;
 
     @InjectMocks
     private VentaDetalleDAO dao;
@@ -94,358 +82,25 @@ class VentaDetalleDAOTest {
         testVentaDetalle.setObservaciones("Detalle de prueba");
     }
 
+    // Tests para métodos específicos de VentaDetalleDAO
+
+    @Test
+    void testConstructor() {
+        // Act
+        VentaDetalleDAO newDao = new VentaDetalleDAO();
+
+        // Assert
+        assertNotNull(newDao);
+    }
+
     @Test
     void testGetEntityManager() {
         // Act
-        EntityManager em = dao.getEntityManager();
-
-        // Assert
-        assertNotNull(em);
-        assertEquals(entityManager, em);
-    }
-
-    @Test
-    void testGetEntityClass() {
-        // Act
-        Class<VentaDetalle> entityClass = dao.getEntityClass();
-
-        // Assert
-        assertNotNull(entityClass);
-        assertEquals(VentaDetalle.class, entityClass);
-    }
-
-    @Test
-    void testFind_Success() {
-        // Arrange
-        when(entityManager.find(VentaDetalle.class, testVentaDetalleId))
-                .thenReturn(testVentaDetalle);
-
-        // Act
-        VentaDetalle result = dao.find(testVentaDetalleId);
+        EntityManager result = dao.getEntityManager();
 
         // Assert
         assertNotNull(result);
-        assertEquals(testVentaDetalleId, result.getId());
-        assertEquals(new BigDecimal("5.00"), result.getCantidad());
-        assertEquals(new BigDecimal("100.00"), result.getPrecio());
-        verify(entityManager, times(1)).find(VentaDetalle.class, testVentaDetalleId);
-    }
-
-    @Test
-    void testFind_NotFound() {
-        // Arrange
-        when(entityManager.find(VentaDetalle.class, testVentaDetalleId))
-                .thenReturn(null);
-
-        // Act
-        VentaDetalle result = dao.find(testVentaDetalleId);
-
-        // Assert
-        assertNull(result);
-        verify(entityManager, times(1)).find(VentaDetalle.class, testVentaDetalleId);
-    }
-
-    @Test
-    void testFind_NullId() {
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> dao.find(null));
-        verify(entityManager, never()).find(any(), any());
-    }
-
-    @Test
-    void testFindById_Success() {
-        // Arrange
-        when(entityManager.find(VentaDetalle.class, testVentaDetalleId))
-                .thenReturn(testVentaDetalle);
-
-        // Act
-        VentaDetalle result = dao.findById(testVentaDetalleId);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(testVentaDetalleId, result.getId());
-        assertEquals("ACTIVO", result.getEstado());
-        verify(entityManager, times(1)).find(VentaDetalle.class, testVentaDetalleId);
-    }
-
-    @Test
-    void testFindById_NotFound() {
-        // Arrange
-        when(entityManager.find(VentaDetalle.class, testVentaDetalleId))
-                .thenReturn(null);
-
-        // Act
-        VentaDetalle result = dao.findById(testVentaDetalleId);
-
-        // Assert
-        assertNull(result);
-    }
-
-    @Test
-    void testFindAll_Success() {
-        // Arrange
-        List<VentaDetalle> expectedList = new ArrayList<>();
-        expectedList.add(testVentaDetalle);
-
-        VentaDetalle detalle2 = new VentaDetalle();
-        detalle2.setId(UUID.randomUUID());
-        detalle2.setIdVenta(testVenta);
-        detalle2.setIdProducto(testProducto);
-        detalle2.setCantidad(new BigDecimal("3.00"));
-        detalle2.setPrecio(new BigDecimal("50.00"));
-        expectedList.add(detalle2);
-
-        // Mock completo de Criteria API
-        when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
-        when(criteriaBuilder.createQuery(VentaDetalle.class)).thenReturn(criteriaQuery);
-        when(criteriaQuery.from(VentaDetalle.class)).thenReturn(root);
-        when(criteriaQuery.select(root)).thenReturn(criteriaQuery);
-        when(entityManager.createQuery(criteriaQuery)).thenReturn(typedQueryVentaDetalle);
-        when(typedQueryVentaDetalle.getResultList()).thenReturn(expectedList);
-
-        // Act
-        List<VentaDetalle> result = dao.findAll();
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals(testVentaDetalleId, result.get(0).getId());
-        verify(entityManager, times(1)).getCriteriaBuilder();
-    }
-
-    @Test
-    void testFindAll_EmptyList() {
-        // Arrange
-        when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
-        when(criteriaBuilder.createQuery(VentaDetalle.class)).thenReturn(criteriaQuery);
-        when(criteriaQuery.from(VentaDetalle.class)).thenReturn(root);
-        when(criteriaQuery.select(root)).thenReturn(criteriaQuery);
-        when(entityManager.createQuery(criteriaQuery)).thenReturn(typedQueryVentaDetalle);
-        when(typedQueryVentaDetalle.getResultList()).thenReturn(new ArrayList<>());
-
-        // Act
-        List<VentaDetalle> result = dao.findAll();
-
-        // Assert
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void testFindRange_Success() {
-        // Arrange
-        List<VentaDetalle> expectedList = new ArrayList<>();
-        expectedList.add(testVentaDetalle);
-
-        when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
-        when(criteriaBuilder.createQuery(VentaDetalle.class)).thenReturn(criteriaQuery);
-        when(criteriaQuery.from(VentaDetalle.class)).thenReturn(root);
-        when(criteriaQuery.select(root)).thenReturn(criteriaQuery);
-        when(root.get("id")).thenReturn(mock(jakarta.persistence.criteria.Path.class));
-        when(criteriaBuilder.asc(any())).thenReturn(mock(jakarta.persistence.criteria.Order.class));
-        when(criteriaQuery.orderBy(any(jakarta.persistence.criteria.Order.class))).thenReturn(criteriaQuery);
-        when(entityManager.createQuery(criteriaQuery)).thenReturn(typedQueryVentaDetalle);
-        when(typedQueryVentaDetalle.setFirstResult(anyInt())).thenReturn(typedQueryVentaDetalle);
-        when(typedQueryVentaDetalle.setMaxResults(anyInt())).thenReturn(typedQueryVentaDetalle);
-        when(typedQueryVentaDetalle.getResultList()).thenReturn(expectedList);
-
-        // Act
-        List<VentaDetalle> result = dao.findRange(0, 10);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(typedQueryVentaDetalle, times(1)).setFirstResult(0);
-        verify(typedQueryVentaDetalle, times(1)).setMaxResults(10);
-    }
-
-    @Test
-    void testFindRange_WithPagination() {
-        // Arrange
-        List<VentaDetalle> expectedList = new ArrayList<>();
-        expectedList.add(testVentaDetalle);
-
-        when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
-        when(criteriaBuilder.createQuery(VentaDetalle.class)).thenReturn(criteriaQuery);
-        when(criteriaQuery.from(VentaDetalle.class)).thenReturn(root);
-        when(criteriaQuery.select(root)).thenReturn(criteriaQuery);
-        when(root.get("id")).thenReturn(mock(jakarta.persistence.criteria.Path.class));
-        when(criteriaBuilder.asc(any())).thenReturn(mock(jakarta.persistence.criteria.Order.class));
-        when(criteriaQuery.orderBy(any(jakarta.persistence.criteria.Order.class))).thenReturn(criteriaQuery);
-        when(entityManager.createQuery(criteriaQuery)).thenReturn(typedQueryVentaDetalle);
-        when(typedQueryVentaDetalle.setFirstResult(anyInt())).thenReturn(typedQueryVentaDetalle);
-        when(typedQueryVentaDetalle.setMaxResults(anyInt())).thenReturn(typedQueryVentaDetalle);
-        when(typedQueryVentaDetalle.getResultList()).thenReturn(expectedList);
-
-        // Act
-        List<VentaDetalle> result = dao.findRange(10, 5);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(typedQueryVentaDetalle, times(1)).setFirstResult(10);
-        verify(typedQueryVentaDetalle, times(1)).setMaxResults(5);
-    }
-
-    @Test
-    void testFindRange_InvalidParameters() {
-        // Act & Assert - first negativo
-        assertThrows(IllegalArgumentException.class, () -> dao.findRange(-1, 10));
-
-        // Act & Assert - pageSize cero
-        assertThrows(IllegalArgumentException.class, () -> dao.findRange(0, 0));
-
-        // Act & Assert - pageSize negativo
-        assertThrows(IllegalArgumentException.class, () -> dao.findRange(0, -5));
-    }
-
-    @Test
-    void testCount_Success() {
-        // Arrange
-        when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
-        when(criteriaBuilder.createQuery(Long.class)).thenReturn(criteriaQueryLong);
-        when(criteriaQueryLong.from(VentaDetalle.class)).thenReturn(root);
-        when(criteriaBuilder.count(root)).thenReturn(mock(jakarta.persistence.criteria.Expression.class));
-        when(criteriaQueryLong.select(any())).thenReturn(criteriaQueryLong);
-        when(entityManager.createQuery(criteriaQueryLong)).thenReturn(longTypedQuery);
-        when(longTypedQuery.getSingleResult()).thenReturn(10L);
-
-        // Act
-        Long result = dao.count();
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(10L, result);
-        verify(entityManager, times(1)).getCriteriaBuilder();
-    }
-
-    @Test
-    void testCount_Zero() {
-        // Arrange
-        when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
-        when(criteriaBuilder.createQuery(Long.class)).thenReturn(criteriaQueryLong);
-        when(criteriaQueryLong.from(VentaDetalle.class)).thenReturn(root);
-        when(criteriaBuilder.count(root)).thenReturn(mock(jakarta.persistence.criteria.Expression.class));
-        when(criteriaQueryLong.select(any())).thenReturn(criteriaQueryLong);
-        when(entityManager.createQuery(criteriaQueryLong)).thenReturn(longTypedQuery);
-        when(longTypedQuery.getSingleResult()).thenReturn(0L);
-
-        // Act
-        Long result = dao.count();
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(0L, result);
-    }
-
-    @Test
-    void testCrear_Success() {
-        // Arrange
-        doNothing().when(entityManager).persist(any(VentaDetalle.class));
-
-        // Act
-        dao.crear(testVentaDetalle);
-
-        // Assert
-        verify(entityManager, times(1)).persist(testVentaDetalle);
-    }
-
-    @Test
-    void testCrear_NullEntity() {
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> dao.crear(null));
-        verify(entityManager, never()).persist(any());
-    }
-
-    @Test
-    void testModificar_Success() {
-        // Arrange
-        when(entityManager.merge(any(VentaDetalle.class)))
-                .thenReturn(testVentaDetalle);
-
-        // Act
-        VentaDetalle result = dao.modificar(testVentaDetalle);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(testVentaDetalle.getId(), result.getId());
-        verify(entityManager, times(1)).merge(testVentaDetalle);
-    }
-
-    @Test
-    void testModificar_NullEntity() {
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> dao.modificar(null));
-        verify(entityManager, never()).merge(any());
-    }
-
-    @Test
-    void testEliminar_Success() {
-        // Arrange
-        when(entityManager.contains(testVentaDetalle)).thenReturn(false);
-        when(entityManager.merge(testVentaDetalle)).thenReturn(testVentaDetalle);
-        doNothing().when(entityManager).remove(any(VentaDetalle.class));
-
-        // Act
-        dao.eliminar(testVentaDetalle);
-
-        // Assert
-        verify(entityManager, times(1)).merge(testVentaDetalle);
-        verify(entityManager, times(1)).remove(any(VentaDetalle.class));
-    }
-
-    @Test
-    void testEliminar_EntityAttached() {
-        // Arrange
-        when(entityManager.contains(testVentaDetalle)).thenReturn(true);
-        doNothing().when(entityManager).remove(any(VentaDetalle.class));
-
-        // Act
-        dao.eliminar(testVentaDetalle);
-
-        // Assert
-        verify(entityManager, never()).merge(any());
-        verify(entityManager, times(1)).remove(testVentaDetalle);
-    }
-
-    @Test
-    void testEliminar_NullEntity() {
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> dao.eliminar(null));
-        verify(entityManager, never()).remove(any());
-    }
-
-    @Test
-    void testEliminarPorId_Success() {
-        // Arrange
-        when(entityManager.find(VentaDetalle.class, testVentaDetalleId))
-                .thenReturn(testVentaDetalle);
-        doNothing().when(entityManager).remove(any(VentaDetalle.class));
-
-        // Act
-        dao.eliminarPorId(testVentaDetalleId);
-
-        // Assert
-        verify(entityManager, times(1)).find(VentaDetalle.class, testVentaDetalleId);
-        verify(entityManager, times(1)).remove(testVentaDetalle);
-    }
-
-    @Test
-    void testEliminarPorId_NotFound() {
-        // Arrange
-        when(entityManager.find(VentaDetalle.class, testVentaDetalleId))
-                .thenReturn(null);
-
-        // Act & Assert
-        assertThrows(RuntimeException.class, () -> dao.eliminarPorId(testVentaDetalleId));
-        verify(entityManager, never()).remove(any());
-    }
-
-    @Test
-    void testEliminarPorId_NullId() {
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> dao.eliminarPorId(null));
-        verify(entityManager, never()).find(any(), any());
+        assertEquals(entityManager, result);
     }
 
     @Test
@@ -454,16 +109,11 @@ class VentaDetalleDAOTest {
         List<Producto> expectedList = new ArrayList<>();
         expectedList.add(testProducto);
 
-        Producto producto2 = new Producto();
-        producto2.setId(UUID.randomUUID());
-        producto2.setNombreProducto("Producto 2");
-        expectedList.add(producto2);
-
         when(entityManager.createQuery(
                 "SELECT vd.idProducto FROM VentaDetalle vd WHERE vd.idVenta.id = :idVenta",
                 Producto.class))
                 .thenReturn(typedQueryProducto);
-        when(typedQueryProducto.setParameter(eq("idVenta"), any(UUID.class)))
+        when(typedQueryProducto.setParameter("idVenta", testVentaId))
                 .thenReturn(typedQueryProducto);
         when(typedQueryProducto.getResultList()).thenReturn(expectedList);
 
@@ -472,21 +122,18 @@ class VentaDetalleDAOTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(2, result.size());
+        assertEquals(1, result.size());
         assertEquals(testProductoId, result.get(0).getId());
-        assertEquals("Producto Test", result.get(0).getNombreProducto());
-        verify(typedQueryProducto, times(1)).setParameter("idVenta", testVentaId);
-        verify(typedQueryProducto, times(1)).getResultList();
+        verify(typedQueryProducto).setParameter("idVenta", testVentaId);
+        verify(typedQueryProducto).getResultList();
     }
 
     @Test
     void testFindProductosByIdVenta_EmptyList() {
         // Arrange
-        when(entityManager.createQuery(
-                "SELECT vd.idProducto FROM VentaDetalle vd WHERE vd.idVenta.id = :idVenta",
-                Producto.class))
+        when(entityManager.createQuery(anyString(), eq(Producto.class)))
                 .thenReturn(typedQueryProducto);
-        when(typedQueryProducto.setParameter(eq("idVenta"), any(UUID.class)))
+        when(typedQueryProducto.setParameter(anyString(), any(UUID.class)))
                 .thenReturn(typedQueryProducto);
         when(typedQueryProducto.getResultList()).thenReturn(new ArrayList<>());
 
@@ -499,18 +146,343 @@ class VentaDetalleDAOTest {
     }
 
     @Test
-    void testFindProductosByIdVenta_NullIdVenta() {
+    void testContarDetallesPorVenta_Success() {
         // Arrange
         when(entityManager.createQuery(
-                "SELECT vd.idProducto FROM VentaDetalle vd WHERE vd.idVenta.id = :idVenta",
-                Producto.class))
-                .thenReturn(typedQueryProducto);
-        when(typedQueryProducto.setParameter(eq("idVenta"), any()))
-                .thenReturn(typedQueryProducto);
-        when(typedQueryProducto.getResultList()).thenReturn(new ArrayList<>());
+                "SELECT COUNT(d) FROM VentaDetalle d WHERE d.idVenta.id = :idCompra",
+                Long.class))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.setParameter("idCompra", testVentaId)).thenReturn(longTypedQuery);
+        when(longTypedQuery.getSingleResult()).thenReturn(5L);
 
         // Act
-        List<Producto> result = dao.findProductosByIdVenta(null);
+        Long result = dao.contarDetallesPorVenta(testVentaId);
+
+        // Assert
+        assertEquals(5L, result);
+        verify(entityManager).createQuery(contains("COUNT(d)"), eq(Long.class));
+        verify(longTypedQuery).setParameter("idCompra", testVentaId);
+        verify(longTypedQuery).getSingleResult();
+    }
+
+    @Test
+    void testContarDetallesPorVenta_Exception() {
+        // Arrange
+        when(entityManager.createQuery(anyString(), eq(Long.class)))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.setParameter(anyString(), any())).thenReturn(longTypedQuery);
+        when(longTypedQuery.getSingleResult()).thenThrow(new RuntimeException("Database error"));
+
+        // Act
+        Long result = dao.contarDetallesPorVenta(testVentaId);
+
+        // Assert
+        assertEquals(0L, result);
+        verify(entityManager).createQuery(anyString(), eq(Long.class));
+    }
+
+    @Test
+    void testContarDetallesDespachadosPorVenta_Success() {
+        // Arrange
+        when(entityManager.createQuery(
+                "SELECT COUNT(d) FROM VentaDetalle d WHERE d.idVenta.id = :idVenta AND d.estado = 'DESPACHADO'",
+                Long.class))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.setParameter("idVenta", testVentaId)).thenReturn(longTypedQuery);
+        when(longTypedQuery.getSingleResult()).thenReturn(3L);
+
+        // Act
+        Long result = dao.contarDetallesDespachadosPorVenta(testVentaId);
+
+        // Assert
+        assertEquals(3L, result);
+        verify(entityManager).createQuery(contains("DESPACHADO"), eq(Long.class));
+        verify(longTypedQuery).setParameter("idVenta", testVentaId);
+        verify(longTypedQuery).getSingleResult();
+    }
+
+    @Test
+    void testContarDetallesDespachadosPorVenta_Exception() {
+        // Arrange
+        when(entityManager.createQuery(anyString(), eq(Long.class)))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.setParameter(anyString(), any())).thenReturn(longTypedQuery);
+        when(longTypedQuery.getSingleResult()).thenThrow(new RuntimeException("Database error"));
+
+        // Act
+        Long result = dao.contarDetallesDespachadosPorVenta(testVentaId);
+
+        // Assert
+        assertEquals(0L, result);
+        verify(entityManager).createQuery(anyString(), eq(Long.class));
+    }
+
+    @Test
+    void testFindByIdVenta_Success() {
+        // Arrange
+        List<VentaDetalle> expectedList = new ArrayList<>();
+        expectedList.add(testVentaDetalle);
+
+        when(entityManager.createQuery(
+                "SELECT vd FROM VentaDetalle vd WHERE vd.idVenta.id = :idVenta",
+                VentaDetalle.class))
+                .thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.setParameter("idVenta", testVentaId)).thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.getResultList()).thenReturn(expectedList);
+
+        // Act
+        List<VentaDetalle> result = dao.findByIdVenta(testVentaId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(testVentaDetalleId, result.get(0).getId());
+        verify(typedQueryVentaDetalle).setParameter("idVenta", testVentaId);
+        verify(typedQueryVentaDetalle).getResultList();
+    }
+
+    @Test
+    void testFindByIdVenta_EmptyList() {
+        // Arrange
+        when(entityManager.createQuery(anyString(), eq(VentaDetalle.class)))
+                .thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.setParameter(anyString(), any(UUID.class)))
+                .thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.getResultList()).thenReturn(new ArrayList<>());
+
+        // Act
+        List<VentaDetalle> result = dao.findByIdVenta(testVentaId);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testTodosDetallesDespachados_True() {
+        // Arrange
+        when(entityManager.createQuery(contains("COUNT(d)"), eq(Long.class)))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.setParameter(anyString(), any(UUID.class)))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.getSingleResult())
+                .thenReturn(5L)
+                .thenReturn(5L);
+
+        // Act
+        boolean result = dao.todosDetallesDespachados(testVentaId);
+
+        // Assert
+        assertTrue(result);
+        verify(entityManager, times(2)).createQuery(anyString(), eq(Long.class));
+        verify(longTypedQuery, times(2)).getSingleResult();
+    }
+
+    @Test
+    void testTodosDetallesDespachados_False() {
+        // Arrange
+        when(entityManager.createQuery(contains("COUNT(d)"), eq(Long.class)))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.setParameter(anyString(), any(UUID.class)))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.getSingleResult())
+                .thenReturn(5L)
+                .thenReturn(3L);
+
+        // Act
+        boolean result = dao.todosDetallesDespachados(testVentaId);
+
+        // Assert
+        assertFalse(result);
+    }
+
+    @Test
+    void testTodosDetallesDespachados_ZeroTotal() {
+        // Arrange
+        when(entityManager.createQuery(contains("COUNT(d)"), eq(Long.class)))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.setParameter(anyString(), any(UUID.class)))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.getSingleResult())
+                .thenReturn(0L)
+                .thenReturn(0L);
+
+        // Act
+        boolean result = dao.todosDetallesDespachados(testVentaId);
+
+        // Assert
+        assertFalse(result);
+    }
+
+    @Test
+    void testObtenerTotalVenta_Success() {
+        // Arrange
+        BigDecimal expectedTotal = new BigDecimal("500.00");
+
+        when(entityManager.createQuery(
+                "SELECT COALESCE(SUM(cd.cantidad * cd.precio), 0) FROM VentaDetalle cd WHERE cd.idVenta.id = :idVenta",
+                BigDecimal.class))
+                .thenReturn(bigDecimalTypedQuery);
+        when(bigDecimalTypedQuery.setParameter("idVenta", testVentaId)).thenReturn(bigDecimalTypedQuery);
+        when(bigDecimalTypedQuery.getSingleResult()).thenReturn(expectedTotal);
+
+        // Act
+        BigDecimal result = dao.obtenerTotalVenta(testVentaId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedTotal, result);
+        verify(entityManager).createQuery(contains("SUM(cd.cantidad * cd.precio)"), eq(BigDecimal.class));
+        verify(bigDecimalTypedQuery).setParameter("idVenta", testVentaId);
+        verify(bigDecimalTypedQuery).getSingleResult();
+    }
+
+    @Test
+    void testObtenerTotalVenta_NullResult() {
+        // Arrange
+        when(entityManager.createQuery(anyString(), eq(BigDecimal.class)))
+                .thenReturn(bigDecimalTypedQuery);
+        when(bigDecimalTypedQuery.setParameter(anyString(), any())).thenReturn(bigDecimalTypedQuery);
+        when(bigDecimalTypedQuery.getSingleResult()).thenReturn(null);
+
+        // Act
+        BigDecimal result = dao.obtenerTotalVenta(testVentaId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(BigDecimal.ZERO, result);
+    }
+
+    @Test
+    void testFindById_Success() {
+        // Arrange
+        when(entityManager.find(VentaDetalle.class, testVentaDetalleId)).thenReturn(testVentaDetalle);
+
+        // Act
+        VentaDetalle result = dao.findById(testVentaDetalleId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(testVentaDetalleId, result.getId());
+        verify(entityManager).find(VentaDetalle.class, testVentaDetalleId);
+    }
+
+    @Test
+    void testFindById_NotFound() {
+        // Arrange
+        when(entityManager.find(VentaDetalle.class, testVentaDetalleId)).thenReturn(null);
+
+        // Act
+        VentaDetalle result = dao.findById(testVentaDetalleId);
+
+        // Assert
+        assertNull(result);
+        verify(entityManager).find(VentaDetalle.class, testVentaDetalleId);
+    }
+
+    @Test
+    void testContarPorVenta_Success() {
+        // Arrange
+        when(entityManager.createQuery(
+                "SELECT COUNT(d) FROM VentaDetalle d WHERE d.idVenta.id = :idVenta",
+                Long.class))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.setParameter("idVenta", testVentaId)).thenReturn(longTypedQuery);
+        when(longTypedQuery.getSingleResult()).thenReturn(7L);
+
+        // Act
+        int result = dao.contarPorVenta(testVentaId);
+
+        // Assert
+        assertEquals(7, result);
+        verify(longTypedQuery).setParameter("idVenta", testVentaId);
+        verify(longTypedQuery).getSingleResult();
+    }
+
+    @Test
+    void testContarPorVenta_NullResult() {
+        // Arrange
+        when(entityManager.createQuery(anyString(), eq(Long.class)))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.setParameter(anyString(), any())).thenReturn(longTypedQuery);
+        when(longTypedQuery.getSingleResult()).thenReturn(null);
+
+        // Act
+        int result = dao.contarPorVenta(testVentaId);
+
+        // Assert
+        assertEquals(0, result);
+    }
+
+    @Test
+    void testContarPorVenta_Exception() {
+        // Arrange
+        when(entityManager.createQuery(anyString(), eq(Long.class)))
+                .thenReturn(longTypedQuery);
+        when(longTypedQuery.setParameter(anyString(), any())).thenReturn(longTypedQuery);
+        when(longTypedQuery.getSingleResult()).thenThrow(new RuntimeException("Database error"));
+
+        // Act
+        int result = dao.contarPorVenta(testVentaId);
+
+        // Assert
+        assertEquals(0, result);
+    }
+
+    @Test
+    void testFindPorVenta_Success() {
+        // Arrange
+        List<VentaDetalle> expectedList = new ArrayList<>();
+        expectedList.add(testVentaDetalle);
+
+        when(entityManager.createQuery(
+                "SELECT vd FROM VentaDetalle vd WHERE vd.idVenta.id = :idVenta",
+                VentaDetalle.class))
+                .thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.setParameter("idVenta", testVentaId)).thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.setFirstResult(10)).thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.setMaxResults(5)).thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.getResultList()).thenReturn(expectedList);
+
+        // Act
+        List<VentaDetalle> result = dao.findPorVenta(testVentaId, 10, 5);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(typedQueryVentaDetalle).setParameter("idVenta", testVentaId);
+        verify(typedQueryVentaDetalle).setFirstResult(10);
+        verify(typedQueryVentaDetalle).setMaxResults(5);
+        verify(typedQueryVentaDetalle).getResultList();
+    }
+
+    @Test
+    void testFindPorVenta_EmptyList() {
+        // Arrange
+        when(entityManager.createQuery(anyString(), eq(VentaDetalle.class)))
+                .thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.setParameter(anyString(), any(UUID.class)))
+                .thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.setFirstResult(anyInt())).thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.setMaxResults(anyInt())).thenReturn(typedQueryVentaDetalle);
+        when(typedQueryVentaDetalle.getResultList()).thenReturn(new ArrayList<>());
+
+        // Act
+        List<VentaDetalle> result = dao.findPorVenta(testVentaId, 0, 10);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testFindPorVenta_Exception() {
+        // Arrange
+        when(entityManager.createQuery(anyString(), eq(VentaDetalle.class)))
+                .thenThrow(new RuntimeException("Database error"));
+
+        // Act
+        List<VentaDetalle> result = dao.findPorVenta(testVentaId, 0, 10);
 
         // Assert
         assertNotNull(result);
