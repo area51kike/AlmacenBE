@@ -103,6 +103,16 @@
                                     outcome="/paginas/Cliente.jsf"
                                     icon="pi pi-users" />
                     </p:submenu>
+
+                    <!-- Categoría: Movimientos de Inventario -->
+                    <p:submenu label="#{msg['sidebar.categoria.movimientos']}" icon="pi pi-arrows-h">
+                        <p:menuitem value="#{msg['sidebar.recepcion']}"
+                                    outcome="/paginas/Recepcion.jsf"
+                                    icon="pi pi-arrow-down" />
+                        <p:menuitem value="#{msg['sidebar.despacho']}"
+                                    outcome="/paginas/Despacho.jsf"
+                                    icon="pi pi-arrow-up" />
+                    </p:submenu>
                 </p:panelMenu>
             </h:form>
         </div>
