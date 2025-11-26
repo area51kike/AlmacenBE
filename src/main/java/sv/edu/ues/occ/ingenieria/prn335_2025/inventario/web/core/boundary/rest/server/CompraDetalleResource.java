@@ -30,13 +30,13 @@ public class CompraDetalleResource {
     private static final Logger LOGGER = Logger.getLogger(CompraDetalleResource.class.getName());
 
     @Inject
-    private CompraDetalleDAO compraDetalleDAO;
+    CompraDetalleDAO compraDetalleDAO;
 
     @Inject
-    private CompraDAO compraDAO;
+    CompraDAO compraDAO;
 
     @Inject
-    private ProductoDAO productoDAO;
+    ProductoDAO productoDAO;
 
     /**
      * GET /compras/{idCompra}/detalles

@@ -1,4 +1,4 @@
-package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.boundary.rest;
+package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.rest.server;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -27,10 +27,10 @@ public class KardexDetalleResource {
     private static final Logger LOGGER = Logger.getLogger(KardexDetalleResource.class.getName());
 
     @Inject
-    private KardexDetalleDAO kardexDetalleDAO;
+    KardexDetalleDAO kardexDetalleDAO;
 
     @Inject
-    private KardexDAO kardexDAO;
+    KardexDAO kardexDAO;
 
     /**
      * GET /kardex/{idKardex}/detalles
