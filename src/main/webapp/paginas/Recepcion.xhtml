@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <meta charset="UTF-8"/>
+    <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['recepcion.titulo']}</title>
+</h:head>
+<h:body>
+    <!-- Traductor -->
+    <ui:include src="/paginas/ues/BotonesTop.xhtml">
+        <ui:param name="section" value="traductor"/>
+    </ui:include>
+
+    <div class="page-container">
+        <!-- Sidebar -->
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['recepcion.titulo']}</h1>
+            </div>
+
+            <div class="content">
+                <!-- ========== TABLA PRINCIPAL DE COMPRAS ========== -->
+                <h:panelGroup id="pnlTabla" layout="block"
+                              style="display:#{recepcionFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTabla">
+                            <p:dataTable id="tabla"
+                                         lazy="true"
+                                         rendered="#{recepcionFrm.estado == 'NADA'}"
+                                         rows="5"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{recepcionFrm.modelo}"
+                                         var="reg"
+                                         selectionMode="single"
+                                         selection="#{recepcionFrm.registro}"
+                                         rowKey="#{reg.id}">
+                                <p:ajax event="rowSelect"
+                                        listener="#{recepcionFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle :messagesTabla"/>
+
+                                <p:column headerText="#{msg['tabla.id']}">
+                                    <h:outputText value="#{reg.id}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.proveedor']}">
+                                    <h:outputText value="#{reg.proveedor.nombre}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.fecha']}">
+                                    <h:outputText value="#{reg.fecha}">
+                                        <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.estado']}">
+                                    <h:outputText value="#{reg.estado}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.observaciones']}">
+                                    <h:outputText value="#{reg.observaciones}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['montoTotal.titulo']}">
+                                    <h:outputText value="$ #{compraFrm.getTotalCompra(reg)}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+
+                        <p:growl id="messagesTabla" showDetail="true" life="5000" sticky="false"/>
+                    </div>
+                </h:panelGroup>
+
+                <!-- ========== DETALLE DE LA COMPRA ========== -->
+                <h:panelGroup id="pnlDetalle">
+                    <p:tabView id="tabRecepcion" cache="false" dynamic="true"
+                               rendered="#{recepcionFrm.estado != 'NADA'}">
+
+                        <!-- TAB: Generalidades -->
+                        <p:tab closable="false" title="#{msg['tab.generalidades']}">
+                            <h:form id="frmGeneral">
+                                <h3>Seleccione las compras que recibirá en detalles de compra.</h3>
+
+                                <h:panelGrid columns="2" cellpadding="5" style="width: 100%;">
+                                    <h:outputLabel value="#{msg['form.id']}:"/>
+                                    <h:outputText value="#{recepcionFrm.registro.id}"/>
+
+                                    <h:outputLabel value="#{msg['tabla.proveedor']}:"/>
+                                    <h:outputText value="#{recepcionFrm.registro.proveedor.nombre}"/>
+
+                                    <h:outputLabel value="#{msg['tabla.fecha']}:"/>
+                                    <h:outputText value="#{recepcionFrm.registro.fecha}">
+                                        <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
+                                    </h:outputText>
+
+                                    <h:outputLabel value="#{msg['tabla.estado']}:"/>
+                                    <h:outputText value="#{recepcionFrm.registro.estado}"/>
+
+                                    <h:outputLabel value="#{msg['tabla.observaciones']}:"/>
+                                    <h:outputText value="#{recepcionFrm.registro.observaciones}"/>
+                                </h:panelGrid>
+                            </h:form>
+
+                            <!-- Botón Cancelar en su propio form -->
+                            <h:form id="frmCancelarGeneral">
+                                <h:panelGrid columns="1" style="margin-top: 15px;">
+                                    <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                        <ui:param name="section" value="cancelar"/>
+                                        <ui:param name="bean" value="#{recepcionFrm}"/>
+                                    </ui:include>
+                                </h:panelGrid>
+                            </h:form>
+                        </p:tab>
+
+                        <!-- TAB: Detalles de Compra -->
+                        <p:tab closable="false"
+                               title="#{msg['tab.compraDetalle']}"
+                               disabled="#{recepcionFrm.estado eq 'CREAR'}">
+                            <h:panelGroup id="pnlCompraDetalles">
+                                <h2>Detalles de esta compra #{recepcionFrm.registro.id}</h2>
+
+                                <!-- TABLA DE DETALLES -->
+                                <h:form id="frmTablaDetalles">
+                                    <p:dataTable id="tablaDetalles"
+                                                 lazy="true"
+                                                 rendered="#{recepcionFrm.compraDetalleFrm.estado == 'NADA'}"
+                                                 rows="5"
+                                                 paginator="true"
+                                                 paginatorPosition="bottom"
+                                                 value="#{recepcionFrm.compraDetalleFrm.modelo}"
+                                                 var="tp"
+                                                 selectionMode="single"
+                                                 selection="#{recepcionFrm.compraDetalleFrm.registro}"
+                                                 rowKey="#{tp.id}">
+                                        <p:ajax event="rowSelect"
+                                                listener="#{recepcionFrm.compraDetalleFrm.selectionHandler}"
+                                                update="tabRecepcion:pnlCompraDetalles tabRecepcion:pnlProductoDetalle :messagesDetalles"/>
+
+                                        <p:column headerText="#{msg['tabla.id']}">
+                                            <h:outputText value="#{tp.id}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['producto.titulo']}">
+                                            <h:outputText value="#{tp.idProducto.nombreProducto}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['tabla.cantidad']}">
+                                            <h:outputText value="#{tp.cantidad}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['tabla.precioUnitario']}">
+                                            <h:outputText value="#{tp.precio}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['form.estado']}">
+                                            <h:outputText value="#{tp.estado}"
+                                                          styleClass="#{tp.estado eq 'RECIBIDO' ? 'estado-recibido' : 'estado-pendiente'}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['form.observaciones']}">
+                                            <h:outputText value="#{tp.observaciones}"/>
+                                        </p:column>
+                                    </p:dataTable>
+
+                                    <p:growl id="messagesDetalles" showDetail="true" life="5000" sticky="false"/>
+                                </h:form>
+                            </h:panelGroup>
+
+                            <!-- DETALLE DEL PRODUCTO SELECCIONADO -->
+                            <h:panelGroup id="pnlProductoDetalle">
+                                <h:form id="frmDetalleProducto"
+                                        rendered="#{recepcionFrm.compraDetalleFrm.estado != 'NADA'}">
+                                    <h:panelGrid columns="2" cellpadding="5" style="width: 100%;">
+                                        <h:outputLabel value="#{msg['form.id']}:"/>
+                                        <h:outputText value="#{recepcionFrm.compraDetalleFrm.registro.id}"/>
+
+                                        <h:outputLabel value="#{msg['producto.titulo']}:"/>
+                                        <h:outputText value="#{recepcionFrm.compraDetalleFrm.registro.idProducto.nombreProducto}"/>
+
+                                        <h:outputLabel value="#{msg['tabla.cantidad']}:"/>
+                                        <h:outputText value="#{recepcionFrm.compraDetalleFrm.registro.cantidad}">
+                                            <f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2"/>
+                                        </h:outputText>
+
+                                        <h:outputLabel value="#{msg['tabla.precioUnitario']}:"/>
+                                        <h:outputText value="#{recepcionFrm.compraDetalleFrm.registro.precio}"/>
+
+                                        <h:outputLabel value="#{msg['form.estado']}:"/>
+                                        <h:outputText value="#{recepcionFrm.compraDetalleFrm.registro.estado}"/>
+
+                                        <h:outputLabel value="#{msg['form.observaciones']}:"/>
+                                        <h:outputText value="#{recepcionFrm.compraDetalleFrm.registro.observaciones}"/>
+                                    </h:panelGrid>
+
+                                    <!-- Botones de Acción -->
+                                    <h:panelGrid columns="1" style="margin-top: 15px;">
+                                        <h:panelGroup>
+                                            <p:commandButton value="Recibir"
+                                                             icon="pi pi-check"
+                                                             styleClass="ui-button-success"
+                                                             action="#{recepcionFrm.recepcionKardexFrm.prepararKardex(recepcionFrm.compraDetalleFrm.registro)}"
+                                                             update=":dlgKardex"
+                                                             oncomplete="PF('dlgKardex').show()"
+                                                             rendered="#{recepcionFrm.compraDetalleFrm.registro.estado ne 'RECIBIDO'}"/>
+
+                                            <h:outputText value="✓ Recibido"
+                                                          rendered="#{recepcionFrm.compraDetalleFrm.registro.estado eq 'RECIBIDO'}"
+                                                          style="color: #4caf50; font-weight: bold; margin-left: 10px;"/>
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                </h:form>
+
+                                <!-- Botón Cancelar en su propio form -->
+                                <h:form id="frmCancelarDetalle">
+                                    <h:panelGrid columns="1" style="margin-top: 10px;">
+                                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                            <ui:param name="section" value="cancelar"/>
+                                            <ui:param name="bean" value="#{recepcionFrm.compraDetalleFrm}"/>
+                                        </ui:include>
+                                    </h:panelGrid>
+                                </h:form>
+                            </h:panelGroup>
+                        </p:tab>
+                    </p:tabView>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== DIÁLOGO KARDEX ========== -->
+    <p:dialog header="Recibir Producto en Kardex"
+              id="dlgKardex"
+              widgetVar="dlgKardex"
+              modal="true"
+              width="600"
+              showEffect="fade"
+              closeOnEscape="true"
+              resetValues="true">
+        <h:form id="frmKardex">
+            <div style="padding: 20px;">
+                <div style="margin-bottom: 15px;">
+                    <strong>Producto:</strong>
+                    <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.idProducto.nombreProducto}"/>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Cantidad:</strong>
+                    <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.cantidad}">
+                        <f:convertNumber pattern="#,##0.00"/>
+                    </h:outputText>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Precio:</strong>
+                    <h:outputText value="$ #{recepcionFrm.recepcionKardexFrm.registro.precio}">
+                        <f:convertNumber pattern="#,##0.00"/>
+                    </h:outputText>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Fecha de Recepción:</strong>
+                    <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.fecha}">
+                        <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
+                    </h:outputText>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Tipo Movimiento:</strong>
+                    <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.tipoMovimiento}"
+                                  style="color: green; font-weight: bold;"/>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Referencia Externa:</strong>
+                    <p:inputText id="txtRefExterna"
+                                 value="#{recepcionFrm.recepcionKardexFrm.registro.referenciaExterna}"
+                                 style="width: 100%;"/>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Observaciones:</strong>
+                    <p:inputTextarea id="txtObsKardex"
+                                     value="#{recepcionFrm.recepcionKardexFrm.registro.observaciones}"
+                                     rows="3"
+                                     style="width: 100%;"/>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Lote:</strong>
+                    <p:inputText id="txtLote"
+                                 value="#{recepcionFrm.recepcionKardexFrm.detalleKardex.lote}"
+                                 style="width: 100%;"/>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: red;">Almacén: *</strong>
+                    <p:selectOneMenu id="cbAlmacenKardex"
+                                     value="#{recepcionFrm.recepcionKardexFrm.registro.idAlmacen}"
+                                     converter="almacenConverter"
+                                     required="true"
+                                     requiredMessage="Debe seleccionar un almacén"
+                                     style="width: 100%;">
+                        <f:selectItem itemLabel="-- Seleccione almacén --" itemValue="#{null}"/>
+                        <f:selectItems value="#{recepcionFrm.recepcionKardexFrm.listaAlmacenes}"
+                                       var="alm"
+                                       itemLabel="#{alm.observaciones}"
+                                       itemValue="#{alm}"/>
+                    </p:selectOneMenu>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px; padding: 10px; border-top: 1px solid #ddd;">
+                <p:commandButton value="Recibir Producto"
+                                 icon="pi pi-save"
+                                 styleClass="ui-button-success"
+                                 actionListener="#{recepcionFrm.recepcionKardexFrm.btnRecibirHandler}"
+                                 update=":messagesGlobal tabRecepcion:pnlCompraDetalles tabRecepcion:pnlProductoDetalle :pnlTabla"
+                                 oncomplete="if(!args.validationFailed) PF('dlgKardex').hide()"/>
+
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 styleClass="ui-button-secondary"
+                                 type="button"
+                                 onclick="PF('dlgKardex').hide();"
+                                 style="margin-left: 10px;"/>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:growl id="messagesGlobal" showDetail="true" life="5000" sticky="false" autoUpdate="true"/>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        (function() {
+            let ws;
+
+            function conectar() {
+                ws = new WebSocket("ws://localhost:9080/JPQL2-1.0-SNAPSHOT/notificadorKardex");
+                ws.onmessage = function(event) {
+                    if (event.data === "RELOAD_TABLE") {
+                        console.log("Recargando tabla...");
+
+                        // Recargar SOLO la tabla usando PrimeFaces Ajax
+                        if (typeof PF !== 'undefined') {
+                            PrimeFaces.ajax.Request.handle({
+                                source: 'frmTabla:tabla',
+                                process: '@this',
+                                update: 'frmTabla:tabla',
+                                oncomplete: function(xhr, status, args) {
+                                    console.log("Tabla actualizada exitosamente");
+                                }
+                            });
+                        } else {
+                            // Fallback si PrimeFaces no está disponible
+                            console.warn("PrimeFaces no disponible, recargando página completa");
+                            location.reload();
+                        }
+                    }
+                };
+
+                ws.onopen = function() {
+                    console.log("WebSocket conectado en página de Recepción");
+                };
+
+                ws.onerror = function(error) {
+                    console.error("Error en WebSocket:", error);
+                };
+
+                ws.onclose = function() {
+                    console.log("WebSocket desconectado. Reconectando en 3 segundos...");
+                    setTimeout(conectar, 3000);
+                };
+            }
+
+            window.addEventListener('load', conectar);
+        })();
+        //]]>
+    </script>
+
+</h:body>
+</html>

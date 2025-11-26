@@ -28,6 +28,24 @@ public class VentaDAO extends InventarioDefaultDataAccess<Venta> {
     public EntityManager getEntityManager() {
         return em;
     }
+    public void actualizarEstado(UUID idVenta, String nuevoEstado) {
+        try {
+            Venta venta = em.find(Venta.class, idVenta);
+            if (venta != null) {
+                venta.setEstado(nuevoEstado);
+                em.merge(venta);
+            }
+        } catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,
+                    "Error al actualizar estado de venta", e);
+            throw new RuntimeException("No se pudo actualizar el estado de la venta", e);
+        }
+    }
+    public List<Venta> findByEstado(String estado) {
+        return em.createQuery("SELECT c FROM Venta c WHERE c.estado = :estado", Venta.class)
+                .setParameter("estado", estado)
+                .getResultList();
+    }
 
     public Venta findById(UUID id) {
         try {

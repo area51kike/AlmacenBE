@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <meta charset="UTF-8"/>
+    <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
+    <title>#{msg['despacho.titulo']}</title>
+</h:head>
+<h:body>
+    <!-- Traductor -->
+    <ui:include src="/paginas/ues/BotonesTop.xhtml">
+        <ui:param name="section" value="traductor"/>
+    </ui:include>
+
+    <div class="page-container">
+        <!-- Sidebar -->
+        <ui:include src="/paginas/ues/Sidebar.xhtml"/>
+
+        <div class="container">
+            <div class="header">
+                <h1>#{msg['despacho.titulo']}</h1>
+            </div>
+
+            <div class="content">
+                <!-- ========== TABLA PRINCIPAL DE VENTAS ========== -->
+                <h:panelGroup id="pnlTabla" layout="block"
+                              style="display:#{despachoFrm.estado eq 'NADA' ? 'block' : 'none'}">
+                    <div class="content-tabla">
+                        <h:form id="frmTabla">
+                            <p:dataTable id="tabla"
+                                         lazy="true"
+                                         rendered="#{despachoFrm.estado == 'NADA'}"
+                                         rows="5"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         value="#{despachoFrm.modelo}"
+                                         var="reg"
+                                         selectionMode="single"
+                                         selection="#{despachoFrm.registro}"
+                                         rowKey="#{reg.id}">
+                                <p:ajax event="rowSelect"
+                                        listener="#{despachoFrm.selectionHandler}"
+                                        update=":pnlTabla :pnlDetalle :messagesTabla"/>
+
+                                <p:column headerText="#{msg['tabla.id']}">
+                                    <h:outputText value="#{reg.id}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['cliente.titulo']}">
+                                    <h:outputText value="#{reg.idCliente.nombre}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.fecha']}">
+                                    <h:outputText value="#{reg.fecha}">
+                                        <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.estado']}">
+                                    <h:outputText value="#{reg.estado}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['tabla.observaciones']}">
+                                    <h:outputText value="#{reg.observaciones}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['montoTotal.titulo']}">
+                                    <h:outputText value="$ #{ventaFrm.getTotalVenta(reg)}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+
+                        <p:growl id="messagesTabla" showDetail="true" life="5000" sticky="false"/>
+                    </div>
+                </h:panelGroup>
+
+                <!-- ========== DETALLE DE LA VENTA ========== -->
+                <h:panelGroup id="pnlDetalle">
+                    <p:tabView id="tabDespacho" cache="false" dynamic="true"
+                               rendered="#{despachoFrm.estado != 'NADA'}">
+
+                        <!-- TAB: Generalidades -->
+                        <p:tab closable="false" title="#{msg['tab.generalidades']}">
+                            <h:form id="frmGeneral">
+                                <h3>Seleccione las ventas que despachará en detalles de venta.</h3>
+
+                                <h:panelGrid columns="2" cellpadding="5" style="width: 100%;">
+                                    <h:outputLabel value="#{msg['form.id']}:"/>
+                                    <h:outputText value="#{despachoFrm.registro.id}"/>
+
+                                    <h:outputLabel value="#{msg['tabla.proveedor']}:"/>
+                                    <h:outputText value="#{despachoFrm.registro.idCliente.nombre}"/>
+
+                                    <h:outputLabel value="#{msg['tabla.fecha']}:"/>
+                                    <h:outputText value="#{despachoFrm.registro.fecha}">
+                                        <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
+                                    </h:outputText>
+
+                                    <h:outputLabel value="#{msg['tabla.estado']}:"/>
+                                    <h:outputText value="#{despachoFrm.registro.estado}"/>
+
+                                    <h:outputLabel value="#{msg['tabla.observaciones']}:"/>
+                                    <h:outputText value="#{despachoFrm.registro.observaciones}"/>
+                                </h:panelGrid>
+                            </h:form>
+
+                            <!-- Botón Cancelar en su propio form -->
+                            <h:form id="frmCancelarGeneral">
+                                <h:panelGrid columns="1" style="margin-top: 15px;">
+                                    <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                        <ui:param name="section" value="cancelar"/>
+                                        <ui:param name="bean" value="#{despachoFrm}"/>
+                                    </ui:include>
+                                </h:panelGrid>
+                            </h:form>
+                        </p:tab>
+
+                        <!-- TAB: Detalles de Venta -->
+                        <p:tab closable="false"
+                               title="#{msg['tab.ventaDetalle']}"
+                               disabled="#{despachoFrm.estado eq 'CREAR'}">
+                            <h:panelGroup id="pnlVentaDetalles">
+                                <h2>Detalles de esta venta #{despachoFrm.registro.id}</h2>
+
+                                <!-- TABLA DE DETALLES -->
+                                <h:form id="frmTablaDetalles">
+                                    <p:dataTable id="tablaDetalles"
+                                                 lazy="true"
+                                                 rendered="#{despachoFrm.ventaDetalleFrm.estado == 'NADA'}"
+                                                 rows="5"
+                                                 paginator="true"
+                                                 paginatorPosition="bottom"
+                                                 value="#{despachoFrm.ventaDetalleFrm.modelo}"
+                                                 var="tp"
+                                                 selectionMode="single"
+                                                 selection="#{despachoFrm.ventaDetalleFrm.registro}"
+                                                 rowKey="#{tp.id}">
+                                        <p:ajax event="rowSelect"
+                                                listener="#{despachoFrm.ventaDetalleFrm.selectionHandler}"
+                                                update="tabDespacho:pnlVentaDetalles tabDespacho:pnlProductoDetalle :messagesDetalles"/>
+
+                                        <p:column headerText="#{msg['tabla.id']}">
+                                            <h:outputText value="#{tp.id}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['producto.titulo']}">
+                                            <h:outputText value="#{tp.idProducto.nombreProducto}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['tabla.cantidad']}">
+                                            <h:outputText value="#{tp.cantidad}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['tabla.precioUnitario']}">
+                                            <h:outputText value="#{tp.precio}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['form.estado']}">
+                                            <h:outputText value="#{tp.estado}"
+                                                          styleClass="#{tp.estado eq 'DESPACHADO' ? 'estado-despachado' : 'estado-pendiente'}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['form.observaciones']}">
+                                            <h:outputText value="#{tp.observaciones}"/>
+                                        </p:column>
+                                    </p:dataTable>
+
+                                    <p:growl id="messagesDetalles" showDetail="true" life="5000" sticky="false"/>
+                                </h:form>
+                            </h:panelGroup>
+
+                            <!-- DETALLE DEL PRODUCTO SELECCIONADO -->
+                            <h:panelGroup id="pnlProductoDetalle">
+                                <h:form id="frmDetalleProducto"
+                                        rendered="#{despachoFrm.ventaDetalleFrm.estado != 'NADA'}">
+                                    <h:panelGrid columns="2" cellpadding="5" style="width: 100%;">
+                                        <h:outputLabel value="#{msg['form.id']}:"/>
+                                        <h:outputText value="#{despachoFrm.ventaDetalleFrm.registro.id}"/>
+
+                                        <h:outputLabel value="#{msg['producto.titulo']}:"/>
+                                        <h:outputText value="#{despachoFrm.ventaDetalleFrm.registro.idProducto.nombreProducto}"/>
+
+                                        <h:outputLabel value="#{msg['tabla.cantidad']}:"/>
+                                        <h:outputText value="#{despachoFrm.ventaDetalleFrm.registro.cantidad}">
+                                            <f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2"/>
+                                        </h:outputText>
+
+                                        <h:outputLabel value="#{msg['tabla.precioUnitario']}:"/>
+                                        <h:outputText value="#{despachoFrm.ventaDetalleFrm.registro.precio}"/>
+
+                                        <h:outputLabel value="#{msg['form.estado']}:"/>
+                                        <h:outputText value="#{despachoFrm.ventaDetalleFrm.registro.estado}"/>
+
+                                        <h:outputLabel value="#{msg['form.observaciones']}:"/>
+                                        <h:outputText value="#{despachoFrm.ventaDetalleFrm.registro.observaciones}"/>
+                                    </h:panelGrid>
+
+                                    <!-- Botones de Acción -->
+                                    <h:panelGrid columns="1" style="margin-top: 15px;">
+                                        <h:panelGroup>
+                                            <p:commandButton value="Despachar"
+                                                             icon="pi pi-check"
+                                                             styleClass="ui-button-success"
+                                                             action="#{despachoFrm.despachoKardexFrm.prepararKardex(despachoFrm.ventaDetalleFrm.registro)}"
+                                                             update=":dlgKardex"
+                                                             oncomplete="PF('dlgKardex').show()"
+                                                             rendered="#{despachoFrm.ventaDetalleFrm.registro.estado ne 'DESPACHADO'}"/>
+
+                                            <h:outputText value="✓ Despachado"
+                                                          rendered="#{despachoFrm.ventaDetalleFrm.registro.estado eq 'DESPACHADO'}"
+                                                          style="color: #4caf50; font-weight: bold; margin-left: 10px;"/>
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                </h:form>
+
+                                <!-- Botón Cancelar en su propio form -->
+                                <h:form id="frmCancelarDetalle">
+                                    <h:panelGrid columns="1" style="margin-top: 10px;">
+                                        <ui:include src="/paginas/ues/BotonesTop.xhtml">
+                                            <ui:param name="section" value="cancelar"/>
+                                            <ui:param name="bean" value="#{despachoFrm.ventaDetalleFrm}"/>
+                                        </ui:include>
+                                    </h:panelGrid>
+                                </h:form>
+                            </h:panelGroup>
+                        </p:tab>
+                    </p:tabView>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== DIÁLOGO KARDEX ========== -->
+    <p:dialog header="Despachar Producto en Bodega"
+              id="dlgKardex"
+              widgetVar="dlgKardex"
+              modal="true"
+              width="600"
+              showEffect="fade"
+              closeOnEscape="true"
+              resetValues="true">
+        <h:form id="frmKardex">
+            <div style="padding: 20px;">
+                <div style="margin-bottom: 15px;">
+                    <strong>Producto:</strong>
+                    <h:outputText value="#{despachoFrm.despachoKardexFrm.registro.idProducto.nombreProducto}"/>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Cantidad:</strong>
+                    <h:outputText value="#{despachoFrm.despachoKardexFrm.registro.cantidad}">
+                        <f:convertNumber pattern="#,##0.00"/>
+                    </h:outputText>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Precio:</strong>
+                    <h:outputText value="$ #{despachoFrm.despachoKardexFrm.registro.precio}">
+                        <f:convertNumber pattern="#,##0.00"/>
+                    </h:outputText>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Fecha de Recepción:</strong>
+                    <h:outputText value="#{despachoFrm.despachoKardexFrm.registro.fecha}">
+                        <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
+                    </h:outputText>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Tipo Movimiento:</strong>
+                    <h:outputText value="#{despachoFrm.despachoKardexFrm.registro.tipoMovimiento}"
+                                  style="color: #b85050; font-weight: bold;"/>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Referencia Externa:</strong>
+                    <p:inputText id="txtRefExterna"
+                                 value="#{despachoFrm.despachoKardexFrm.registro.referenciaExterna}"
+                                 style="width: 100%;"/>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Observaciones:</strong>
+                    <p:inputTextarea id="txtObsKardex"
+                                     value="#{despachoFrm.despachoKardexFrm.registro.observaciones}"
+                                     rows="3"
+                                     style="width: 100%;"/>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong>Lote:</strong>
+                    <p:inputText id="txtLote"
+                                 value="#{despachoFrm.despachoKardexFrm.detalleKardex.lote}"
+                                 style="width: 100%;"/>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: red;">Almacén: *</strong>
+                    <p:selectOneMenu id="cbAlmacenKardex"
+                                     value="#{despachoFrm.despachoKardexFrm.registro.idAlmacen}"
+                                     converter="almacenConverter"
+                                     required="true"
+                                     requiredMessage="Debe seleccionar un almacén"
+                                     style="width: 100%;">
+                        <f:selectItem itemLabel="-- Seleccione almacén --" itemValue="#{null}"/>
+                        <f:selectItems value="#{despachoFrm.despachoKardexFrm.listaAlmacenes}"
+                                       var="alm"
+                                       itemLabel="#{alm.observaciones}"
+                                       itemValue="#{alm}"/>
+                    </p:selectOneMenu>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px; padding: 10px; border-top: 1px solid #ddd;">
+                <p:commandButton value="Despachar Producto"
+                                 icon="pi pi-save"
+                                 styleClass="ui-button-success"
+                                 actionListener="#{despachoFrm.despachoKardexFrm.btnRecibirHandler}"
+                                 update=":messagesGlobal tabDespacho:pnlVentaDetalles tabDespacho:pnlProductoDetalle :pnlTabla"
+                                 oncomplete="if(!args.validationFailed) PF('dlgKardex').hide()"/>
+
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 styleClass="ui-button-secondary"
+                                 type="button"
+                                 onclick="PF('dlgKardex').hide();"
+                                 style="margin-left: 10px;"/>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:growl id="messagesGlobal" showDetail="true" life="5000" sticky="false" autoUpdate="true"/>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        (function() {
+            let ws;
+
+            function conectar() {
+                ws = new WebSocket("ws://localhost:9080/JPQL2-1.0-SNAPSHOT/notificadorKardex");
+
+                ws.onmessage = function(event) {
+                    if (event.data === "RELOAD_TABLE") {
+                        console.log("Recargando tabla...");
+
+                        // Recargar SOLO la tabla usando PrimeFaces Ajax
+                        if (typeof PF !== 'undefined') {
+                            PrimeFaces.ajax.Request.handle({
+                                source: 'frmTabla:tabla',
+                                process: '@this',
+                                update: 'frmTabla:tabla',
+                                oncomplete: function(xhr, status, args) {
+                                    console.log("Tabla actualizada exitosamente");
+                                }
+                            });
+                        } else {
+                            // Fallback si PrimeFaces no está disponible
+                            console.warn("PrimeFaces no disponible, recargando página completa");
+                            location.reload();
+                        }
+                    }
+                };
+
+                ws.onopen = function() {
+                    console.log("WebSocket conectado en página de Despacho");
+                };
+
+                ws.onerror = function(error) {
+                    console.error("Error en WebSocket:", error);
+                };
+
+                ws.onclose = function() {
+                    console.log("WebSocket desconectado. Reconectando en 3 segundos...");
+                    setTimeout(conectar, 3000);
+                };
+            }
+
+            window.addEventListener('load', conectar);
+        })();
+        //]]>
+    </script>
+
+</h:body>
+</html>

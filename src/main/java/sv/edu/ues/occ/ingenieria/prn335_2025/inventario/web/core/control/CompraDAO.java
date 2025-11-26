@@ -111,4 +111,22 @@ public class CompraDAO extends InventarioDefaultDataAccess<Compra> implements Se
             }
         }
     }
+    public List<Compra> findByEstado(String estado) {
+        return em.createQuery("SELECT c FROM Compra c WHERE c.estado = :estado", Compra.class)
+                .setParameter("estado", estado)
+                .getResultList();
+    }
+    public void actualizarEstado(Long idCompra, String nuevoEstado) {
+        try {
+            Compra compra = em.find(Compra.class, idCompra);
+            if (compra != null) {
+                compra.setEstado(nuevoEstado);
+                em.merge(compra);
+            }
+        } catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,
+                    "Error al actualizar estado de compra", e);
+            throw new RuntimeException("No se pudo actualizar el estado de la compra", e);
+        }
+    }
 }

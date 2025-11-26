@@ -27,6 +27,7 @@ import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Producto
 @Named("ventaDetalleFrm")
 @ViewScoped
 public class VentaDetalleFrm extends DefaultFrm<VentaDetalle> implements Serializable {
+    protected UUID idVenta;
 
     private static final Logger LOGGER = Logger.getLogger(VentaDetalleFrm.class.getName());
 
@@ -68,6 +69,12 @@ public class VentaDetalleFrm extends DefaultFrm<VentaDetalle> implements Seriali
             this.ventasDisponibles = new ArrayList<>();
             this.productosDisponibles = new ArrayList<>();
         }
+    }
+    public UUID getIdVenta() {
+        return idVenta;
+    }
+    public void setIdVenta(UUID idVenta) {
+        this.idVenta = idVenta;
     }
 
 

@@ -38,7 +38,7 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
 
     @Inject
     private ProductoDAO productoDao;
-
+    protected Long idCompra;
     // Listas para los selectOneMenu
     private List<Compra> comprasDisponibles;
     private List<Producto> productosDisponibles;
@@ -190,6 +190,13 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
             return null;
         }
     }
+    public Long getIdCompra() {
+        return idCompra;
+    }
+
+    public void setIdCompra(Long idCompra) {
+        this.idCompra = idCompra;
+    }
 
     @Override
     public void btnGuardarHandler(jakarta.faces.event.ActionEvent actionEvent) {
@@ -289,6 +296,7 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
                             "Ocurrió un error: " + e.getMessage()));
         }
     }
+
 
 
     // ---------------------- Getters para JSF ----------------------

@@ -8,22 +8,22 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDAO;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.NotificadorKardex;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProveedorDAO;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.*;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Proveedor;
 
 @Named("compraFrm")
 @ViewScoped
 public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
+    @Inject
+    CompraDetalleDAO compraDetalleDAO;
 
     @Inject
     private CompraDAO compraDao;
@@ -245,5 +245,11 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Error", "No se pudo cerrar la compra: " + e.getMessage()));
         }
+    }
+    public BigDecimal getTotalCompra(Compra compra) {
+        if (compra != null && compra.getId() != null) {
+            return compraDetalleDAO.obtenerTotalCompra(compra.getId());
+        }
+        return BigDecimal.ZERO;
     }
 }

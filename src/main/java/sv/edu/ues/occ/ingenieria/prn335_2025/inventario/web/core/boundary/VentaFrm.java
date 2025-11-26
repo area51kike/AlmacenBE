@@ -7,14 +7,12 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.NotificadorKardex;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.VentaDAO;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ClienteDAO;
-import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.InventarioDefaultDataAccess;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.*;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Venta;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Cliente;
 
@@ -27,6 +25,8 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
 
     @Inject
     private ClienteDAO clienteDao;
+    @Inject
+    VentaDetalleDAO ventaDetalleDAO;
 
     @Inject
     private NotificadorKardex notificadorKardex;
@@ -286,6 +286,12 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Error", "No se pudo anular la venta: " + e.getMessage()));
         }
+    }
+    public BigDecimal getTotalVenta(Venta venta) {
+        if (venta != null && venta.getId() != null) {
+            return ventaDetalleDAO.obtenerTotalVenta(venta.getId());
+        }
+        return BigDecimal.ZERO;
     }
 
     public List<Cliente> getClientesDisponibles() {
