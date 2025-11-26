@@ -168,6 +168,19 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
 
         return fallo;
     }
+    public List<CompraDetalle> cargarDatos(int first, int max) {
+        try {
+            if (idCompra != null) {
+                LOGGER.log(Level.INFO, "Cargando detalles para compra ID: {0}", idCompra);
+                return compraDetalleDao.findByIdCompra(idCompra);
+            } else {
+                LOGGER.log(Level.WARNING, "idCompra es null, retornando lista vacía");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error cargando detalles de compra", e);
+        }
+        return List.of();
+    }
 
     // ---------------------- Manejo de Guardado y Sincronización de FK ----------------------
 
@@ -180,6 +193,8 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
             return null;
         }
     }
+
+
 
     private Producto obtenerProductoCompleto(UUID id) {
         if (id == null) return null;

@@ -306,11 +306,16 @@
                                      required="true"
                                      requiredMessage="Debe seleccionar un almacén"
                                      style="width: 100%;">
-                        <f:selectItem itemLabel="-- Seleccione almacén --" itemValue="#{null}"/>
+                        <f:selectItem itemLabel="-- Seleccione almacén --"
+                                      itemValue="#{null}"
+                                      noSelectionOption="true"/> <!-- AÑADE noSelectionOption -->
                         <f:selectItems value="#{recepcionFrm.recepcionKardexFrm.listaAlmacenes}"
                                        var="alm"
                                        itemLabel="#{alm.observaciones}"
                                        itemValue="#{alm}"/>
+                        <p:ajax event="change"
+                                listener="#{recepcionFrm.recepcionKardexFrm.onAlmacenChange}"
+                                update="@this"/>
                     </p:selectOneMenu>
                 </div>
             </div>
