@@ -14,13 +14,13 @@ class EstadoCompraTest {
 
         // 2. Prueba el método valueOf() (cubre la conversión de String a Enum)
         // Probamos con uno de los valores reales
-        EstadoCompra estado = EstadoCompra.valueOf("ORDEN");
-        assertEquals(EstadoCompra.ORDEN, estado);
+        EstadoCompra estado = EstadoCompra.valueOf("CREADA");
+        assertEquals(EstadoCompra.CREADA, estado);
 
         // Opcional: Probar todos para asegurar existencia
         assertEquals(EstadoCompra.CREADA, EstadoCompra.valueOf("CREADA"));
-        assertEquals(EstadoCompra.APROBADA, EstadoCompra.valueOf("APROBADA"));
-        assertEquals(EstadoCompra.RECHAZADA, EstadoCompra.valueOf("RECHAZADA"));
         assertEquals(EstadoCompra.ANULADA, EstadoCompra.valueOf("ANULADA"));
+        assertEquals(EstadoCompra.RECIBIDA, EstadoCompra.valueOf("RECIBIDA"));
+        assertEquals(EstadoCompra.PAGADA, EstadoCompra.valueOf("PAGADA"));
     }
 }
