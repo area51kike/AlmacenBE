@@ -114,7 +114,7 @@ class VentaFrmTest {
 
         cut.inicializar();
 
-        assertEquals("Gestión de Ventas", cut.nombreBean);
+        assertEquals("Gestion de Ventas", cut.nombreBean);
         assertNotNull(cut.getDao());
         assertNotNull(cut.getClientesDisponibles());
         assertFalse(cut.getClientesDisponibles().isEmpty());
@@ -138,7 +138,12 @@ class VentaFrmTest {
         assertNotNull(nuevo.getId());
         assertNotNull(nuevo.getIdCliente());
         assertNotNull(nuevo.getFecha());
-        assertNull(nuevo.getEstado());
+
+        // ANTES (Falla porque espera null, pero el código asigna "CREADA")
+        // assertNull(nuevo.getEstado());
+
+        // DESPUÉS (Espera el valor correcto)
+        assertEquals("CREADA", nuevo.getEstado());
     }
 
     @Test

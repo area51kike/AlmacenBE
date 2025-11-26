@@ -65,6 +65,7 @@ public class KardexFrm extends DefaultFrm<Kardex> implements Serializable {
     public void inicializar() {
         super.inicializar();
         cargarDatosFiltros();
+        this.pageSize = 6;
         this.nombreBean = "Gestión de Kardex";
         LOGGER.log(Level.INFO, "KardexFrm inicializado correctamente");
     }

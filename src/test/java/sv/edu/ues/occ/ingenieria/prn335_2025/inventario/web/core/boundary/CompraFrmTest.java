@@ -3,6 +3,7 @@ package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.CompraDAO;
+import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.NotificadorKardex;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.control.ProveedorDAO;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.entity.Proveedor;
@@ -36,6 +37,9 @@ class CompraFrmTest {
 
     @Mock
     FacesContext facesContext;
+
+    @Mock
+    NotificadorKardex notificadorKardex;
 
     @InjectMocks
     CompraFrm cut;
@@ -218,13 +222,22 @@ class CompraFrmTest {
 
     @Test
     void testBtnGuardarHandler_Modificar_Exito() {
+        // ARRANGE
         setEstado(cut, "MODIFICAR");
+
+        // 1. Mockear la llamada de validación a CompraDAO
+        doNothing().when(compraDao).validarProveedor(10);
+
+        // 2. Mockear la carga del proveedor
         when(proveedorDao.findById(10)).thenReturn(mockProveedor);
 
+        // ACT
         cut.btnGuardarHandler(null);
 
+        // ASSERT
         verify(compraDao).validarProveedor(10);
         verify(compraDao).modificar(mockCompra);
+        verify(notificadorKardex).notificarCambio("RELOAD_TABLE"); // Verificar notificación
         verify(facesContext).addMessage(isNull(), argThat(m ->
                 m.getSeverity() == FacesMessage.SEVERITY_INFO && m.getDetail().contains("guardado correctamente")
         ));

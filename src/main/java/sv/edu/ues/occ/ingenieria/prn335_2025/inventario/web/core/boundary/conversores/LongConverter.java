@@ -1,15 +1,10 @@
-package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.converter;
+package sv.edu.ues.occ.ingenieria.prn335_2025.inventario.web.core.boundary.conversores;
 
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.ConverterException;
 import jakarta.faces.convert.FacesConverter;
-
-/**
- * Converter JSF para manejar conversiones entre String y Long.
- * Útil para IDs de tipo Long en selectOneMenu.
- */
 @FacesConverter(value = "longConverter")
 public class LongConverter implements Converter<Long> {
 
