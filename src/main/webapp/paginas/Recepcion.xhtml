@@ -8,6 +8,123 @@
     <meta charset="UTF-8"/>
     <h:outputStylesheet library="estilos" name="disenoAlmacen.css"/>
     <title>#{msg['recepcion.titulo']}</title>
+    <style>
+        /* Estilos para el diálogo Kardex mejorado */
+        .kardex-dialog .ui-dialog-titlebar {
+            background: linear-gradient(135deg, #20c997 0%, #0ca678 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .kardex-container {
+            background: #f8f9fa;
+            padding: 15px;
+        }
+
+        .kardex-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .kardex-field {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 3px solid #20c997;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .kardex-field-full {
+            grid-column: 1 / -1;
+        }
+
+        .kardex-label {
+            display: block;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: #495057;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .kardex-value {
+            font-size: 0.95em;
+            color: #212529;
+            font-weight: 500;
+        }
+
+        .kardex-tipo-movimiento {
+            background: #d3f9e8;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            font-weight: 600;
+            color: #0ca678;
+        }
+
+        .kardex-input .ui-inputtext,
+        .kardex-input .ui-selectonemenu {
+            width: 100%;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 0.9em;
+        }
+
+        .kardex-input .ui-inputtext:focus,
+        .kardex-input .ui-selectonemenu:focus {
+            border-color: #20c997;
+            box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.1);
+        }
+
+        .kardex-required {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .kardex-footer {
+            background: white;
+            padding: 12px 15px;
+            border-top: 2px solid #e9ecef;
+            text-align: center;
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .kardex-btn-primary {
+            background: linear-gradient(135deg, #20c997 0%, #0ca678 100%);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 2px 8px rgba(32, 201, 151, 0.3);
+        }
+
+        .kardex-btn-primary:hover {
+            background: linear-gradient(135deg, #1ab386 0%, #099268 100%);
+            box-shadow: 0 4px 12px rgba(32, 201, 151, 0.4);
+        }
+
+        .kardex-btn-secondary {
+            background: #6c757d;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .kardex-btn-secondary:hover {
+            background: #5a6268;
+        }
+    </style>
 </h:head>
 <h:body>
     <!-- Traductor -->
@@ -233,107 +350,121 @@
         </div>
     </div>
 
-    <!-- ========== DIÁLOGO KARDEX ========== -->
+    <!-- ========== DIÁLOGO KARDEX REDISEÑADO ========== -->
     <p:dialog header="Recibir Producto en Kardex"
               id="dlgKardex"
               widgetVar="dlgKardex"
               modal="true"
-              width="600"
+              width="700"
               showEffect="fade"
               closeOnEscape="true"
-              resetValues="true">
+              resetValues="true"
+              styleClass="kardex-dialog">
         <h:form id="frmKardex">
-            <div style="padding: 20px;">
-                <div style="margin-bottom: 15px;">
-                    <strong>Producto:</strong>
-                    <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.idProducto.nombreProducto}"/>
-                </div>
+            <div class="kardex-container">
+                <!-- Grid de 2 columnas -->
+                <div class="kardex-grid">
+                    <!-- Producto -->
+                    <div class="kardex-field kardex-field-full">
+                        <span class="kardex-label">Producto</span>
+                        <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.idProducto.nombreProducto}"
+                                      styleClass="kardex-value"/>
+                    </div>
 
-                <div style="margin-bottom: 15px;">
-                    <strong>Cantidad:</strong>
-                    <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.cantidad}">
-                        <f:convertNumber pattern="#,##0.00"/>
-                    </h:outputText>
-                </div>
+                    <!-- Cantidad -->
+                    <div class="kardex-field">
+                        <span class="kardex-label">Cantidad</span>
+                        <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.cantidad}"
+                                      styleClass="kardex-value">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                    </div>
 
-                <div style="margin-bottom: 15px;">
-                    <strong>Precio:</strong>
-                    <h:outputText value="$ #{recepcionFrm.recepcionKardexFrm.registro.precio}">
-                        <f:convertNumber pattern="#,##0.00"/>
-                    </h:outputText>
-                </div>
+                    <!-- Precio -->
+                    <div class="kardex-field">
+                        <span class="kardex-label">Precio</span>
+                        <h:outputText value="$ #{recepcionFrm.recepcionKardexFrm.registro.precio}"
+                                      styleClass="kardex-value">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                    </div>
 
-                <div style="margin-bottom: 15px;">
-                    <strong>Fecha de Recepción:</strong>
-                    <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.fecha}">
-                        <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
-                    </h:outputText>
-                </div>
+                    <!-- Fecha -->
+                    <div class="kardex-field">
+                        <span class="kardex-label">Fecha de Recepción</span>
+                        <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.fecha}"
+                                      styleClass="kardex-value">
+                            <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
+                        </h:outputText>
+                    </div>
 
-                <div style="margin-bottom: 15px;">
-                    <strong>Tipo Movimiento:</strong>
-                    <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.tipoMovimiento}"
-                                  style="color: green; font-weight: bold;"/>
-                </div>
+                    <!-- Tipo Movimiento -->
+                    <div class="kardex-field">
+                        <span class="kardex-label">Tipo Movimiento</span>
+                        <h:outputText value="#{recepcionFrm.recepcionKardexFrm.registro.tipoMovimiento}"
+                                      styleClass="kardex-tipo-movimiento"/>
+                    </div>
 
-                <div style="margin-bottom: 15px;">
-                    <strong>Referencia Externa:</strong>
-                    <p:inputText id="txtRefExterna"
-                                 value="#{recepcionFrm.recepcionKardexFrm.registro.referenciaExterna}"
-                                 style="width: 100%;"/>
-                </div>
+                    <!-- Referencia Externa -->
+                    <div class="kardex-field kardex-field-full kardex-input">
+                        <span class="kardex-label">Referencia Externa</span>
+                        <p:inputText id="txtRefExterna"
+                                     value="#{recepcionFrm.recepcionKardexFrm.registro.referenciaExterna}"/>
+                    </div>
 
-                <div style="margin-bottom: 15px;">
-                    <strong>Observaciones:</strong>
-                    <p:inputTextarea id="txtObsKardex"
-                                     value="#{recepcionFrm.recepcionKardexFrm.registro.observaciones}"
-                                     rows="3"
-                                     style="width: 100%;"/>
-                </div>
+                    <!-- Observaciones -->
+                    <div class="kardex-field kardex-field-full kardex-input">
+                        <span class="kardex-label">Observaciones</span>
+                        <p:inputTextarea id="txtObsKardex"
+                                         value="#{recepcionFrm.recepcionKardexFrm.registro.observaciones}"
+                                         rows="2"
+                                         style="width: 100%;"/>
+                    </div>
 
-                <div style="margin-bottom: 15px;">
-                    <strong>Lote:</strong>
-                    <p:inputText id="txtLote"
-                                 value="#{recepcionFrm.recepcionKardexFrm.detalleKardex.lote}"
-                                 style="width: 100%;"/>
-                </div>
+                    <!-- Lote -->
+                    <div class="kardex-field kardex-input">
+                        <span class="kardex-label">Lote</span>
+                        <p:inputText id="txtLote"
+                                     value="#{recepcionFrm.recepcionKardexFrm.detalleKardex.lote}"/>
+                    </div>
 
-                <div style="margin-bottom: 15px;">
-                    <strong style="color: red;">Almacén: *</strong>
-                    <p:selectOneMenu id="cbAlmacenKardex"
-                                     value="#{recepcionFrm.recepcionKardexFrm.registro.idAlmacen}"
-                                     converter="almacenConverter"
-                                     required="true"
-                                     requiredMessage="Debe seleccionar un almacén"
-                                     style="width: 100%;">
-                        <f:selectItem itemLabel="-- Seleccione almacén --"
-                                      itemValue="#{null}"
-                                      noSelectionOption="true"/> <!-- AÑADE noSelectionOption -->
-                        <f:selectItems value="#{recepcionFrm.recepcionKardexFrm.listaAlmacenes}"
-                                       var="alm"
-                                       itemLabel="#{alm.observaciones}"
-                                       itemValue="#{alm}"/>
-                        <p:ajax event="change"
-                                listener="#{recepcionFrm.recepcionKardexFrm.onAlmacenChange}"
-                                update="@this"/>
-                    </p:selectOneMenu>
+                    <!-- Almacén -->
+                    <div class="kardex-field kardex-input">
+                        <span class="kardex-label kardex-required">Almacén *</span>
+                        <p:selectOneMenu id="cbAlmacenKardex"
+                                         value="#{recepcionFrm.recepcionKardexFrm.registro.idAlmacen}"
+                                         converter="almacenConverter"
+                                         required="true"
+                                         requiredMessage="Debe seleccionar un almacén">
+                            <f:selectItem itemLabel="-- Seleccione almacén --"
+                                          itemValue="#{null}"
+                                          noSelectionOption="true"/>
+                            <f:selectItems value="#{recepcionFrm.recepcionKardexFrm.listaAlmacenes}"
+                                           var="alm"
+                                           itemLabel="#{alm.observaciones}"
+                                           itemValue="#{alm}"/>
+                            <p:ajax event="change"
+                                    listener="#{recepcionFrm.recepcionKardexFrm.onAlmacenChange}"
+                                    update="@this"/>
+                        </p:selectOneMenu>
+                    </div>
                 </div>
             </div>
 
-            <div style="text-align: center; margin-top: 20px; padding: 10px; border-top: 1px solid #ddd;">
+            <!-- Footer con botones -->
+            <div class="kardex-footer">
                 <p:commandButton value="Recibir Producto"
-                                 icon="pi pi-save"
-                                 styleClass="ui-button-success"
+                                 icon="pi pi-check-circle"
+                                 styleClass="kardex-btn-primary"
                                  actionListener="#{recepcionFrm.recepcionKardexFrm.btnRecibirHandler}"
                                  update=":messagesGlobal tabRecepcion:pnlCompraDetalles tabRecepcion:pnlProductoDetalle :pnlTabla"
                                  oncomplete="if(!args.validationFailed) PF('dlgKardex').hide()"/>
 
                 <p:commandButton value="Cancelar"
-                                 icon="pi pi-times"
-                                 styleClass="ui-button-secondary"
+                                 icon="pi pi-times-circle"
+                                 styleClass="kardex-btn-secondary"
                                  type="button"
-                                 onclick="PF('dlgKardex').hide();"
-                                 style="margin-left: 10px;"/>
+                                 onclick="PF('dlgKardex').hide();"/>
             </div>
         </h:form>
     </p:dialog>
@@ -351,7 +482,6 @@
                     if (event.data === "RELOAD_TABLE") {
                         console.log("Recargando tabla...");
 
-                        // Recargar SOLO la tabla usando PrimeFaces Ajax
                         if (typeof PF !== 'undefined') {
                             PrimeFaces.ajax.Request.handle({
                                 source: 'frmTabla:tabla',
@@ -362,7 +492,6 @@
                                 }
                             });
                         } else {
-                            // Fallback si PrimeFaces no está disponible
                             console.warn("PrimeFaces no disponible, recargando página completa");
                             location.reload();
                         }

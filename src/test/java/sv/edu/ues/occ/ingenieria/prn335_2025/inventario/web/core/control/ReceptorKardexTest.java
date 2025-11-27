@@ -141,6 +141,7 @@ class ReceptorKardexTest {
         // Assert
         verify(textMessage).getText();
     }
+    // Auxiliar para la relación con Kardex (String para evitar error de conversión)
 
     @Test
     void onMessage_deberiaLlamarGetTextSoloUnaVez() throws JMSException {
